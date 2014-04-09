@@ -1,0 +1,82 @@
+body {
+	text-align: center;
+	margin: 0 auto; 
+}
+
+th,td {
+	padding: 5px;
+	border: 1px solid #ccc;
+	text-align: center;
+}
+
+th {
+	background-color: #eee
+}
+
+h1 {
+	
+}
+
+/**********header***********/
+#header {
+	width:100%;
+}
+
+
+
+
+
+/**********calendar***********/
+#prev {
+	display: inline;
+	/*float: left;*/
+	margin-top: 20px;
+	/*margin-left: 30px;*/
+}
+
+#next {
+	display: inline;
+	/*float: right;*/
+	margin-top: 20px;
+	/*margin-right: 30px;*/
+}
+
+#calendar {
+	margin-top: 30px;
+}
+
+#main_calendar {
+	display: inline-block;
+	vertical-align: top;
+	margin: 30px;
+}
+
+#prev_calendar {
+	display: inline-block;
+	vertical-align: top;
+	margin: 30px;
+
+}
+
+#next_calendar {
+	display: inline-block;
+	vertical-align: top;
+	margin: 30px;
+
+}
+
+.today {
+	background-color: #FFCC66;
+}
+
+.saturday {
+	background-color: #E0FFFF;
+}
+
+
+.sunday {
+	background-color: #FFA07A;
+	/*color: blue;*/
+}
+
+/**********footer***********/
