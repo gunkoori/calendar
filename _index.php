@@ -16,11 +16,15 @@ $prev = date("Y-n", mktime(0, 0, 0, $now_month-1, 1, $now_year));
 $now = date("Y-n", mktime(0, 0, 0, $now_month, 1, $now_year));
 $next = date("Y-n", mktime(0, 0, 0, $now_month+1, 1, $now_year));
 
-// Y-nを60コ取得
-for ($i=-50; $i<=10; $i++) {
-  $months[] = date("Y-n", mktime(0, 0, 0, $now_month+($i), 1, $now_year));
+
+//$ym = isset($_GET['ym']) ? $_GET['ym'] : date("Y-m");
+/*
+$timeStamp = strtotime($ym . "-01");
+print_r($timeStamp);
+if ($timeStamp === false) {
+  $timeStamp = time();
 }
-// print_r($months);
+*/
 
 $now_day = date("j"); //現在の日を取得
 
@@ -52,17 +56,29 @@ $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
   <body>
     <div id="header">
       <h3>郡カレンダー</h3>
-      <div id="prev"><a href="?ym=<?php echo $prev;?>">前の月</a></div>
-      <div id="next"><a href="?ym=<?php echo $next;?>">次の月</a></div>
+      <div id="prev"><a href="?select=prev&ym=<?php echo $prev;?>">前の月</a></div>
+      <div id="next"><a href="?select=next&ym=<?php echo $next;?>">次の月</a></div>
 
       <form id="" name="" method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
-        <select name="ym">
-          <?php for ($i=0; $i<=69; $i++):?>
-          <option id="select_year_month" value="<?php echo $months["$i"] ;?>"><?php echo $months["$i"] ;?></option>
+        <select name="select=prev">
+          <?php for ($i=1990; $i<=$now_year; $i++):?>
+          <option id="select_year" value="<?php echo $i ;?>"><?php echo $i."年" ;?></option>
           <?php endfor; ?>
         </select>
+
+        <select name="month">
+          <?php for ($i=1; $i<=12; $i++): ?>
+          <option id="select_month" value="<?php echo $i ;?>"><?php echo $i."月" ;?></option>
+          <?php endfor; ?>
+        </select>
+        
+        <!-- <button class="change_calendar">変更</button> -->
+        <!-- <input type="hidden" value="prev"> -->
+        <!-- <input type="hidden" value="ym"> -->
+        <!-- <a href="?select=prev&ym=<?php echo $_POST['year']."-".$_POST['month'];?>">-->
         <input type="submit" value="表示する">
       </form>
+      <?php //print_r($_POST);?>
       <?php //print_r($_GET); ?>
     </div>
 
@@ -75,10 +91,12 @@ $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
                   if (!isset($_GET['ym'])) {
                     echo $prev;
                   }
-                  else {
+                  elseif (isset($_GET['select']) && $_GET['select'] == "prev") {
                     echo $prev;
                   }
-                  
+                  elseif (isset($_GET['select']) && $_GET['select'] == "next") {
+                    echo $prev;
+                  }
                 ?>
               </th>
           </tr>
@@ -146,9 +164,11 @@ $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
                   if (!isset($_GET['ym'])) {
                     echo $now;
                   }
-                  else {
+                  elseif (isset($_GET['select']) && $_GET['select'] == "prev") {
                     echo $now;
-                  
+                  }
+                  elseif (isset($_GET['select']) && $_GET['select'] == "next") {
+                    echo $now;
                   }
                 ?>
               </th>
@@ -218,9 +238,11 @@ $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
                   if (!isset($_GET['ym'])) {
                     echo $next;
                   }
-                  else {
+                  elseif (isset($_GET['select']) && $_GET['select'] == "prev") {
                     echo $next;
-                  
+                  }
+                  elseif (isset($_GET['select']) && $_GET['select'] == "next") {
+                    echo $next;
                   }
                 ?>
               </th>
