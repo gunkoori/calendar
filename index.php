@@ -7,6 +7,9 @@ if(isset($_GET['ym']))
   $now_year  = date('Y',strtotime($_GET['ym'].'-1'));
   $now_month = date('n',strtotime($_GET['ym'].'-1'));
 }
+$now = time();
+$today = getdate($now);
+// print_r($today);
 
 $prev_month = $now_month - 1;
 $next_month = $now_month + 1;
@@ -188,7 +191,7 @@ if($results=file_get_contents($holidays_url)) {
               for ($i=1; $i<=$wd1; $i++) {
                   echo "<td></td>";
               }
-            	while (checkdate($now_month, $start_day, $now_year)) {
+                while (checkdate($now_month, $start_day, $now_year)) {
 
                 $now_month_weekend=date("w", mktime(0, 0, 0, $now_month, $start_day, $now_year));
                 switch( $now_month_weekend ){
