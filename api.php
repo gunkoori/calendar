@@ -2,8 +2,8 @@
 $holidays_url = sprintf(
     'http://74.125.235.142/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json' ,
     'outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com' ,
-    '2010-04-01',    // 取得開始日
-    '2015-03-31',    // 取得終了日
+    '2012-01-01',    // 取得開始日
+    '2014-12-31',    // 取得終了日
     100                // 最大取得数
 );
 

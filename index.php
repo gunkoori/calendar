@@ -7,7 +7,6 @@ if(isset($_GET['ym']))
   $now_month = date("n",strtotime($_GET['ym'].'-1'));
 }
 
-
 $prev_month = $now_month - 1;
 $next_month = $now_month + 1;
 
@@ -16,8 +15,8 @@ $prev = date("Y-n", mktime(0, 0, 0, $now_month-1, 1, $now_year));
 $now = date("Y-n", mktime(0, 0, 0, $now_month, 1, $now_year));
 $next = date("Y-n", mktime(0, 0, 0, $now_month+1, 1, $now_year));
 
-// Y-nを60コ取得
-for ($i=-50; $i<=10; $i++) {
+// Y-nを取得。$now_yeaeの前後1年
+for ($i=-12; $i<=12; $i++) {
   $months[] = date("Y-n", mktime(0, 0, 0, $now_month+($i), 1, $now_year));
 }
 // print_r($months);
@@ -38,6 +37,30 @@ $prev_wdx = date("w", mktime(0, 0, 0, $prev_month + 1, 0, $now_year));
 $next_wd1 = date("w", mktime(0, 0, 0, $next_month, 1, $now_year)); //1日の曜日を数値で取得
 $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
 
+
+/*Google Calendar API*/
+$last_year = date("Y-01-01", mktime(0, 0, 0, $now_month, 1, $now_year-1)); //今から1年前
+$next_year = date("Y-12-31", mktime(0, 0, 0, $now_month, 1, $now_year+1)); //今から1年後
+
+$holidays_url = sprintf(
+    "http://74.125.235.142/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json",
+    "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com",
+    "$last_year",    // 取得開始日
+    "$next_year",    // 取得終了日
+    100                // 最大取得数
+);
+
+if($results=file_get_contents($holidays_url)) {
+    $results = json_decode($results, true);
+    $holidays = array();
+    foreach($results['feed']['entry'] as $val) {
+        $date = $val['gd$when'][0]['startTime']; // 日付を取得
+        $title = $val['title']['$t']; // 何の日かを取得
+        $holidays[$date] = $title; // 日付をキーに、祝日名を値に格納
+    }
+    ksort($holidays); // 日付順にソート
+}
+print_r($holidays);
 ?>
 
 <!DOCTYPE html>
@@ -103,13 +126,13 @@ $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
               while (checkdate($prev_month, $prev_month_day, $now_year)) {
                 $prev_month_weekend=date("w", mktime(0, 0, 0, $prev_month, $prev_month_day, $now_year));
                 switch( $prev_month_weekend ){
-                  case 0: //日曜日の文字色
+                  case 0: //日曜日の色
                       echo '<td class="sunday">'.$prev_month_day.'</td>';
                       break;
-                  case 6: //土曜日の文字色
+                  case 6: //土曜日の色
                       echo '<td class="saturday">'.$prev_month_day.'</td>' ;
                       break;
-                  default: //月～金曜日の文字色
+                  default: //月～金曜日の色
                       if ($prev_month_day == $now_day && $prev == date('Y-n')) {
                         echo '<td class="today">'.$prev_month_day.'</td>';
                         break;
@@ -175,13 +198,13 @@ $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
                 
                 $now_month_weekend=date("w", mktime(0, 0, 0, $now_month, $start_day, $now_year));
                 switch( $now_month_weekend ){
-                  case 0: //日曜日の文字色
+                  case 0: //日曜日の色
                       echo '<td class="sunday">'.$start_day.'</td>';
                       break;
-                  case 6: //土曜日の文字色
+                  case 6: //土曜日の色
                       echo '<td class="saturday">'.$start_day.'</td>' ;
                       break;
-                  default: //月～金曜日の文字色
+                  default: //月～金曜日の色
                       if ($start_day == $now_day && $now == date('Y-n')) {
                         echo '<td class="today">'.$start_day.'</td>';
                         break;
@@ -247,13 +270,13 @@ $next_wdx = date("w", mktime(0, 0, 0, $next_month + 1, 0, $now_year));
                 
                 $next_month_weekend=date("w", mktime(0, 0, 0, $next_month, $next_month_day, $now_year));
                 switch( $next_month_weekend ){
-                  case 0: //日曜日の文字色
+                  case 0: //日曜日の色
                       echo '<td class="sunday">'.$next_month_day.'</td>';
                       break;
-                  case 6: //土曜日の文字色
+                  case 6: //土曜日の色
                       echo '<td class="saturday">'.$next_month_day.'</td>' ;
                       break;
-                  default: //月～金曜日の文字色
+                  default: //月～金曜日の色
                       if ($next_month_day == $now_day && $next == date('Y-n')) {
                         echo '<td class="today">'.$next_month_day.'</td>';
                         break;
