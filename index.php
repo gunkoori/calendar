@@ -171,7 +171,6 @@ if($results=file_get_contents($holidays_url)) {
                   <?php for ($i = 1; $i < 7 -$wdx; $i++) :?>
                       <td></td>
                   <?php endfor ;?>
-                ?>
             </tbody>
         </table>
         <?php //endfor ;?>
