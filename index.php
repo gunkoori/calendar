@@ -4,7 +4,8 @@ $now = time();
 $today = getdate($now);
 $year = $today['year'];
 $month = $today['mon'];
-$d = date('t');
+$start_day = 1;
+$end_day = date('t');
 
 if (isset($_GET['ym'])) {
     $year = date('Y',strtotime($_GET['ym'].'-1'));
@@ -12,10 +13,20 @@ if (isset($_GET['ym'])) {
 }
 // print_r($year);
 
-$this_month = strtotime($year.$month.'01');
-print_r($this_month);
+//今月
+$this_month = strtotime($year.$month.'1');//1397646881
 
+//先月
+$last_month = array(
+  'year' => date('Y', strtotime('last month', $this_month)),
+  'month' => date('n', strtotime('last month', $this_month))
+);
 
+//来月
+$next_month = array(
+  'year' => date('Y', strtotime('next month', $this_month)),
+  'month' => date('n', strtotime('next month', $this_month))
+);
 
 //先月
 // $last_month = date('m', strtotime('last month', $month));
@@ -33,8 +44,7 @@ if(isset($_GET['ym']))
 }
 */
 
-$prev_month = $month - 1;
-$next_month = $month + 1;
+
 $next_next_month = $prev_month+2;
 
 //前月、翌月リンク
@@ -47,7 +57,6 @@ for ($i=-12; $i<=12; $i++) {
     $months[] = date('Y-n', mktime(0, 0, 0, $month+($i), 1, $year));
 }
 
-$start_day      = 1;
 $prev_month_day = 1;
 $next_month_day = 1;
 
@@ -89,100 +98,101 @@ if($results=file_get_contents($holidays_url)) {
 
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
+<head>
+<meta charset="utf-8">
+<title></title>
+<link href="calendar.css" rel="stylesheet">
+</head>
+<body>
+<div id="header">
+<h3>郡カレンダー</h3>
+<div id="prev"><a href="?ym=<?php echo $last_month['year'].'-'.$last_month['month'];?>">先月</a></div>
+<div id="this"><a href="/">今月</a></div>
+<div id="next"><a href="?ym=<?php echo $next_month['year'].'-'.$next_month['month'];?>">来月</a></div>
+<form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
+    <select name="ym">
+    <?php for ($i=0; $i<=24; $i++):?>
+    <option id="select_year_month" value="<?php echo $months[$i] ;?>"><?php echo $months[$i] ;?></option>
+    <?php endfor; ?>
+    </select>
+    <input type="submit" value="表示する">
+</form>
+</div><!--header-->
 
-    <link href="calendar.css" rel="stylesheet">
+<div id="calendar">
+<?php //for($months=$last_month['month']; $months<=$next_month['next_month']; $months++):?>
+<table class="main_calendar">
+    <thead>
+    <tr>
+       <th colspan="7">
+        <?php
+            if (!isset($_GET['ym'])) {
+                echo $now;
+            }
+            else {
+                echo $now;
+            }
+        ?>
+      </th>
+    </tr>
+    <tr>
+    <th class="sunday">日</th>
+    <th>月</th>
+    <th>火</th>
+    <th>水</th>
+    <th>木</th>
+    <th>金</th>
+    <th class="saturday">土</th>
 
-  </head>
-  <body>
-    <div id="header">
-      <h3>郡カレンダー</h3>
-      <div id="prev"><a href="?ym=<?php echo $prev;?>">前の月</a></div>
-      <div id="next"><a href="?ym=<?php echo $next;?>">次の月</a></div>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <!-- 空セル挿入 -->
+    <?php for($i=1; $i<=$wd1; $i++) :?>
+        <td></td>
+    <?php endfor ;?>
 
-        <form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
-            <select name="ym">
-                <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo $months[$i] ;?>"><?php echo $months[$i] ;?></option>
-                <?php endfor; ?>
-            </select>
-            <input type="submit" value="表示する">
-        </form>
-    </div>
+        <?php //while (checkdate($month, $start_day, $year)) :?>
 
-    <div id="calendar">
-        <?php //for($months=$prev_month; $months<=$next_next_month; $months++):?>
-        <table class="main_calendar">
-            <thead>
-              <tr>
-                  <th colspan="7">
-                    <?php
-                      if (!isset($_GET['ym'])) {
-                        echo $now;
-                      }
-                      else {
-                        echo $now;
-                      }
-                    ?>
-                  </th>
-              </tr>
-              <tr>
-                <th class="sunday">日</th>
-                <th>月</th>
-                <th>火</th>
-                <th>水</th>
-                <th>木</th>
-                <th>金</th>
-                <th class="saturday">土</th>
+        <!-- 日付挿入 -->
+        <?php for ($start_day=$start_day; $start_day<=$end_day; $start_day++):?>
+            <?php $month_weekend=date("w", mktime(0, 0, 0, $month, $start_day, $year));?>
+            <!-- 週末 -->
+            <?php if ($month_weekend == 0) :?>
+                <td class="sunday"><?php echo $start_day ;?></td>
+            <?php endif ;?>
+            <?php if ($month_weekend == 6) :?>
+                <td class="saturday"><?php echo $start_day ;?></td></tr>
+            <?php endif ;?>
+            <!-- 週末以外 -->
+            <?php if ($month_weekend != 0 && $month_weekend != 6) :?>
+                <td><?php echo $start_day ;?></td>
+            <?php endif ;?>
+        <?php endfor ;?>
 
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <!-- 空セル挿入 -->
-                <?php for($i=1; $i<=$wd1; $i++) :?>
-                    <td></td>
-                <?php endfor ;?>
-                    <?php while (checkdate($month, $start_day, $year)) :?>
+        <?php //endwhile ;?>
 
-                    <?php for ($start_day=1; $start_day<=$d; $start_day++):?>
-                        <?php $month_weekend=date("w", mktime(0, 0, 0, $month, $start_day, $year));?>
-                        <?php if ($month_weekend == 0) :?>
-                            <td class="sunday"><?php echo $start_day ;?></td>
-                        <?php endif ;?>
-                        <?php if ($month_weekend == 6) :?>
-                            <td class="saturday"><?php echo $start_day ;?></td></tr>
-                        <?php endif ;?>
-                        <?php if ($month_weekend != 0 && $month_weekend != 6) :?>
-                            <td><?php echo $start_day ;?></td>
-                        <?php endif ;?>
+        <!-- 土曜日で改行する -->
+        <?php //if ($month_weekend == 6) :?>
+        <!-- </tr> -->
+        <?php //endif ;?>
+        <!-- 新たな週を準備 -->
+        <?php //if (checkdate($month, $start_day + 1, $year)) :?>
+            <!-- <tr> -->
+        <?php //endif ;?>
 
-                    <?php endfor ;?>
-
-                    <?php endwhile ;?>
-
-                    <!-- 土曜日で改行する -->
-                    <?php //if ($month_weekend == 6) :?>
-                        <!-- </tr> -->
-                    <?php //endif ;?>
-                        <!-- 新たな週を準備 -->
-                        <?php //if (checkdate($month, $start_day + 1, $year)) :?>
-                            <!-- <tr> -->
-                        <?php //endif ;?>
-
-                  <!-- 空セル挿入 -->
-                  <?php for ($i = 1; $i < 7 -$wdx; $i++) :?>
-                      <td></td>
-                  <?php endfor ;?>
-            </tbody>
-        </table>
-        <?php //endfor ;?>
-    </div>
+      <!-- 空セル挿入 -->
+      <?php for ($i = 1; $i < 7 -$wdx; $i++) :?>
+          <td></td>
+      <?php endfor ;?>
+    </tbody>
+</table>
+<?php //endfor ;?>
+</div><!--calendar-->
 
 
-    <div id="footer">
-    </div>
-  </body>
+<div id="footer">
+</div><!--footer-->
+</body>
 </html>

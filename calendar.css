@@ -27,11 +27,20 @@ h1 {
 
 
 /**********calendar***********/
+#this {
+	display: inline;
+	margin-top: 20px;
+	margin-right: 10px;
+	margin-left: 10px;
+	margin-bottom: 20px;
+}
 #prev {
 	display: inline;
 	/*float: left;*/
 	margin-top: 20px;
 	/*margin-left: 30px;*/
+	margin-bottom: 20px;
+
 }
 
 #next {
@@ -39,6 +48,7 @@ h1 {
 	/*float: right;*/
 	margin-top: 20px;
 	/*margin-right: 30px;*/
+	margin-bottom: 20px;
 }
 
 #calendar {
