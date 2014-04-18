@@ -58,8 +58,6 @@ if ($display_count % 2 == 1) {
 for ($i=-12; $i<=12; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month+($i), 1, $year));
 }
-// print_r($months);
-
 
 /*
 * Googlle Calendar API 祝日取得
@@ -93,7 +91,22 @@ if ( $results = file_get_contents($holidays_url) ) {
         ksort($holidays);
 }
 
+$holi = array();
+foreach ($holidays as $date => $holiday) {
+    //print_r($date."<br>");
+    // print_r($holiday."<br>");
+    $days = sprintf('%02d', $date);
+    $holi[$date] = $holiday;
+}
+// print_r($holi);
 
+/*foreach ($holidays as $date => $holiday) {
+    $explode_date  = explode('-', $date);
+    $explode_holidays = explode(' / ', $holiday);
+
+    if ($value.'-'.$days == $explode_date[0].'-'.$explode_date[1].'-'.$explode_date[2]) {
+    }
+}*/
 // var_dump($holidays['2013-04-29']);
 // print_r($holidays);
 
@@ -154,34 +167,55 @@ if ( $results = file_get_contents($holidays_url) ) {
         <!-- 日付挿入 -->
         <?php for ($day=$start_day; $day<=$end_day[$key]; $day++):?>
 
+
+
             <!-- 桁数を揃える -->
-            <?php $days = sprintf('%02d', $day) ; $hoge = $value."-".$days;?>
+            <?php $days = sprintf('%02d', $day) ;?>
+            <?php //$aaa = sprintf('%2d', $days) ; print_r($aaa);?>
             <!-- 週末取得0~6 -->
             <?php $month_weekend=date("w", strtotime($value.'-'.$day));?>
 
                 <!-- 週末 -->
-                <?php if ($month_weekend == 0) :?>
+                <?php if ($month_weekend == 0) :?><!-- 土曜日 -->
                     <td class="sunday"><?php echo $day ;?></td>
-                <?php endif ;?>
 
-                <?php if ($month_weekend == 6) :?>
+                <?php elseif ($month_weekend == 6) :?><!-- 日曜日 -->
                     <td class="saturday"><?php echo $day ;?></td></tr>
-                <?php endif ;?>
 
                 <!-- 週末以外 -->
-                <?php if ($month_weekend != 0 && $month_weekend != 6) :?>
-                    <?php if (date('j') == $day && $year.'-'.$month === $value) :?>
+                <?php elseif ($month_weekend != 0 && $month_weekend != 6) :?><!-- 平日 -->
+
+
+                    <?php foreach ($holidays as $date => $holiday):?>
+                        <?php $explode_date  = explode('-', $date); ?>
+                        <?php $explode_holidays = explode(' / ', $holiday);?>
+                        <!-- 日付と祝日の日付が一致するとき -->
+                        <?php if ($value.'-'.$days == $explode_date[0].'-'.$explode_date[1].'-'.$explode_date[2]): ?>
+                            <td class="sunday"><?php echo $day;?><br /><?php echo $explode_holidays[0]; ?></td>
+                        <?php else:?>
+                            <!-- <td><?php //echo $day;?></td> -->
+                        <?php //break;?>
+                        <?php endif;?>
+                    <?php endforeach;?>
+
+                    <?php if(date('j') == $day && $year.'-'.$month === $value) :?>
                         <td class="today"><?php echo $day;?></td>
                     <?php else :?>
-                        <td><?php echo $day ;?></td>
-                    <?php endif ;?>
+
+                        <td><?php echo $day;?></td>
+                    <?php endif;?>
+
+
                 <?php endif ;?>
+
+
         <?php endfor ;?>
 
         <!-- 空セル挿入 -->
         <?php for ($i=1; $i<(7-$after_cell[$key]); $i++) :?>
             <td></td>
         <?php endfor ;?>
+
     </tbody>
 </table>
 <?php endforeach ;?>
