@@ -17,10 +17,6 @@ $explode_ym = explode('-', $ym);//[0] => 2014 [1] => 5
 $year_of_ym = $explode_ym[0];
 $month_of_ym = $explode_ym[1];
 
-//今月
-$this_month = strtotime($year.'-'.$month.'-01');//1397646881
-$date_this_month = date('Y-n', $this_month);
-
 //先月
 $last_month = array(
   'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
@@ -32,9 +28,6 @@ $next_month = array(
   'month' => date('n', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
-//前後の空セル
-$before = date('w', mktime(0, 0, 0, $month_of_ym, 1, $year_of_ym)); //1日の曜日を数値で取得
-$after  = date('w', mktime(0, 0, 0, $month_of_ym + 1, 0, $year_of_ym));
 
 $prev_month  = $month_of_ym -1;
 $prev_month2 = $month_of_ym -1;
@@ -126,8 +119,8 @@ for ($i=-12; $i<=12; $i++) {
             <?php endif ;?>
             <!-- 週末以外 -->
             <?php if ($month_weekend != 0 && $month_weekend != 6) :?>
-                <?php if (date('n') == $month && $day == $today['mday']) :?>
-                    <td class="today"><?php echo $day ;?></td>
+                <?php if ($today['mday'] === $day && $year.'-'.$month === $value) :?>
+                    <td class="today"><?php echo $day;?></td>
                 <?php else :?>
                     <td><?php echo $day ;?></td>
                 <?php endif ;?>
