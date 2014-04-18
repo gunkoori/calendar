@@ -4,12 +4,8 @@ define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 ini_set("date.timezone", "Asia/Tokyo");
 
 //現在の年月日、曜日の取得
-// $now = time();
-// $today = getdate($now);
-// $year = $today['year'];
 $year = date('Y');
 $month = date('m');
-// print_r($month);
 //月のスタート
 $start_day = 1;
 //カレンダー数
@@ -34,7 +30,6 @@ $next_month = array(
   'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
-
 $prev_month  = $month_of_ym -1;
 $prev_month2 = $month_of_ym -1;
 $prev_month3 = $month_of_ym -1;
@@ -55,26 +50,21 @@ if ($display_count % 2 == 1) {
 }
 
 // Y-nを取得。$now_yeaeの前後1年
-for ($i=-12; $i<=12; $i++) {
+for ($i=-6; $i<=6; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month+($i), 1, $year));
 }
+$min_date = $months[0].'-01';
+$max_date = $months[12].'-01';
 
 /*
 * Googlle Calendar API 祝日取得
 */
-/*if ($_GET['ym'] == $year.'-'.$month) {
-    $ym = $year.'-'.$next_month['month'];
-}
-print_r($_GET['ym']);
-*/
-
-// print_r($ym);
 $holidays_url = sprintf(
         "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
         "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
-        "1970-01-01" ,  // 取得開始日
-        "2015-12-01" ,  // 取得終了日
-        10000             // 最大取得数
+        "$min_date" ,  // 取得開始日
+        "$max_date" ,  // 取得終了日
+        50             // 最大取得数
         );
 if ( $results = file_get_contents($holidays_url) ) {
         $results = json_decode($results, true);
@@ -84,33 +74,22 @@ if ( $results = file_get_contents($holidays_url) ) {
                 $date  = $val['gd$when'][0]['startTime'];
                 $title = $val['title']['$t'];
                 $holidays[$date] = $title;// [2007-01-01] => 元日 / Ganjitsu / New Year's Day
-                // $holidays[$key]= array($date=>$title);
-                // print_r($val);
-
         }
         ksort($holidays);
 }
 
-$holi = array();
+$explode_date = array();
+$explode_holidays = array();
+$holiday_list = array();
+$date_list = array();
 foreach ($holidays as $date => $holiday) {
-    //print_r($date."<br>");
-    // print_r($holiday."<br>");
-    $days = sprintf('%02d', $date);
-    $holi[$date] = $holiday;
-}
-// print_r($holi);
-
-/*foreach ($holidays as $date => $holiday) {
-    $explode_date  = explode('-', $date);
-    $explode_holidays = explode(' / ', $holiday);
-
-    if ($value.'-'.$days == $explode_date[0].'-'.$explode_date[1].'-'.$explode_date[2]) {
+    $explode_date[]  = explode('-', $date);
+    $explode_holidays[] = explode(' / ', $holiday);
+    $date_list[] = $date;
+    foreach ($explode_holidays as $key => $value) {
+        $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
     }
-}*/
-// var_dump($holidays['2013-04-29']);
-// print_r($holidays);
-
-
+}
 ?>
 
 <!DOCTYPE html>
@@ -167,60 +146,41 @@ foreach ($holidays as $date => $holiday) {
         <!-- 日付挿入 -->
         <?php for ($day=$start_day; $day<=$end_day[$key]; $day++):?>
 
-
-
             <!-- 桁数を揃える -->
             <?php $days = sprintf('%02d', $day) ;?>
-            <?php //$aaa = sprintf('%2d', $days) ; print_r($aaa);?>
+            <?php //printf($days);?>
             <!-- 週末取得0~6 -->
             <?php $month_weekend=date("w", strtotime($value.'-'.$day));?>
 
                 <!-- 週末 -->
-                <?php if ($month_weekend == 0) :?><!-- 土曜日 -->
-                    <td class="sunday"><?php echo $day ;?></td>
-
-                <?php elseif ($month_weekend == 6) :?><!-- 日曜日 -->
-                    <td class="saturday"><?php echo $day ;?></td></tr>
-
-                <!-- 週末以外 -->
-                <?php elseif ($month_weekend != 0 && $month_weekend != 6) :?><!-- 平日 -->
-
-
-                    <?php foreach ($holidays as $date => $holiday):?>
-                        <?php $explode_date  = explode('-', $date); ?>
-                        <?php $explode_holidays = explode(' / ', $holiday);?>
-                        <!-- 日付と祝日の日付が一致するとき -->
-                        <?php if ($value.'-'.$days == $explode_date[0].'-'.$explode_date[1].'-'.$explode_date[2]): ?>
-                            <td class="sunday"><?php echo $day;?><br /><?php echo $explode_holidays[0]; ?></td>
-                        <?php else:?>
-                            <!-- <td><?php //echo $day;?></td> -->
-                        <?php //break;?>
-                        <?php endif;?>
-                    <?php endforeach;?>
-
-                    <?php if(date('j') == $day && $year.'-'.$month === $value) :?>
-                        <td class="today"><?php echo $day;?></td>
-                    <?php else :?>
-
-                        <td><?php echo $day;?></td>
+                    <?php $class = ''; ?>
+                    <?php if($month_weekend == 0):?>
+                        <?php $class = 'sunday'; ?>
+                    <?php elseif($month_weekend == 6):?>
+                        <?php $class = 'suturday'; ?>
                     <?php endif;?>
-
-
-                <?php endif ;?>
-
-
+                    <?php if(date('j') == $day && $year.'-'.$month === $value) :?>
+                        <?php $class = 'today'; ?>
+                    <?php endif;?>
+                    <?php $holiday_name = ''; ?>
+                    <?php if(isset($holiday_list[$value.'-'.$days])):?>
+                         <?php $class = 'sunday'; ?>
+                        <?php $holiday_name = '<br />'.$holiday_list[$value.'-'.$days]; ?>
+                    <?php endif;?>
+                    <td class="<?php echo $class; ?>"><?php echo $day.$holiday_name;?></td>
+                    <?php if($month_weekend == 6): ?>
+                        </tr>
+                    <?php endif; ?>
         <?php endfor ;?>
 
         <!-- 空セル挿入 -->
         <?php for ($i=1; $i<(7-$after_cell[$key]); $i++) :?>
             <td></td>
         <?php endfor ;?>
-
     </tbody>
 </table>
 <?php endforeach ;?>
 </div><!--calendar-->
-
 
 <div id="footer">
 </div><!--footer-->
