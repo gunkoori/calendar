@@ -55,7 +55,6 @@ for ($i=-6; $i<=6; $i++) {
 }
 $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
 $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_day[2];
-print_r($max_date);
 
 /*
 * Googlle Calendar API 祝日取得
@@ -115,10 +114,9 @@ foreach ($holidays as $date => $holiday) {
 </form>
 </div><!--header-->
 
-<div id="calendar">
 <!-- カレンダーループ 3回ループ -->
 <?php foreach ($calendars as $key => $value) :?>
-<table class="main_calendar">
+<table class="calendar">
     <thead>
     <tr>
         <th colspan="7">
@@ -154,17 +152,17 @@ foreach ($holidays as $date => $holiday) {
                 <?php if($month_weekend == 0):?><!-- 日曜日 -->
                     <?php $class = 'sunday'; ?>
                 <?php elseif($month_weekend == 6):?><!-- 土曜日 -->
-                    <?php $class = 'suturday'; ?>
+                    <?php $class = 'saturday'; ?>
                 <?php endif;?>
                 <?php if(date('j') == $day && $year.'-'.$month === $value) :?><!-- 今日 -->
                     <?php $class = 'today'; ?>
                 <?php endif;?>
                 <?php $holiday_name = ''; ?>
                 <?php if(isset($holiday_list[$value.'-'.$days])):?><!-- 祝日 -->
-                    <?php $class = 'sunday'; ?>
+                    <?php $class = 'holiday'; ?>
                     <?php $holiday_name = '<br />'.$holiday_list[$value.'-'.$days]; ?>
                 <?php endif;?>
-                <td class="<?php echo $class; ?>"><?php echo $day.$holiday_name;?></td>
+                    <td class="<?php echo $class; ?>"><span id="day"><?php echo $day;?></span><?php echo $holiday_name;?></td>
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
                     </tr>
                 <?php endif; ?>
@@ -176,8 +174,8 @@ foreach ($holidays as $date => $holiday) {
         <?php endfor ;?>
     </tbody>
 </table>
-<?php endforeach ;?>
 </div><!--calendar-->
+<?php endforeach ;?>
 
 <div id="footer">
 </div><!--footer-->
