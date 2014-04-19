@@ -88,6 +88,30 @@ foreach ($holidays as $date => $holiday) {
         $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
     }
 }
+
+/*
+*オークショントピック
+*/
+$rss = simplexml_load_file('http://aucfan.com/article/feed/');
+// $data = simplexml_load_string($rss);
+// print_r((string)$rss[0]);
+$data = get_object_vars($rss);
+print_r($data['channel']['item']);
+if (empty($rss)) {
+    return;
+}
+
+// print_r($rss);
+$column_data = array();
+foreach ($rss->channel->item as $key => $value) {
+    // print_r($value);
+    // $dc = $value->children('http://purl.org/dc/elements/1.1/');
+// print_r($dc);
+    $column_data[] =  $value;
+}
+// print_r($column_data);
+
+
 ?>
 
 <!DOCTYPE html>
