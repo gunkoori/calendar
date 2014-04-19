@@ -37,17 +37,17 @@ $prev_month4 = $month_of_ym -1;
 $before_cell = array();
 $after_cell  = array();
 
-//$display_countが奇数月の場合
-if ($display_count % 2 == 1) {
-    for ($i=1; $i<=$display_count; $i++) {
-        $position = $i-(floor($display_count/2)+1);
-        $calendars[] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
-        $before_cell[] = date('w', mktime(0, 0, 0, $prev_month2++, 1, $year_of_ym));
-        $after_cell[]  = date('w', mktime(0, 0, 0, $prev_month3+1, 0, $year_of_ym));
-        $prev_month3++;
-        $end_day[] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
-    }
+//3ヶ月分の空セル等を取得
+// if ($display_count % 2 == 1) {//$display_countが奇数月の場合
+for ($i=1; $i<=$display_count; $i++) {
+    $position = $i-(floor($display_count/2)+1);
+    $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
+    $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month2++, 1, $year_of_ym));
+    $after_cell[$i]  = date('w', mktime(0, 0, 0, $prev_month3+1, 0, $year_of_ym));
+    $prev_month3++;
+    $end_day[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
 }
+// }
 
 // Y-nを取得。$now_yearの前後1年
 for ($i=-6; $i<=6; $i++) {
@@ -55,6 +55,7 @@ for ($i=-6; $i<=6; $i++) {
 }
 $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
 $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_day[2];
+print_r($max_date);
 
 /*
 * Googlle Calendar API 祝日取得
