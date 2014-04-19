@@ -37,7 +37,7 @@ $prev_month4 = $month_of_ym -1;
 $before_cell = array();
 $after_cell  = array();
 
-//奇数月と偶数月
+//$display_countが奇数月の場合
 if ($display_count % 2 == 1) {
     for ($i=1; $i<=$display_count; $i++) {
         $position = $i-(floor($display_count/2)+1);
@@ -49,12 +49,12 @@ if ($display_count % 2 == 1) {
     }
 }
 
-// Y-nを取得。$now_yeaeの前後1年
+// Y-nを取得。$now_yearの前後1年
 for ($i=-6; $i<=6; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month+($i), 1, $year));
 }
-$min_date = $months[0].'-01';
-$max_date = $months[12].'-01';
+$min_date = $last_month['year'].'-'.$last_month['month'].'-01';
+$max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_day[2];
 
 /*
 * Googlle Calendar API 祝日取得
@@ -81,11 +81,9 @@ if ( $results = file_get_contents($holidays_url) ) {
 $explode_date = array();
 $explode_holidays = array();
 $holiday_list = array();
-$date_list = array();
 foreach ($holidays as $date => $holiday) {
     $explode_date[]  = explode('-', $date);
     $explode_holidays[] = explode(' / ', $holiday);
-    $date_list[] = $date;
     foreach ($explode_holidays as $key => $value) {
         $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
     }
@@ -148,29 +146,27 @@ foreach ($holidays as $date => $holiday) {
 
             <!-- 桁数を揃える -->
             <?php $days = sprintf('%02d', $day) ;?>
-            <?php //printf($days);?>
             <!-- 週末取得0~6 -->
             <?php $month_weekend=date("w", strtotime($value.'-'.$day));?>
 
-                <!-- 週末 -->
-                    <?php $class = ''; ?>
-                    <?php if($month_weekend == 0):?>
-                        <?php $class = 'sunday'; ?>
-                    <?php elseif($month_weekend == 6):?>
-                        <?php $class = 'suturday'; ?>
-                    <?php endif;?>
-                    <?php if(date('j') == $day && $year.'-'.$month === $value) :?>
-                        <?php $class = 'today'; ?>
-                    <?php endif;?>
-                    <?php $holiday_name = ''; ?>
-                    <?php if(isset($holiday_list[$value.'-'.$days])):?>
-                         <?php $class = 'sunday'; ?>
-                        <?php $holiday_name = '<br />'.$holiday_list[$value.'-'.$days]; ?>
-                    <?php endif;?>
-                    <td class="<?php echo $class; ?>"><?php echo $day.$holiday_name;?></td>
-                    <?php if($month_weekend == 6): ?>
-                        </tr>
-                    <?php endif; ?>
+                <?php $class = ''; ?>
+                <?php if($month_weekend == 0):?><!-- 日曜日 -->
+                    <?php $class = 'sunday'; ?>
+                <?php elseif($month_weekend == 6):?><!-- 土曜日 -->
+                    <?php $class = 'suturday'; ?>
+                <?php endif;?>
+                <?php if(date('j') == $day && $year.'-'.$month === $value) :?><!-- 今日 -->
+                    <?php $class = 'today'; ?>
+                <?php endif;?>
+                <?php $holiday_name = ''; ?>
+                <?php if(isset($holiday_list[$value.'-'.$days])):?><!-- 祝日 -->
+                    <?php $class = 'sunday'; ?>
+                    <?php $holiday_name = '<br />'.$holiday_list[$value.'-'.$days]; ?>
+                <?php endif;?>
+                <td class="<?php echo $class; ?>"><?php echo $day.$holiday_name;?></td>
+                <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
+                    </tr>
+                <?php endif; ?>
         <?php endfor ;?>
 
         <!-- 空セル挿入 -->
