@@ -3,10 +3,12 @@ body {
 	margin: 0 auto;
 }
 
-th,td {
+td {
+	height: 50px;
+	width: 70px;
 	padding: 5px;
 	border: 1px solid #ccc;
-	text-align: center;
+	/*text-align: center;*/
 }
 
 th {
@@ -27,11 +29,20 @@ h1 {
 
 
 /**********calendar***********/
+#this {
+	display: inline;
+	margin-top: 20px;
+	margin-right: 10px;
+	margin-left: 10px;
+	margin-bottom: 20px;
+}
 #prev {
 	display: inline;
 	/*float: left;*/
 	margin-top: 20px;
 	/*margin-left: 30px;*/
+	margin-bottom: 20px;
+
 }
 
 #next {
@@ -39,29 +50,23 @@ h1 {
 	/*float: right;*/
 	margin-top: 20px;
 	/*margin-right: 30px;*/
+	margin-bottom: 20px;
 }
 
-#calendar {
-	margin-top: 30px;
-}
 
-.main_calendar {
+
+.calendar {
 	display: inline-block;
 	vertical-align: top;
-	margin: 30px;
+	/*margin: 30px;*/
+	margin-bottom: 20px;
 }
 
-#prev_calendar {
-	display: inline-block;
-	vertical-align: top;
-	margin: 30px;
-
-}
-
-#next_calendar {
-	display: inline-block;
-	vertical-align: top;
-	margin: 30px;
+#day {
+	font-size: 10px;
+	/*float: left;*/
+	/*vertical-align: top;*/
+	float: top;
 
 }
 
@@ -74,9 +79,9 @@ h1 {
 }
 
 
-.sunday {
+.holiday, .sunday {
 	background-color: #FFA07A;
-	/*color: blue;*/
+	font-size: 14px;
 }
 
 /**********footer***********/
