@@ -100,11 +100,14 @@ if (empty($rss)) {
 
 $title = array();
 $date = array();
-$auc_topi_data = array();
+$link = array();
+$auc_topi_title = array();
 foreach ($rss->channel->item as $key => $value) {
     $title = (string)$value->title;
     $date = date('Y-m-d', strtotime((string)$value->pubDate));
-    $auc_topi_data[$date] = $title;
+    $link = (string)$value->link;
+    $auc_topi_title[$date] = $title;
+    $auc_topi_link[$date] = $link;
 }
 
 ?>
@@ -185,15 +188,15 @@ foreach ($rss->channel->item as $key => $value) {
                 <?php endif;?>
 
                 <?php $auc_topi_feed = '';?><!-- オークショントピック -->
-                <?php if (isset($auc_topi_data[$value.'-'.$days])):?>
-                    <?php $class = 'column';?>
-                    <?php $auc_topi_feed = '<br />'.$auc_topi_data[$value.'-'.$days];?>
+                <?php if (isset($auc_topi_title[$value.'-'.$days])):?>
+                    <?php $class = 'auc_topi';?>
+                    <?php $auc_topi_feed = '<br />'.$auc_topi_title[$value.'-'.$days];?>
                 <?php endif;?>
 
                     <td class="<?php echo $class; ?>">
                         <span id="day"><?php echo $day;?></span>
                         <?php echo $holiday_name;?>
-                        <?php echo $auc_topi_feed;?>
+                        <span><a href="<?php echo $auc_topi_link[$value.'-'.$days];?>" target="_blank"><?php echo $auc_topi_feed;?></a></span>
                     </td>
 
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
