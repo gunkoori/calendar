@@ -93,24 +93,19 @@ foreach ($holidays as $date => $holiday) {
 *オークショントピック
 */
 $rss = simplexml_load_file('http://aucfan.com/article/feed/');
-// $data = simplexml_load_string($rss);
-// print_r((string)$rss[0]);
 $data = get_object_vars($rss);
-print_r($data['channel']['item']);
 if (empty($rss)) {
     return;
 }
 
-// print_r($rss);
-$column_data = array();
+$title = array();
+$date = array();
+$auc_topi_data = array();
 foreach ($rss->channel->item as $key => $value) {
-    // print_r($value);
-    // $dc = $value->children('http://purl.org/dc/elements/1.1/');
-// print_r($dc);
-    $column_data[] =  $value;
+    $title = (string)$value->title;
+    $date = date('Y-m-d', strtotime((string)$value->pubDate));
+    $auc_topi_data[$date] = $title;
 }
-// print_r($column_data);
-
 
 ?>
 
@@ -178,15 +173,29 @@ foreach ($rss->channel->item as $key => $value) {
                 <?php elseif($month_weekend == 6):?><!-- 土曜日 -->
                     <?php $class = 'saturday'; ?>
                 <?php endif;?>
+
                 <?php if(date('j') == $day && $year.'-'.$month === $value) :?><!-- 今日 -->
                     <?php $class = 'today'; ?>
                 <?php endif;?>
-                <?php $holiday_name = ''; ?>
-                <?php if(isset($holiday_list[$value.'-'.$days])):?><!-- 祝日 -->
+
+                <?php $holiday_name = ''; ?><!-- 祝日 -->
+                <?php if(isset($holiday_list[$value.'-'.$days])):?>
                     <?php $class = 'holiday'; ?>
                     <?php $holiday_name = '<br />'.$holiday_list[$value.'-'.$days]; ?>
                 <?php endif;?>
-                    <td class="<?php echo $class; ?>"><span id="day"><?php echo $day;?></span><?php echo $holiday_name;?></td>
+
+                <?php $auc_topi_feed = '';?><!-- オークショントピック -->
+                <?php if (isset($auc_topi_data[$value.'-'.$days])):?>
+                    <?php $class = 'column';?>
+                    <?php $auc_topi_feed = '<br />'.$auc_topi_data[$value.'-'.$days];?>
+                <?php endif;?>
+
+                    <td class="<?php echo $class; ?>">
+                        <span id="day"><?php echo $day;?></span>
+                        <?php echo $holiday_name;?>
+                        <?php echo $auc_topi_feed;?>
+                    </td>
+
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
                     </tr>
                 <?php endif; ?>
