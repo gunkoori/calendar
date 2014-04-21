@@ -20,6 +20,11 @@ $ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);
 $explode_ym = explode('-', $ym);//[0] => 2014 [1] => 05
 $year_of_ym = $explode_ym[0];
 $month_of_ym = $explode_ym[1];
+if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
+    header('Location: http://kensyu.aucfan.com/');
+    exit;
+}
+
 
 $prev_month  = $month_of_ym -1;
 $prev_month2 = $month_of_ym -1;
@@ -37,6 +42,12 @@ $next_month = array(
   'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
+// Y-nを取得。$now_yearの前後1年
+for ($i=-12; $i<=12; $i++) {
+    $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
+}
+
+
 
 $calendar_year = array();
 $calendar_month = array();
@@ -50,16 +61,12 @@ for ($i=1; $i<=$display_count; $i++) {
     $end_day[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
 }
 
-// Y-nを取得。$now_yearの前後1年
-for ($i=-12; $i<=12; $i++) {
-    $months[] = date('Y-m', mktime(0, 0, 0, $month+($i), 1, $year));
-}
-$min_date = $last_month['year'].'-'.$last_month['month'].'-01';
-$max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_day[2];
 
 /*
 * Googlle Calendar API 祝日取得
 */
+$min_date = $last_month['year'].'-'.$last_month['month'].'-01';
+$max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_day[2];
 $holidays_url = sprintf(
         "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
         "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
@@ -149,7 +156,7 @@ foreach ($rss->channel->item as $key => $value) {
             $cal_year = $explode_cal[0];
             $calendar_month = $explode_cal[1];
         ?>
-        <?php echo $year.'年'.$month.'月';?>
+        <?php echo $cal_year.'年'.$calendar_month.'月';?>
         </th>
     </tr>
     <tr>
@@ -201,13 +208,13 @@ foreach ($rss->channel->item as $key => $value) {
                 <?php endif;?>
 
                     <td class="<?php echo $class; ?>">
-                        <span id="day"><?php echo $day;?></span>
+                        <span class="day"><?php echo $day;?></span>
                         <?php echo $holiday_name;?>
                         <span>
                             <br /><a href="<?php echo $auc_topi_link[$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
                             <?php
-                                $auc_topi_feed = mb_substr($auc_topi_feed, 0, 15, 'utf-8');//始めの文字から20文字取得
-                                if (mb_strlen($auc_topi_feed) > 15) {//10文字以上なら...表示
+                                $auc_topi_feed = mb_substr($auc_topi_feed, 0, 15, 'utf-8');//始めの文字から15文字取得
+                                if (mb_strlen($auc_topi_feed) > 15) {//15文字以上なら...表示
                                     $auc_topi_feed .= '...';
                                 }
                                 echo $auc_topi_feed;
