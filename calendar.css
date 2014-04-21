@@ -4,11 +4,11 @@ body {
 }
 
 td {
-	height: 50px;
+	height: 70px;
 	width: 70px;
-	padding: 5px;
+	/*padding: 5px;*/
 	border: 1px solid #ccc;
-	/*text-align: center;*/
+	vertical-align: top;
 }
 
 th {
@@ -64,8 +64,8 @@ h1 {
 
 #day {
 	font-size: 10px;
-	/*float: left;*/
-	/*vertical-align: top;*/
+	float: left;
+	vertical-align: top;
 	float: top;
 
 }
