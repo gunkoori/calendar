@@ -12,12 +12,19 @@ $start_day = 1;
 $display_count = 3;
 $calendars = array();
 $end_day = array();
+$before_cell = array();
+$after_cell  = array();
 
 //GET値がある場合。ない場合は現在の年月
 $ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);
 $explode_ym = explode('-', $ym);//[0] => 2014 [1] => 05
 $year_of_ym = $explode_ym[0];
 $month_of_ym = $explode_ym[1];
+
+$prev_month  = $month_of_ym -1;
+$prev_month2 = $month_of_ym -1;
+$prev_month3 = $month_of_ym -1;
+$prev_month4 = $month_of_ym -1;
 
 //先月
 $last_month = array(
@@ -30,13 +37,9 @@ $next_month = array(
   'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
-$prev_month  = $month_of_ym -1;
-$prev_month2 = $month_of_ym -1;
-$prev_month3 = $month_of_ym -1;
-$prev_month4 = $month_of_ym -1;
-$before_cell = array();
-$after_cell  = array();
 
+$calendar_year = array();
+$calendar_month = array();
 //3ヶ月分の空セル等を取得
 for ($i=1; $i<=$display_count; $i++) {
     $position = $i-(floor($display_count/2)+1);
@@ -46,7 +49,6 @@ for ($i=1; $i<=$display_count; $i++) {
     $prev_month3++;
     $end_day[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
 }
-
 
 // Y-nを取得。$now_yearの前後1年
 for ($i=-12; $i<=12; $i++) {
@@ -109,6 +111,7 @@ foreach ($rss->channel->item as $key => $value) {
     $auc_topi_link[$date] = $link;
 }
 
+
 ?>
 
 <!DOCTYPE html>
@@ -121,9 +124,9 @@ foreach ($rss->channel->item as $key => $value) {
 <body>
 <div id="header">
 <h3>郡カレンダー</h3>
-<div id="prev"><a href="?ym=<?php echo $last_month['year'].'-'.$last_month['month'];?>">先月</a></div>
+<div id="prev"><a href="?ym=<?php echo $last_month['year'].'-'.$last_month['month'];?>">前月</a></div>
 <div id="this"><a href="/">今月</a></div>
-<div id="next"><a href="?ym=<?php echo $next_month['year'].'-'.$next_month['month']; ?>">来月</a></div>
+<div id="next"><a href="?ym=<?php echo $next_month['year'].'-'.$next_month['month']; ?>">次月</a></div>
 <form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
     <select name="ym">
     <option>選択してください</option>
@@ -141,7 +144,12 @@ foreach ($rss->channel->item as $key => $value) {
     <thead>
     <tr>
         <th colspan="7">
-            <?php echo $value;?>
+        <?php
+            $explode_cal = explode('-', $value);
+            $cal_year = $explode_cal[0];
+            $calendar_month = $explode_cal[1];
+        ?>
+        <?php echo $year.'年'.$month.'月';?>
         </th>
     </tr>
     <tr>
@@ -189,13 +197,23 @@ foreach ($rss->channel->item as $key => $value) {
                 <?php $auc_topi_feed = '';?><!-- オークショントピック -->
                 <?php if (isset($auc_topi_title[$value.'-'.$days])):?>
                     <?php $class = 'auc_topi';?>
-                    <?php $auc_topi_feed = '<br />'.$auc_topi_title[$value.'-'.$days];?>
+                    <?php $auc_topi_feed = $auc_topi_title[$value.'-'.$days];?>
                 <?php endif;?>
 
                     <td class="<?php echo $class; ?>">
                         <span id="day"><?php echo $day;?></span>
                         <?php echo $holiday_name;?>
-                        <span><a href="<?php echo $auc_topi_link[$value.'-'.$days];?>" target="_blank"><?php echo $auc_topi_feed;?></a></span>
+                        <span>
+                            <br /><a href="<?php echo $auc_topi_link[$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
+                            <?php
+                                $auc_topi_feed = mb_substr($auc_topi_feed, 0, 15, 'utf-8');//始めの文字から20文字取得
+                                if (mb_strlen($auc_topi_feed) > 15) {//10文字以上なら...表示
+                                    $auc_topi_feed .= '...';
+                                }
+                                echo $auc_topi_feed;
+                            ?>
+                            </a>
+                        </span>
                     </td>
 
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
