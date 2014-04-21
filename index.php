@@ -38,7 +38,6 @@ $before_cell = array();
 $after_cell  = array();
 
 //3ヶ月分の空セル等を取得
-// if ($display_count % 2 == 1) {//$display_countが奇数月の場合
 for ($i=1; $i<=$display_count; $i++) {
     $position = $i-(floor($display_count/2)+1);
     $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
@@ -47,10 +46,10 @@ for ($i=1; $i<=$display_count; $i++) {
     $prev_month3++;
     $end_day[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
 }
-// }
+
 
 // Y-nを取得。$now_yearの前後1年
-for ($i=-6; $i<=6; $i++) {
+for ($i=-12; $i<=12; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month+($i), 1, $year));
 }
 $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
