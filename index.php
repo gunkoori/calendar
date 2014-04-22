@@ -3,6 +3,62 @@ define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
 
+/*
+*DB接続
+*/
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$database = 'calendar';
+
+$sql=<<<END
+    INSERT INTO
+         schedules
+     SET
+        start_date=NOW(),
+        end_date=NOW(),
+        schedule_title="DB接続",
+        schedule_detail="詰まる",
+        update_at=NOW(),
+        created_at=NOW(),
+        deleted_at="null"
+
+END;
+
+
+
+$sql2=<<<END
+    select
+        *
+    from
+        schedules
+END;
+
+
+
+// MySQL に接続し、データベースを選択
+$db = mysqli_connect($host, $user, $password, $database);
+
+// 接続状況をチェック
+if (mysqli_connect_errno()) {
+    die(mysqli_connect_error());
+}
+
+// SQL クエリを実行
+if ($result = mysqli_query($db, $sql)) {
+    // 結果を出力
+    while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
+        echo $row[0] . "\n";
+    }
+    // 結果セットを開放
+    mysqli_free_result($result);
+}
+mysqli_close($db);
+
+
+
+
+
 //現在の年月日、曜日の取得
 $year = date('Y');
 $month = date('m');
