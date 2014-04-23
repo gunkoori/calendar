@@ -2,11 +2,8 @@
 $year = $_GET['year'];
 $month = $_GET['month'];
 $day = $_GET['day'];
-// print_r($year.'年'.$month.'月'.$day);
 
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="ja">

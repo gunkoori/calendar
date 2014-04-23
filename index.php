@@ -11,16 +11,21 @@ $user = 'root';
 $password = '';
 $database = 'calendar';
 
+// MySQL に接続し、データベースを選択
+$db = mysqli_connect($host, $user, $password, $database);
+
+// 接続状況をチェック
+if (mysqli_connect_errno()) {
+    die(mysqli_connect_error());
+}
+
 $post_data = $_POST;
-if(isset($post_data)) {
 $start_day = $post_data['start_day'];
 $end_day = $post_data['end_day'];
 $schedule_title = $post_data['schedule_title'];
 $schedule_detail = $post_data['schedule_detail'];
-}
-print_r($start_day);
 
-$sql=<<<END
+$insert=<<<END
     INSERT INTO
          schedules
      SET
@@ -34,40 +39,45 @@ $sql=<<<END
 
 END;
 
+$update =<<<END
+    UPDATE
+         schedules
+     SET
+        start_date="$start_day",
+        end_date="$end_day",
+        schedule_title="$schedule_title",
+        schedule_detail="$schedule_detail",
+        update_at=NOW(),
+        created_at=NOW(),
+        deleted_at="null"
 
+END;
 
-$sql2=<<<END
-    select
-        *
-    from
-        schedules
+$schedule_sql =<<<END
+    SELECT
+         start_date, schedule_title, schedule_detail
+     FROM
+         schedules
+
 END;
 
 
-
-// MySQL に接続し、データベースを選択
-$db = mysqli_connect($host, $user, $password, $database);
-
-// 接続状況をチェック
-if (mysqli_connect_errno()) {
-    die(mysqli_connect_error());
+//SQL実行
+if (isset($start_day)) {
+    $result = mysqli_query($db, $insert);
+}
+if ($result = mysqli_query($db, $schedule_sql)) {
+    while ($row = mysqli_fetch_row($result)) {
+        $explode_db_date = explode(' ', $row[0]);
+        $schedule_list[$explode_db_date[0]] = $row[1];
+        $schedule_list_detail[$explode_db_date[0]] = $row[2];
+    }
+    mysqli_free_result($result);
 }
 
-// SQL クエリを実行
-if ($result = mysqli_query($db, $sql)) {
-    // print_r($sql); exit;
-    // 結果を出力
-    /*while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
-        echo $row[0] . "\n";
-    }*/
-    // 結果セットを開放
-    // mysqli_free_result($result);
-}
 mysqli_close($db);
 
-
-
-
+print_r($schedule_list_detail);
 
 //現在の年月日、曜日の取得
 $year = date('Y');
@@ -91,7 +101,6 @@ if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
     exit;
 }
 
-
 $prev_month  = $month_of_ym -1;
 $prev_month2 = $month_of_ym -1;
 $prev_month3 = $month_of_ym -1;
@@ -112,8 +121,6 @@ $next_month = array(
 for ($i=-12; $i<=12; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
 }
-
-
 
 $calendar_year = array();
 $calendar_month = array();
@@ -184,8 +191,6 @@ foreach ($rss->channel->item as $key => $value) {
     $auc_topi_link[$date] = $link;
 }
 
-// var_dump($PostData);
-var_dump($_POST['schedule_detail']);
 ?>
 
 <!DOCTYPE html>
@@ -274,6 +279,13 @@ var_dump($_POST['schedule_detail']);
                     <?php $auc_topi_feed = $auc_topi_title[$value.'-'.$days];?>
                 <?php endif;?>
 
+                <?php $schedule = '';?><!-- DBに登録されている予定 -->
+                <?php if (isset($schedule_list[$value.'-'.$days])):?>
+                    <?php $class = 'schedule';?>
+                    <?php $schedule = $schedule_list[$value.'-'.$days];?>
+                    <?php //$schedule_details = $schedule_list_detail[$value.'-'.$days];?>
+                <?php endif;?>
+
                     <td class="<?php echo $class; ?>">
                         <span class="day"><a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day;?>"><?php echo $day;?></a></span>
                         <?php echo $holiday_name;?>
@@ -287,6 +299,10 @@ var_dump($_POST['schedule_detail']);
                                 echo $auc_topi_feed;
                             ?>
                             </a>
+                        </span><br />
+                        <span>
+                            <br /><a href="" title= "<?php echo $schedule_list_detail[$value.'-'.$days];?>"><?php echo $schedule;?></a>
+
                         </span>
                     </td>
 
