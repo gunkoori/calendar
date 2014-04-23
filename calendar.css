@@ -89,3 +89,34 @@ h1 {
 }
 
 /**********footer***********/
+
+
+
+
+/********** schedule.php ***********/
+#start_day {
+	display: inline-block;
+
+}
+
+#end_day {
+	display: inline-block;
+
+}
+
+#schedule_title {
+	display: inline;
+
+}
+
+#schedule_detail {
+	display: inline;
+
+}
+
+
+
+
+
+
+

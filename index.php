@@ -11,14 +11,23 @@ $user = 'root';
 $password = '';
 $database = 'calendar';
 
+$post_data = $_POST;
+if(isset($post_data)) {
+$start_day = $post_data['start_day'];
+$end_day = $post_data['end_day'];
+$schedule_title = $post_data['schedule_title'];
+$schedule_detail = $post_data['schedule_detail'];
+}
+print_r($start_day);
+
 $sql=<<<END
     INSERT INTO
          schedules
      SET
-        start_date=NOW(),
-        end_date=NOW(),
-        schedule_title="DB接続",
-        schedule_detail="詰まる",
+        start_date="$start_day",
+        end_date="$end_day",
+        schedule_title="$schedule_title",
+        schedule_detail="$schedule_detail",
         update_at=NOW(),
         created_at=NOW(),
         deleted_at="null"
@@ -46,12 +55,13 @@ if (mysqli_connect_errno()) {
 
 // SQL クエリを実行
 if ($result = mysqli_query($db, $sql)) {
+    // print_r($sql); exit;
     // 結果を出力
-    while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
+    /*while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
         echo $row[0] . "\n";
-    }
+    }*/
     // 結果セットを開放
-    mysqli_free_result($result);
+    // mysqli_free_result($result);
 }
 mysqli_close($db);
 
@@ -63,7 +73,7 @@ mysqli_close($db);
 $year = date('Y');
 $month = date('m');
 //月のスタート
-$start_day = 1;
+$start_date = 1;
 //カレンダー数
 $display_count = 3;
 $calendars = array();
@@ -174,7 +184,8 @@ foreach ($rss->channel->item as $key => $value) {
     $auc_topi_link[$date] = $link;
 }
 
-
+// var_dump($PostData);
+var_dump($_POST['schedule_detail']);
 ?>
 
 <!DOCTYPE html>
@@ -210,9 +221,9 @@ foreach ($rss->channel->item as $key => $value) {
         <?php
             $explode_cal = explode('-', $value);
             $cal_year = $explode_cal[0];
-            $calendar_month = $explode_cal[1];
+            $cal_month = $explode_cal[1];
         ?>
-        <?php echo $cal_year.'年'.$calendar_month.'月';?>
+        <?php echo $cal_year.'年'.$cal_month.'月';?>
         </th>
     </tr>
     <tr>
@@ -233,7 +244,7 @@ foreach ($rss->channel->item as $key => $value) {
         <?php endfor ;?>
 
         <!-- 日付挿入 -->
-        <?php for ($day=$start_day; $day<=$end_day[$key]; $day++):?>
+        <?php for ($day=$start_date; $day<=$end_day[$key]; $day++):?>
 
             <!-- 桁数を揃える -->
             <?php $days = sprintf('%02d', $day) ;?>
@@ -264,13 +275,13 @@ foreach ($rss->channel->item as $key => $value) {
                 <?php endif;?>
 
                     <td class="<?php echo $class; ?>">
-                        <span class="day"><?php echo $day;?></span>
+                        <span class="day"><a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day;?>"><?php echo $day;?></a></span>
                         <?php echo $holiday_name;?>
                         <span>
                             <br /><a href="<?php echo $auc_topi_link[$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
                             <?php
                                 $auc_topi_feed = mb_substr($auc_topi_feed, 0, 15, 'utf-8');//始めの文字から15文字取得
-                                if (mb_strlen($auc_topi_feed) > 15) {//15文字以上なら...表示
+                                if (mb_strlen($auc_topi_feed) >= 15) {//15文字以上なら...表示
                                     $auc_topi_feed .= '...';
                                 }
                                 echo $auc_topi_feed;
