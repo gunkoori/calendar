@@ -6,6 +6,7 @@ body {
 td {
     height: 70px;
     width: 70px;
+    text-align: center;
     /*padding: 5px;*/
     border: 1px solid #ccc;
     vertical-align: top;
@@ -17,6 +18,10 @@ th {
 
 h1 {
 
+}
+
+a {
+    text-decoration: none;
 }
 
 /**********header***********/
@@ -90,7 +95,9 @@ h1 {
 
 .schedule {
     font-size: 7px;
-    /*background-color: red;*/
+    font-color:red;
+    background-color: #FFB6C1
+;
 }
 
 /**********footer***********/

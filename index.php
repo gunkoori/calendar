@@ -60,7 +60,7 @@ $sql=<<<END
 END;
 
 }
-print_r($sql);
+
 $schedule_sql =<<<END
     SELECT
          start_date, schedule_title, schedule_detail
@@ -79,7 +79,6 @@ if ($result = mysqli_query($db, $schedule_sql)) {
         $explode_db_date = explode(' ', $row[0]);
         $schedule_list[$explode_db_date[0]] = $row[1];
         $schedule_list_detail[$explode_db_date[0]] = $row[2];
-        print_r($row);
     }
     mysqli_free_result($result);
 }
