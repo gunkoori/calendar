@@ -24,10 +24,14 @@ $start_day = $post_data['start_day'];
 $end_day = $post_data['end_day'];
 $schedule_title = $post_data['schedule_title'];
 $schedule_detail = $post_data['schedule_detail'];
+// setcookie('schedule_title', $schedule_title);
+// print_r($_COOKIE['update']);
+// var_dump($_COOKIE['update']);
+if ($_COOKIE['update'] == NULL) {
 
-$insert=<<<END
+$sql=<<<END
     INSERT INTO
-         schedules
+         cal_schedules
      SET
         start_date="$start_day",
         end_date="$end_day",
@@ -36,48 +40,51 @@ $insert=<<<END
         update_at=NOW(),
         created_at=NOW(),
         deleted_at="null"
-
 END;
 
-$update =<<<END
+}
+else {
+
+$sql=<<<END
     UPDATE
-         schedules
+         cal_schedules
      SET
         start_date="$start_day",
         end_date="$end_day",
         schedule_title="$schedule_title",
         schedule_detail="$schedule_detail",
         update_at=NOW(),
-        created_at=NOW(),
         deleted_at="null"
-
+    WHERE
+        start_date="$start_day"
 END;
 
+}
+print_r($sql);
 $schedule_sql =<<<END
     SELECT
          start_date, schedule_title, schedule_detail
      FROM
-         schedules
+         cal_schedules
 
 END;
 
 
 //SQL実行
 if (isset($start_day)) {
-    $result = mysqli_query($db, $insert);
+    $result = mysqli_query($db, $sql);
 }
 if ($result = mysqli_query($db, $schedule_sql)) {
     while ($row = mysqli_fetch_row($result)) {
         $explode_db_date = explode(' ', $row[0]);
         $schedule_list[$explode_db_date[0]] = $row[1];
         $schedule_list_detail[$explode_db_date[0]] = $row[2];
+        print_r($row);
     }
     mysqli_free_result($result);
 }
-
+// print_r($schedule_list);
 mysqli_close($db);
-
-print_r($schedule_list_detail);
 
 //現在の年月日、曜日の取得
 $year = date('Y');
@@ -92,10 +99,10 @@ $before_cell = array();
 $after_cell  = array();
 
 //GET値がある場合。ない場合は現在の年月
-$ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);
-$explode_ym = explode('-', $ym);//[0] => 2014 [1] => 05
-$year_of_ym = $explode_ym[0];
-$month_of_ym = $explode_ym[1];
+$ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);//2014-04-01
+$explode_ym = explode('-', $ym);//[0] => 2014 [1] => 04
+$year_of_ym = $explode_ym[0];//2014
+$month_of_ym = $explode_ym[1];//04
 if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
     header('Location: http://kensyu.aucfan.com/');
     exit;
@@ -210,7 +217,7 @@ foreach ($rss->channel->item as $key => $value) {
     <select name="ym">
     <option>選択してください</option>
     <?php for ($i=0; $i<=24; $i++):?>
-    <option id="select_year_month" value="<?php echo $months[$i] ;?>"><?php echo $months[$i] ;?></option>
+    <option id="select_year_month" value="<?php echo $months[$i];?>"><?php echo $months[$i] ;?></option>
     <?php endfor; ?>
     </select>
     <input type="submit" value="表示する">
@@ -257,6 +264,7 @@ foreach ($rss->channel->item as $key => $value) {
             <?php $month_weekend=date("w", strtotime($value.'-'.$day));?>
 
                 <?php $class = ''; ?>
+                <?php $span_class = '';?>
                 <?php if($month_weekend == 0):?><!-- 日曜日 -->
                     <?php $class = 'sunday'; ?>
                 <?php elseif($month_weekend == 6):?><!-- 土曜日 -->
@@ -281,14 +289,20 @@ foreach ($rss->channel->item as $key => $value) {
 
                 <?php $schedule = '';?><!-- DBに登録されている予定 -->
                 <?php if (isset($schedule_list[$value.'-'.$days])):?>
-                    <?php $class = 'schedule';?>
+                    <?php //$span_class = 'schedule';?>
                     <?php $schedule = $schedule_list[$value.'-'.$days];?>
-                    <?php //$schedule_details = $schedule_list_detail[$value.'-'.$days];?>
                 <?php endif;?>
 
                     <td class="<?php echo $class; ?>">
-                        <span class="day"><a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day;?>"><?php echo $day;?></a></span>
-                        <?php echo $holiday_name;?>
+                        <!-- 日付出力 -->
+                        <span class="day">
+                            <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day;?>"><?php echo $day;?></a>
+                        </span>
+                        <!-- 祝日出力 -->
+                        <span>
+                            <?php echo $holiday_name;?>
+                        </span>
+                        <!-- オクトピ出力 -->
                         <span>
                             <br /><a href="<?php echo $auc_topi_link[$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
                             <?php
@@ -300,9 +314,10 @@ foreach ($rss->channel->item as $key => $value) {
                             ?>
                             </a>
                         </span><br />
-                        <span>
-                            <br /><a href="" title= "<?php echo $schedule_list_detail[$value.'-'.$days];?>"><?php echo $schedule;?></a>
 
+                        <!-- DBに登録されている予定出力 -->
+                        <span>
+                            <br /><span class="schedule"><a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day;?>" title="<?php echo $schedule_list_detail[$value.'-'.$days];?>"><?php echo $schedule;?></a></span>
                         </span>
                     </td>
 
