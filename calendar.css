@@ -4,8 +4,8 @@ body {
 }
 
 td {
-    height: 70px;
-    width: 70px;
+    height: 80px;
+    width: 80px;
     text-align: center;
     /*padding: 5px;*/
     border: 1px solid #ccc;

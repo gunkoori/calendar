@@ -1,9 +1,17 @@
 <?php
+$year = isset($_GET['year']) ? $_GET['year']:'';
+$month = '';
+$day = '';
+$update ='';
 $year = $_GET['year'];
 $month = $_GET['month'];
 $day = $_GET['day'];
+$status = $_GET['status'];
 $date = sprintf('%02d', $day);
-// print_r($_COOKIE['schedule_title']);
+
+
+
+
 /*
 *DB接続
 */
@@ -22,7 +30,7 @@ if (mysqli_connect_errno()) {
 
 $schedule_sql =<<<END
     SELECT
-         start_date, schedule_title, schedule_detail
+         start_date, end_date, schedule_title, schedule_detail
      FROM
          cal_schedules
 END;
@@ -31,13 +39,30 @@ END;
 //SQL実行
 if ($result = mysqli_query($db, $schedule_sql)) {
     while ($row = mysqli_fetch_row($result)) {
-        $explode_db_date = explode(' ', $row[0]);
-        $schedule_list[$explode_db_date[0]] = $row[1];
-        $schedule_list_detail[$explode_db_date[0]] = $row[2];
+        $start_date = explode(' ', $row[0]);//開始日
+        $end_date = explode(' ', $row[1]);//終了日
+        $schedule_end_date[$start_date[0]] = explode('-', $end_date[0]);//[2014-04-01] => Array([0] => 2014,[1] => 05,[2] => 01)
+        $schedule_list[$start_date[0]] = $row[2];
+        $schedule_list_detail[$start_date[0]] = $row[3];
     }
+
     mysqli_free_result($result);
 }
 mysqli_close($db);
+
+//終了日
+$end_year = $schedule_end_date[$year.'-'.$month.'-'.$date][0];
+$end_month = $schedule_end_date[$year.'-'.$month.'-'.$date][1];
+$end_day = $schedule_end_date[$year.'-'.$month.'-'.$date][2];
+
+//
+if ($status != 'update') {
+    $end_year = $year;
+    $end_month = $month;
+    $end_day = $day;
+    $schedule_list[$year.'-'.$month.'-'.$date] = '';
+    $schedule_list_detail[$year.'-'.$month.'-'.$date] = '';
+}
 ?>
 
 <!DOCTYPE html>
@@ -51,11 +76,25 @@ mysqli_close($db);
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
     <form method="post" action="http://kensyu.aucfan.com/">
-        <input type="text" id="start_day" name="start_day" value="<?php echo $year.'-'.$month.'-'.$day?>" />〜
-        <input type="text" id="end_day" name="end_day" value="<?php echo $year.'-'.$month.'-'.$day?>" /><br />
+        <span>
+            <input type="text" id="start_year" name="start_year" value="<?php echo $year;?>" />年
+            <input type="text" id="start_month" name="start_month" value="<?php echo $month;?>" />月
+            <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日〜
+            <input type="text" id="end_year" name="end_year" value="<?php echo $end_year;?>" />年
+            <input type="text" id="end_month" name="end_month" value="<?php echo $end_month;?>" />月
+            <input type="text" id="end_day" name="end_day" value="<?php echo $end_day;?>" />日
+        </span>
+        <br />
+        <span>
+            <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
+            <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分〜
+            <input type="text" id="end_hour" name="end_hour" value="<?php echo date('G');?>" />時
+            <input type="text" id="end_min" name="end_min" value="<?php echo date('i');?>" />分
+        </span>
+        <br />
         タイトル：<input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedule_list[$year.'-'.$month.'-'.$date];?>" /><br />
         詳細：<input type="text" id="schedule_detail" name="schedule_detail" value="<?php echo $schedule_list_detail[$year.'-'.$month.'-'.$date];?>"/><br />
-        <?php if(isset($schedule_list[$year.'-'.$month.'-'.$date])):?>
+        <?php if($status == 'update'):?>
             <?php setcookie('update', 'update', time()+10);?>
             <input type="submit" value="更新する" />
         <?php else:?>

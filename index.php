@@ -19,15 +19,20 @@ if (mysqli_connect_errno()) {
     die(mysqli_connect_error());
 }
 
+//フォームからPOSTされたでーた
 $post_data = $_POST;
-$start_day = $post_data['start_day'];
-$end_day = $post_data['end_day'];
+//開始時間と終了時間
+$start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
+$end_time = $post_data['end_hour'].':'.$post_data['end_min'].':00';
+//開始日と終了日
+$start_day = $post_data['start_year'].'-'.$post_data['start_month'].'-'.$post_data['start_day'].' '.$start_time;
+$end_day = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['end_day'].' '.$end_time;
+//予定のタイトルと詳細
 $schedule_title = $post_data['schedule_title'];
 $schedule_detail = $post_data['schedule_detail'];
-// setcookie('schedule_title', $schedule_title);
-// print_r($_COOKIE['update']);
-// var_dump($_COOKIE['update']);
-if ($_COOKIE['update'] == NULL) {
+
+//UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
+if (($_COOKIE['update'] == null) && ($schedule_title != null)) {
 
 $sql=<<<END
     INSERT INTO
@@ -63,12 +68,11 @@ END;
 
 $schedule_sql =<<<END
     SELECT
-         start_date, schedule_title, schedule_detail
+         schedule_id, start_date, schedule_title, schedule_detail
      FROM
          cal_schedules
 
 END;
-
 
 //SQL実行
 if (isset($start_day)) {
@@ -76,14 +80,14 @@ if (isset($start_day)) {
 }
 if ($result = mysqli_query($db, $schedule_sql)) {
     while ($row = mysqli_fetch_row($result)) {
-        $explode_db_date = explode(' ', $row[0]);
-        $schedule_list[$explode_db_date[0]] = $row[1];
-        $schedule_list_detail[$explode_db_date[0]] = $row[2];
+        $explode_db_date = explode(' ', $row[1]);
+        $schedule_list[$explode_db_date[0]] = $row[2];
+        $schedule_list_detail[$explode_db_date[0]] = $row[3];
     }
     mysqli_free_result($result);
 }
-// print_r($schedule_list);
 mysqli_close($db);
+
 
 //現在の年月日、曜日の取得
 $year = date('Y');
@@ -316,7 +320,7 @@ foreach ($rss->channel->item as $key => $value) {
 
                         <!-- DBに登録されている予定出力 -->
                         <span>
-                            <br /><span class="schedule"><a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day;?>" title="<?php echo $schedule_list_detail[$value.'-'.$days];?>"><?php echo $schedule;?></a></span>
+                            <br /><span class="schedule"><a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day.'&status=update';?>" title="<?php echo $schedule_list_detail[$value.'-'.$days];?>"><?php echo $schedule;?></a></span>
                         </span>
                     </td>
 
