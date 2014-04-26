@@ -19,7 +19,9 @@ if (mysqli_connect_errno()) {
     die(mysqli_connect_error());
 }
 
-//フォームからPOSTされたでーた
+/*
+*フォームからPOSTされたデータ
+*/
 $post_data = $_POST;
 //開始時間と終了時間
 $start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
@@ -73,6 +75,22 @@ $schedule_sql =<<<END
          cal_schedules
 
 END;
+
+$schedule_of_date =<<<END
+    SELECT
+         *
+    FROM
+         cal_schedules
+    WHERE
+         start_date
+    BETWEEN
+         "$start_day 00:00:01"
+    AND
+         "$start_day 23:59:59"
+
+END;
+
+print_r(mysqli_query($db, $schedule_of_date));
 
 //SQL実行
 if (isset($start_day)) {
