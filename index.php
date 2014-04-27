@@ -3,6 +3,118 @@ define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
 
+//現在の年月日、曜日の取得
+$year = date('Y');
+$month = date('m');
+//月のスタート
+$start_date = 1;
+//カレンダー数
+$display_count = 3;
+$calendars = array();
+$end_days = array();
+$before_cell = array();
+$after_cell  = array();
+
+//GET値がある場合。ない場合は現在の年月
+$ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);//2014-04-01
+$explode_ym = explode('-', $ym);//[0] => 2014 [1] => 04
+$year_of_ym = $explode_ym[0];//2014
+$month_of_ym = $explode_ym[1];//04
+if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
+    header('Location: http://kensyu.aucfan.com/');
+    exit;
+}
+
+$prev_month  = $month_of_ym -1;
+$prev_month2 = $month_of_ym -1;
+$prev_month3 = $month_of_ym -1;
+$prev_month4 = $month_of_ym -1;
+
+//先月
+$last_month = array(
+  'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
+  'month' => date('m', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
+);
+//来月
+$next_month = array(
+  'year' => date('Y', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
+  'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
+);
+
+// Y-nを取得。$now_yearの前後1年
+for ($i=-12; $i<=12; $i++) {
+    $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
+}
+
+$calendar_year = array();
+$calendar_month = array();
+//3ヶ月分の空セル等を取得
+for ($i=1; $i<=$display_count; $i++) {
+    $position = $i-(floor($display_count/2)+1);
+    $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
+    $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month2++, 1, $year_of_ym));
+    $after_cell[$i]  = date('w', mktime(0, 0, 0, $prev_month3+1, 0, $year_of_ym));
+    $prev_month3++;
+    $end_days[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
+}
+
+/*
+* Googlle Calendar API 祝日取得
+*/
+$min_date = $last_month['year'].'-'.$last_month['month'].'-01';
+$max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_days[2];
+$holidays_url = sprintf(
+        "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
+        "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
+        "$min_date" ,  // 取得開始日
+        "$max_date" ,  // 取得終了日
+        50             // 最大取得数
+        );
+if ( $results = file_get_contents($holidays_url) ) {
+        $results = json_decode($results, true);
+
+        $holidays = array();
+        foreach ($results['feed']['entry'] as $key =>$val ) {
+                $date  = $val['gd$when'][0]['startTime'];
+                $title = $val['title']['$t'];
+                $holidays[$date] = $title;// [2007-01-01] => 元日 / Ganjitsu / New Year's Day
+        }
+        ksort($holidays);
+}
+
+$explode_date = array();
+$explode_holidays = array();
+$holiday_list = array();
+foreach ($holidays as $date => $holiday) {
+    $explode_date[]  = explode('-', $date);
+    $explode_holidays[] = explode(' / ', $holiday);
+    foreach ($explode_holidays as $key => $value) {
+        $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
+    }
+}
+
+/*
+*オークショントピック
+*/
+$rss = simplexml_load_file('http://aucfan.com/article/feed/');
+$data = get_object_vars($rss);
+if (empty($rss)) {
+    return;
+}
+
+$title = array();
+$date = array();
+$link = array();
+$auc_topi_title = array();
+foreach ($rss->channel->item as $key => $value) {
+    $title = (string)$value->title;
+    $date = date('Y-m-d', strtotime((string)$value->pubDate));
+    $link = (string)$value->link;
+    $auc_topi_title[$date] = $title;
+    $auc_topi_link[$date] = $link;
+}
+
+
 /*
 *DB接続
 */
@@ -76,148 +188,22 @@ $schedule_sql =<<<END
 
 END;
 
-$schedule_of_date =<<<END
-    SELECT
-         *
-    FROM
-         cal_schedules
-    WHERE
-         start_date
-    BETWEEN
-         "$start_day 00:00:01"
-    AND
-         "$start_day 23:59:59"
 
-END;
-
-print_r(mysqli_query($db, $schedule_of_date));
 
 //SQL実行
 if (isset($start_day)) {
     $result = mysqli_query($db, $sql);
 }
 if ($result = mysqli_query($db, $schedule_sql)) {
-    while ($row = mysqli_fetch_row($result)) {
-        $explode_db_date = explode(' ', $row[1]);
-        $schedule_list[$explode_db_date[0]] = $row[2];
-        $schedule_list_detail[$explode_db_date[0]] = $row[3];
+    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+        list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
+        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
     }
     mysqli_free_result($result);
 }
 mysqli_close($db);
 
-
-//現在の年月日、曜日の取得
-$year = date('Y');
-$month = date('m');
-//月のスタート
-$start_date = 1;
-//カレンダー数
-$display_count = 3;
-$calendars = array();
-$end_day = array();
-$before_cell = array();
-$after_cell  = array();
-
-//GET値がある場合。ない場合は現在の年月
-$ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);//2014-04-01
-$explode_ym = explode('-', $ym);//[0] => 2014 [1] => 04
-$year_of_ym = $explode_ym[0];//2014
-$month_of_ym = $explode_ym[1];//04
-if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
-    header('Location: http://kensyu.aucfan.com/');
-    exit;
-}
-
-$prev_month  = $month_of_ym -1;
-$prev_month2 = $month_of_ym -1;
-$prev_month3 = $month_of_ym -1;
-$prev_month4 = $month_of_ym -1;
-
-//先月
-$last_month = array(
-  'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
-  'month' => date('m', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
-);
-//来月
-$next_month = array(
-  'year' => date('Y', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
-  'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
-);
-
-// Y-nを取得。$now_yearの前後1年
-for ($i=-12; $i<=12; $i++) {
-    $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
-}
-
-$calendar_year = array();
-$calendar_month = array();
-//3ヶ月分の空セル等を取得
-for ($i=1; $i<=$display_count; $i++) {
-    $position = $i-(floor($display_count/2)+1);
-    $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
-    $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month2++, 1, $year_of_ym));
-    $after_cell[$i]  = date('w', mktime(0, 0, 0, $prev_month3+1, 0, $year_of_ym));
-    $prev_month3++;
-    $end_day[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
-}
-
-
-/*
-* Googlle Calendar API 祝日取得
-*/
-$min_date = $last_month['year'].'-'.$last_month['month'].'-01';
-$max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_day[2];
-$holidays_url = sprintf(
-        "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
-        "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
-        "$min_date" ,  // 取得開始日
-        "$max_date" ,  // 取得終了日
-        50             // 最大取得数
-        );
-if ( $results = file_get_contents($holidays_url) ) {
-        $results = json_decode($results, true);
-
-        $holidays = array();
-        foreach ($results['feed']['entry'] as $key =>$val ) {
-                $date  = $val['gd$when'][0]['startTime'];
-                $title = $val['title']['$t'];
-                $holidays[$date] = $title;// [2007-01-01] => 元日 / Ganjitsu / New Year's Day
-        }
-        ksort($holidays);
-}
-
-$explode_date = array();
-$explode_holidays = array();
-$holiday_list = array();
-foreach ($holidays as $date => $holiday) {
-    $explode_date[]  = explode('-', $date);
-    $explode_holidays[] = explode(' / ', $holiday);
-    foreach ($explode_holidays as $key => $value) {
-        $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
-    }
-}
-
-/*
-*オークショントピック
-*/
-$rss = simplexml_load_file('http://aucfan.com/article/feed/');
-$data = get_object_vars($rss);
-if (empty($rss)) {
-    return;
-}
-
-$title = array();
-$date = array();
-$link = array();
-$auc_topi_title = array();
-foreach ($rss->channel->item as $key => $value) {
-    $title = (string)$value->title;
-    $date = date('Y-m-d', strtotime((string)$value->pubDate));
-    $link = (string)$value->link;
-    $auc_topi_title[$date] = $title;
-    $auc_topi_link[$date] = $link;
-}
 
 ?>
 
@@ -277,7 +263,7 @@ foreach ($rss->channel->item as $key => $value) {
         <?php endfor ;?>
 
         <!-- 日付挿入 -->
-        <?php for ($day=$start_date; $day<=$end_day[$key]; $day++):?>
+        <?php for ($day=$start_date; $day<=$end_days[$key]; $day++):?>
 
             <!-- 桁数を揃える -->
             <?php $days = sprintf('%02d', $day) ;?>
@@ -308,12 +294,6 @@ foreach ($rss->channel->item as $key => $value) {
                     <?php $auc_topi_feed = $auc_topi_title[$value.'-'.$days];?>
                 <?php endif;?>
 
-                <?php $schedule = '';?><!-- DBに登録されている予定 -->
-                <?php if (isset($schedule_list[$value.'-'.$days])):?>
-                    <?php //$span_class = 'schedule';?>
-                    <?php $schedule = $schedule_list[$value.'-'.$days];?>
-                <?php endif;?>
-
                     <td class="<?php echo $class; ?>">
                         <!-- 日付出力 -->
                         <span class="day">
@@ -338,7 +318,18 @@ foreach ($rss->channel->item as $key => $value) {
 
                         <!-- DBに登録されている予定出力 -->
                         <span>
-                            <br /><span class="schedule"><a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day.'&status=update';?>" title="<?php echo $schedule_list_detail[$value.'-'.$days];?>"><?php echo $schedule;?></a></span>
+                            <br /><span class="schedule">
+
+
+                            <?php if (isset($schedules[$cal_year][$cal_month][$day])):?>
+                                <?php foreach ($schedules[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
+                                    <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day.'&status=update';?>"
+                                    title="<?php echo $schedule['detail'];?>">
+                                    <?php echo $schedule['title'];?><br />
+                                <?php endforeach;?>
+                            <?php endif;?>
+
+                            </a></span>
                         </span>
                     </td>
 
