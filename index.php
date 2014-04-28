@@ -145,6 +145,8 @@ $end_day = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['en
 $schedule_title = $post_data['schedule_title'];
 $schedule_detail = $post_data['schedule_detail'];
 $id = $post_data['schedule_id'];
+$between_begin = $calendars[1].'-01 00:00:01';
+$between_end = $calendars[3].'-'.$end_days[3].' 23:59:59';
 
 //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
 if (($_COOKIE['update'] == null) && ($schedule_title != null)) {
@@ -175,15 +177,15 @@ $sql=<<<END
         schedule_detail="$schedule_detail",
         update_at=NOW()
      WHERE
-        schedule_id=$id
+        schedule_id="$id"
 END;
 
 }
-else {
+/*else {
     echo "失敗";
-}
+}*/
 
-//予定を取得
+//予定を3ヶ月分取得
 $schedule_sql=<<<END
     SELECT
          schedule_id, start_date, schedule_title, schedule_detail
@@ -193,10 +195,17 @@ $schedule_sql=<<<END
          deleted_at
      IS
          null
+     AND
+         start_date
+     BETWEEN
+         "$between_begin"
+     AND
+         "$between_end"
+
 END;
 
 //SQL実行
-if (!empty($start_day)) {
+if (isset($start_day) && !empty($sql)) {
     $sql_result = mysqli_query($db, $sql);
 }
 if ($result = mysqli_query($db, $schedule_sql)) {
