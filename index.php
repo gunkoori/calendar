@@ -144,7 +144,10 @@ $end_day = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['en
 //予定のタイトルと詳細
 $schedule_title = $post_data['schedule_title'];
 $schedule_detail = $post_data['schedule_detail'];
+$id = $post_data['schedule_id'];
+print_r($post_data);
 
+// print_r($_COOKIE);
 //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
 if (($_COOKIE['update'] == null) && ($schedule_title != null)) {
 
@@ -162,7 +165,7 @@ $sql=<<<END
 END;
 
 }
-else {
+elseif ($_COOKIE['update'] == 'update') {
 
 $sql=<<<END
     UPDATE
@@ -175,24 +178,32 @@ $sql=<<<END
         update_at=NOW(),
         deleted_at="null"
     WHERE
-        start_date="$start_day"
+        schedule_id=$id
 END;
 
 }
+else {
+    echo "失敗";
+}
 
-$schedule_sql =<<<END
+//予定を取得
+$schedule_sql=<<<END
     SELECT
          schedule_id, start_date, schedule_title, schedule_detail
      FROM
          cal_schedules
-
+     WHERE
+         deleted_at="0000-00-00 00:00:00"
 END;
+
+// print_r($schedule_sql);
+print_r($sql);
 
 
 
 //SQL実行
-if (isset($start_day)) {
-    $result = mysqli_query($db, $sql);
+if (!empty($start_day)) {
+    $sql_result = mysqli_query($db, $sql);
 }
 if ($result = mysqli_query($db, $schedule_sql)) {
     while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
@@ -271,7 +282,6 @@ mysqli_close($db);
             <?php $month_weekend=date("w", strtotime($value.'-'.$day));?>
 
                 <?php $class = ''; ?>
-                <?php $span_class = '';?>
                 <?php if($month_weekend == 0):?><!-- 日曜日 -->
                     <?php $class = 'sunday'; ?>
                 <?php elseif($month_weekend == 6):?><!-- 土曜日 -->
@@ -323,7 +333,7 @@ mysqli_close($db);
 
                             <?php if (isset($schedules[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
-                                    <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day.'&status=update';?>"
+                                    <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day.'&id='.$schedule_id;?>"
                                     title="<?php echo $schedule['detail'];?>">
                                     <?php echo $schedule['title'];?><br />
                                 <?php endforeach;?>

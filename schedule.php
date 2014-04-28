@@ -6,7 +6,7 @@ $update ='';
 $year = $_GET['year'];
 $month = $_GET['month'];
 $day = $_GET['day'];
-$status = $_GET['status'];
+$schedule_id = $_GET['id'];
 $date = sprintf('%02d', $day);
 
 
@@ -33,6 +33,8 @@ $schedule_sql =<<<END
          start_date, end_date, schedule_title, schedule_detail
      FROM
          cal_schedules
+     WHERE
+         deleted_at="0000-00-00 00:00:00"
 END;
 
 
@@ -56,7 +58,7 @@ $end_month = $schedule_end_date[$year.'-'.$month.'-'.$date][1];
 $end_day = $schedule_end_date[$year.'-'.$month.'-'.$date][2];
 
 //
-if ($status != 'update') {
+if (!isset($schedule_id)) {
     $end_year = $year;
     $end_month = $month;
     $end_day = $day;
@@ -94,7 +96,8 @@ if ($status != 'update') {
         <br />
         タイトル：<input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedule_list[$year.'-'.$month.'-'.$date];?>" /><br />
         詳細：<input type="text" id="schedule_detail" name="schedule_detail" value="<?php echo $schedule_list_detail[$year.'-'.$month.'-'.$date];?>"/><br />
-        <?php if($status == 'update'):?>
+        <input type="hidden" id="schedule_id" name="schedule_id" value="<?php echo $schedule_id;?>" />
+        <?php if(!empty($schedule_id)):?>
             <?php setcookie('update', 'update', time()+10);?>
             <input type="submit" value="更新する" />
         <?php else:?>
