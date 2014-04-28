@@ -9,9 +9,6 @@ $day = $_GET['day'];
 $schedule_id = $_GET['id'];
 $date = sprintf('%02d', $day);
 
-
-
-
 /*
 *DB接続
 */
@@ -34,9 +31,13 @@ $schedule_sql =<<<END
      FROM
          cal_schedules
      WHERE
-         deleted_at="0000-00-00 00:00:00"
-     AND
          schedule_id="$schedule_id"
+
+     AND
+         deleted_at
+     IS
+         null
+
 END;
 
 
@@ -53,7 +54,7 @@ if ($result = mysqli_query($db, $schedule_sql)) {
     mysqli_free_result($result);
 }
 mysqli_close($db);
-print_r($schedule_list);
+
 //終了日
 $end_year = $schedule_end_date[$year.'-'.$month.'-'.$date][0];
 $end_month = $schedule_end_date[$year.'-'.$month.'-'.$date][1];

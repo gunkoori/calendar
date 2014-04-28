@@ -145,9 +145,7 @@ $end_day = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['en
 $schedule_title = $post_data['schedule_title'];
 $schedule_detail = $post_data['schedule_detail'];
 $id = $post_data['schedule_id'];
-print_r($post_data);
 
-// print_r($_COOKIE);
 //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
 if (($_COOKIE['update'] == null) && ($schedule_title != null)) {
 
@@ -161,7 +159,7 @@ $sql=<<<END
         schedule_detail="$schedule_detail",
         update_at=NOW(),
         created_at=NOW(),
-        deleted_at="null"
+        deleted_at=null
 END;
 
 }
@@ -171,12 +169,12 @@ $sql=<<<END
     UPDATE
          cal_schedules
      SET
-        start_date="$start_day",
-        end_date="$end_day",
-        schedule_title="$schedule_title",
-        schedule_detail="$schedule_detail",
+        start_date=$start_day,
+        end_date=$end_day,
+        schedule_title=$schedule_title,
+        schedule_detail=$schedule_detail,
         update_at=NOW(),
-        deleted_at="null"
+        deleted_at=null
     WHERE
         schedule_id=$id
 END;
@@ -193,12 +191,10 @@ $schedule_sql=<<<END
      FROM
          cal_schedules
      WHERE
-         deleted_at="0000-00-00 00:00:00"
+         deleted_at
+     IS
+         null
 END;
-
-// print_r($schedule_sql);
-print_r($sql);
-
 
 
 //SQL実行
