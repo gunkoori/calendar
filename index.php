@@ -181,14 +181,12 @@ $sql=<<<END
 END;
 
 }
-/*else {
-    echo "失敗";
-}*/
+
 
 //予定を3ヶ月分取得
 $schedule_sql=<<<END
     SELECT
-         schedule_id, start_date, schedule_title, schedule_detail
+         schedule_id, start_date, end_date, schedule_title, schedule_detail
      FROM
          cal_schedules
      WHERE
@@ -211,8 +209,14 @@ if (isset($start_day) && !empty($sql)) {
 if ($result = mysqli_query($db, $schedule_sql)) {
     while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
+        list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
         $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
         $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
+        if ($row['start_date'] != $row['end_date']) {
+            for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
+                $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+            }
+        }
     }
     mysqli_free_result($result);
 }
