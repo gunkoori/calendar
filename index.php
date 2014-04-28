@@ -147,9 +147,10 @@ $schedule_detail = $post_data['schedule_detail'];
 $id = $post_data['schedule_id'];
 $between_begin = $calendars[1].'-01 00:00:01';
 $between_end = $calendars[3].'-'.$end_days[3].' 23:59:59';
+print_r($post_data);
 
 //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
-if (($_COOKIE['update'] == null) && ($schedule_title != null)) {
+if (/*($_COOKIE['update'] == null)*/empty($id) && ($schedule_title != null)) {
 
 $sql=<<<END
     INSERT INTO
@@ -165,7 +166,7 @@ $sql=<<<END
 END;
 
 }
-elseif ($_COOKIE['update'] == 'update') {
+elseif (/*$_COOKIE['update'] == 'update'*/isset($id) && !isset($post_data['delete'])) {
 
 $sql=<<<END
     UPDATE
@@ -181,8 +182,20 @@ $sql=<<<END
 END;
 
 }
+elseif ($post_data['delete'] == 'delete') {
 
+$sql=<<<END
+    UPDATE
+         cal_schedules
+     SET
+        deleted_at=NOW()
+     WHERE
+        schedule_id="$id"
+END;
 
+}
+
+print_r($sql);
 //予定を3ヶ月分取得
 $schedule_sql=<<<END
     SELECT

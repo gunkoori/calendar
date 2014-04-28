@@ -58,13 +58,23 @@ if ($result = mysqli_query($db, $schedule_sql)) {
 mysqli_close($db);
 
 
+
+
 //&id=**がないとき。つまり予定の編集ではないとき
 if (!isset($schedule_id)) {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $day = $_GET['day'];
     $end_year = $year;
     $end_month = $month;
     $end_day = $day;
-    $schedule_list[$year.'-'.$month.'-'.$date] = '';
-    $schedule_list_detail[$year.'-'.$month.'-'.$date] = '';
+} else {
+    $year = $schedule_year;
+    $month = $schedule_month;
+    $day = $schedule_day;
+    $end_year = $end_schedule_year;
+    $end_month = $end_schedule_month;
+    $end_day = $end_schedule_day;
 }
 ?>
 
@@ -84,9 +94,9 @@ if (!isset($schedule_id)) {
     <tr>
         <th>開始</th>
         <td>
-            <input type="text" id="start_year" name="start_year" value="<?php echo $schedule_year;?>" />年
-            <input type="text" id="start_month" name="start_month" value="<?php echo $schedule_month;?>" />月
-            <input type="text" id="start_day" name="start_day" value="<?php echo $schedule_day;?>" />日<br />
+            <input type="text" id="start_year" name="start_year" value="<?php echo $year;?>" />年
+            <input type="text" id="start_month" name="start_month" value="<?php echo $month;?>" />月
+            <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日<br />
             <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分
         </td>
@@ -94,9 +104,9 @@ if (!isset($schedule_id)) {
     <tr>
         <th>終了</th>
         <td>
-            <input type="text" id="end_year" name="end_year" value="<?php echo $end_schedule_year;?>" />年
-            <input type="text" id="end_month" name="end_month" value="<?php echo $end_schedule_month;?>" />月
-            <input type="text" id="end_day" name="end_day" value="<?php echo $end_schedule_day;?>" />日<br />
+            <input type="text" id="end_year" name="end_year" value="<?php echo $end_year;?>" />年
+            <input type="text" id="end_month" name="end_month" value="<?php echo $end_month;?>" />月
+            <input type="text" id="end_day" name="end_day" value="<?php echo $end_day;?>" />日<br />
             <input type="text" id="end_hour" name="end_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="end_min" name="end_min" value="<?php echo date('i');?>" />分
         </td>
@@ -113,15 +123,20 @@ if (!isset($schedule_id)) {
             <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['detail'];?></textarea>
         </td>
     </tr>
-    <input type="hidden" id="schedule_id" name="schedule_id" value="<?php echo $schedule_id;?>" />
+    <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
     <?php if(!empty($schedule_id)):?>
-            <?php setcookie('update', 'update', time()+10);?>
-            <input type="submit" value="更新する" />
+            <?php //setcookie('update', 'update', time()+10);?>
+            <input type="submit" value="更新" />
     <?php else:?>
-            <input type="submit" value="登録する" />
+            <input type="submit" value="登録" />
     <?php endif;?>
 
 </table>
+</form>
+<form method="post" action="http://kensyu.aucfan.com/">
+    <input type="hidden" id="delete" name="delete" value="delete" />
+    <input type="hidden"  name="schedule_id" value="<?php echo $schedule_id;?>" />
+    <input type="submit" value="削除" />
 </form>
 
 </div><!-- schedule_form -->
