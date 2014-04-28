@@ -3,11 +3,11 @@ body {
     margin: 0 auto;
 }
 
+/*
 td {
     height: 80px;
     width: 80px;
     text-align: center;
-    /*padding: 5px;*/
     border: 1px solid #ccc;
     vertical-align: top;
 }
@@ -15,6 +15,7 @@ td {
 th {
     background-color: #eee
 }
+*/
 
 h1 {
 
@@ -34,6 +35,18 @@ a {
 
 
 /**********calendar***********/
+.calendar td {
+    height: 80px;
+    width: 80px;
+    text-align: center;
+    border: 1px solid #ccc;
+    vertical-align: top;
+}
+
+.calendar th {
+    background-color: #eee
+}
+
 #this {
     display: inline;
     margin-top: 20px;
@@ -106,9 +119,29 @@ a {
 
 
 /********** schedule.php ***********/
+#schedule_form {
+}
+
+#form {
+    text-align: center;
+    margin: 0 auto;
+}
+
+#schedule_form td {
+    /*height: 80px;*/
+    /*width: 80px;*/
+    text-align: left;
+    border: 1px solid #ccc;
+    vertical-align: top;
+}
+
+#schedule_form th {
+    text-align: left;
+    background-color: #eee;
+}
+
 #start_day {
     display: inline-block;
-
 }
 
 #end_day {
@@ -118,12 +151,10 @@ a {
 
 #schedule_title {
     display: inline;
-
 }
 
 #schedule_detail {
     display: inline;
-
 }
 
 

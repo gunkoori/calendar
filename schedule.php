@@ -80,33 +80,52 @@ if (!isset($schedule_id)) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-    <form method="post" action="http://kensyu.aucfan.com/">
-        <span>
+<form method="post" action="http://kensyu.aucfan.com/">
+
+<table>
+    <tr>
+        <th>開始</th>
+        <td>
             <input type="text" id="start_year" name="start_year" value="<?php echo $year;?>" />年
             <input type="text" id="start_month" name="start_month" value="<?php echo $month;?>" />月
-            <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日〜
+            <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日<br />
+            <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
+            <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分
+        </td>
+    </tr>
+    <tr>
+        <th>終了</th>
+        <td>
             <input type="text" id="end_year" name="end_year" value="<?php echo $end_year;?>" />年
             <input type="text" id="end_month" name="end_month" value="<?php echo $end_month;?>" />月
-            <input type="text" id="end_day" name="end_day" value="<?php echo $end_day;?>" />日
-        </span>
-        <br />
-        <span>
-            <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
-            <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分〜
+            <input type="text" id="end_day" name="end_day" value="<?php echo $end_day;?>" />日<br />
             <input type="text" id="end_hour" name="end_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="end_min" name="end_min" value="<?php echo date('i');?>" />分
-        </span>
-        <br />
-        タイトル：<input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedule_list[$year.'-'.$month.'-'.$date];?>" /><br />
-        詳細：<input type="text" id="schedule_detail" name="schedule_detail" value="<?php echo $schedule_list_detail[$year.'-'.$month.'-'.$date];?>"/><br />
-        <input type="hidden" id="schedule_id" name="schedule_id" value="<?php echo $schedule_id;?>" />
-        <?php if(!empty($schedule_id)):?>
+        </td>
+    </tr>
+    <tr>
+        <th>タイトル</th>
+        <td>
+            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedule_list[$year.'-'.$month.'-'.$date];?>" /><br />
+        </td>
+    </tr>
+    <tr>
+        <th>詳細</th>
+        <td>
+            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedule_list_detail[$year.'-'.$month.'-'.$date];?></textarea>
+        </td>
+    </tr>
+    <input type="hidden" id="schedule_id" name="schedule_id" value="<?php echo $schedule_id;?>" />
+    <?php if(!empty($schedule_id)):?>
             <?php setcookie('update', 'update', time()+10);?>
             <input type="submit" value="更新する" />
-        <?php else:?>
+    <?php else:?>
             <input type="submit" value="登録する" />
-        <?php endif;?>
-    </form>
-</div>
+    <?php endif;?>
+
+</table>
+</form>
+
+</div><!-- schedule_form -->
 </body>
 </html>

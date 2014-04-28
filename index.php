@@ -169,13 +169,12 @@ $sql=<<<END
     UPDATE
          cal_schedules
      SET
-        start_date=$start_day,
-        end_date=$end_day,
-        schedule_title=$schedule_title,
-        schedule_detail=$schedule_detail,
-        update_at=NOW(),
-        deleted_at=null
-    WHERE
+        start_date="$start_day",
+        end_date="$end_day",
+        schedule_title="$schedule_title",
+        schedule_detail="$schedule_detail",
+        update_at=NOW()
+     WHERE
         schedule_id=$id
 END;
 
@@ -195,7 +194,6 @@ $schedule_sql=<<<END
      IS
          null
 END;
-
 
 //SQL実行
 if (!empty($start_day)) {
