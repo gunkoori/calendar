@@ -9,6 +9,14 @@ $day = $_GET['day'];
 $schedule_id = $_GET['id'];
 $date = sprintf('%02d', $day);
 
+if (isset($schedule_id)) {
+    setcookie("get_parameter", "?year=".$year."&month=".$month."&day=".$day."&id=".$schedule_id, time()+10);
+} else {
+    setcookie("get_parameter", "?year=$year&month=$month&day=$day", time()+10);
+}
+
+
+
 /*
 *DB接続
 */
@@ -99,6 +107,12 @@ if (!isset($schedule_id)) {
             <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日<br />
             <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分
+            <?php if (!isset($year) || !isset($month) || !isset($day)):?>
+                <?php
+                    echo "空欄があります！！";
+                    exit;
+                ?>
+            <?php endif;?>
         </td>
     </tr>
     <tr>
@@ -123,12 +137,13 @@ if (!isset($schedule_id)) {
             <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['detail'];?></textarea>
         </td>
     </tr>
-    <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
+
     <?php if(!empty($schedule_id)):?>
-            <?php //setcookie('update', 'update', time()+10);?>
-            <input type="submit" value="更新" />
+            <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
+
+            <input type="submit" name="update" value="更新" />
     <?php else:?>
-            <input type="submit" value="登録" />
+            <input type="submit" name="insert" value="登録" />
     <?php endif;?>
 
 </table>

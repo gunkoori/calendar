@@ -134,6 +134,7 @@ if (mysqli_connect_errno()) {
 /*
 *フォームからPOSTされたデータ
 */
+
 $post_data = $_POST;
 //開始時間と終了時間
 $start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
@@ -147,8 +148,15 @@ $schedule_detail = $post_data['schedule_detail'];
 $id = $post_data['schedule_id'];
 $between_begin = $calendars[1].'-01 00:00:01';
 $between_end = $calendars[3].'-'.$end_days[3].' 23:59:59';
-print_r($post_data);
 
+$post_data = $_POST;
+if (isset($post_data['insert']) || isset($post_data['update'])) {
+    if (empty($post_data['start_year']) || empty($post_data['start_month']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) || empty($schedule_title) || empty($schedule_detail)) {
+
+            header("Location: http://kensyu.aucfan.com/error.php");
+            exit;
+    }
+}
 //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
 if (/*($_COOKIE['update'] == null)*/empty($id) && ($schedule_title != null)) {
 
@@ -195,7 +203,6 @@ END;
 
 }
 
-print_r($sql);
 //予定を3ヶ月分取得
 $schedule_sql=<<<END
     SELECT
