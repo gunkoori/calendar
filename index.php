@@ -140,8 +140,9 @@ $post_data = $_POST;
 $start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
 $end_time = $post_data['end_hour'].':'.$post_data['end_min'].':00';
 //開始日と終了日
-$start_day = $post_data['start_year'].'-'.$post_data['start_month'].'-'.$post_data['start_day'].' '.$start_time;
-$end_day = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['end_day'].' '.$end_time;
+$start_day = $post_data['start_ym'].'-'.$post_data['start_day'].' '.$start_time;
+print_r($post_data);
+$end_day = $post_data['end_ym'].'-'.$post_data['end_day'].' '.$end_time;
 //予定のタイトルと詳細
 $schedule_title = $post_data['schedule_title'];
 $schedule_detail = $post_data['schedule_detail'];
@@ -151,14 +152,13 @@ $between_end = $calendars[3].'-'.$end_days[3].' 23:59:59';
 
 $post_data = $_POST;
 if (isset($post_data['insert']) || isset($post_data['update'])) {
-    if (empty($post_data['start_year']) || empty($post_data['start_month']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) || empty($schedule_title) || empty($schedule_detail)) {
-
+    if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail)) {
             header("Location: http://kensyu.aucfan.com/error.php");
             exit;
     }
 }
 //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
-if (/*($_COOKIE['update'] == null)*/empty($id) && ($schedule_title != null)) {
+if (empty($id) && ($schedule_title != null)) {
 
 $sql=<<<END
     INSERT INTO
@@ -174,7 +174,7 @@ $sql=<<<END
 END;
 
 }
-elseif (/*$_COOKIE['update'] == 'update'*/isset($id) && !isset($post_data['delete'])) {
+elseif (isset($id) && !isset($post_data['delete'])) {
 
 $sql=<<<END
     UPDATE

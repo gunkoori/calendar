@@ -15,8 +15,6 @@ if (isset($schedule_id)) {
     setcookie("get_parameter", "?year=$year&month=$month&day=$day", time()+10);
 }
 
-
-
 /*
 *DB接続
 */
@@ -65,10 +63,7 @@ if ($result = mysqli_query($db, $schedule_sql)) {
 }
 mysqli_close($db);
 
-
-
-
-//&id=**がないとき。つまり予定の編集ではないとき
+//新規登録のとき
 if (!isset($schedule_id)) {
     $year = $_GET['year'];
     $month = $_GET['month'];
@@ -76,7 +71,7 @@ if (!isset($schedule_id)) {
     $end_year = $year;
     $end_month = $month;
     $end_day = $day;
-} else {
+} else {//編集のとき
     $year = $schedule_year;
     $month = $schedule_month;
     $day = $schedule_day;
@@ -84,6 +79,21 @@ if (!isset($schedule_id)) {
     $end_month = $end_schedule_month;
     $end_day = $end_schedule_day;
 }
+
+/*
+*コンボボックス
+*/
+for ($i=-12; $i<=12; $i++) {
+    list($years, $months, $days) = explode('-', date('Y-n-t', mktime(0, 0, 0, $month+($i), 1, $year)));
+    $ym[] = $years.'年'.$months.'月';
+    // $d[] = $days;
+    $combo[$years][$months]=$days;
+
+    for ($j=1; $j<=$days; $j++) {
+            $combos[$years][$months] = $j;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -102,24 +112,27 @@ if (!isset($schedule_id)) {
     <tr>
         <th>開始</th>
         <td>
-            <input type="text" id="start_year" name="start_year" value="<?php echo $year;?>" />年
-            <input type="text" id="start_month" name="start_month" value="<?php echo $month;?>" />月
+            <select name="start_ym">
+            <?php for ($i=0; $i<=24; $i++):?>
+                <option id="select_year_month" value="<?php echo $year.'-'.$month;?>"><?php echo $ym[$i]?></option>
+            <?php endfor; ?>
+            </select>
+
+
             <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日<br />
             <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分
-            <?php if (!isset($year) || !isset($month) || !isset($day)):?>
-                <?php
-                    echo "空欄があります！！";
-                    exit;
-                ?>
-            <?php endif;?>
         </td>
     </tr>
     <tr>
         <th>終了</th>
         <td>
-            <input type="text" id="end_year" name="end_year" value="<?php echo $end_year;?>" />年
-            <input type="text" id="end_month" name="end_month" value="<?php echo $end_month;?>" />月
+            <select name="end_ym">
+            <?php for ($i=0; $i<=24; $i++):?>
+                <option id="select_year_month" value="<?php echo $end_year.'-'.$end_month;?>"><?php echo $ym[$i]?>日</option>
+            <?php endfor; ?>
+            </select>
+
             <input type="text" id="end_day" name="end_day" value="<?php echo $end_day;?>" />日<br />
             <input type="text" id="end_hour" name="end_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="end_min" name="end_min" value="<?php echo date('i');?>" />分
