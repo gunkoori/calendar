@@ -121,7 +121,7 @@ for ($i=-12; $i<=12; $i++) {
 
 <table>
     <tr>
-        <th>開始</th>
+        <th>開始<br />※必須</th>
         <td>
             <select name="start_ym">
             <?php for ($i=0; $i<=24; $i++):?>
@@ -134,8 +134,8 @@ for ($i=-12; $i<=12; $i++) {
                 <option id="select_start_day" value="<?php echo $i;?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo $i?>日</option>
             <?php endfor; ?>
             </select>
-            <?php echo $error_ymd;?><br />
-            <?php echo $error_date;?><br />
+            <span class="error"><?php echo $error_ymd;?></span><br />
+            <span class="error"><?php echo $error_date;?></span><br />
             <select name="start_hour">
             <?php for ($i=1; $i<24; $i++):?>
                 <option id="start_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
@@ -145,11 +145,11 @@ for ($i=-12; $i<=12; $i++) {
                 <option class="start_min" value="00">00分</option>
                 <option class="start_min" value="30">30分</option>
             </select>
-            <br /><?php echo $error_hour;?>
+            <br /><span class="error"><?php echo $error_hour;?></span>
         </td>
     </tr>
     <tr>
-        <th>終了</th>
+        <th>終了<br />※必須</th>
         <td>
             <select name="end_ym">
             <?php for ($i=0; $i<=24; $i++):?>
@@ -162,8 +162,8 @@ for ($i=-12; $i<=12; $i++) {
                 <option id="select_end_day" value="<?php echo $i;?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo $i?>日</option>
             <?php endfor; ?>
             </select>
-            <?php echo $error_ymd;?><br />
-            <?php echo $error_date;?><br />
+            <span class="error"><?php echo $error_ymd;?></span><br />
+            <span class="error"><?php echo $error_date;?></span><br />
             <select name="end_hour">
             <?php for ($i=1; $i<24; $i++):?>
                 <option id="end_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
@@ -173,21 +173,21 @@ for ($i=-12; $i<=12; $i++) {
                 <option class="end_min" value="00">00分</option>
                 <option class="end_min" value="30">30分</option>
             </select>
-            <br /><?php echo $error_hour;?>
+            <br /><span class="error"><?php echo $error_hour;?></span>
         </td>
     </tr>
     <tr>
-        <th>タイトル</th>
+        <th>タイトル<br />※必須</th>
         <td>
             <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['title'];?>" /><br />
-            <?php echo $error_schedule_title;?>
+            <span class="error"><?php echo $error_schedule_title;?></span>
         </td>
     </tr>
     <tr>
-        <th>詳細</th>
+        <th>詳細<br />※必須</th>
         <td>
             <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['detail'];?></textarea>
-            <br /><?php echo $error_schedule_detail;?>
+            <br /><span class="error"><?php echo $error_schedule_detail;?></span>
         </td>
     </tr>
 

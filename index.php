@@ -161,16 +161,16 @@ if (isset($_COOKIE['error_id'])) {
 if ($post_data['start_hour'] == '' || $post_data['start_min'] == '' || $post_data['end_hour'] == '' || $post_data['end_min'] == '') {
     setcookie('error_hour', '時間は必須です', time()+1);
 }
-elseif ($post_data['start_ym'] == '' || $post_data['start_day'] == '' || $post_data['end_ym'] == '' || $post_data['end_day'] == '') {
+if ($post_data['start_ym'] == '' || $post_data['start_day'] == '' || $post_data['end_ym'] == '' || $post_data['end_day'] == '') {
     setcookie('ymd', '年月日は必須です', time()+1);
 }
-elseif ($schedule_title == '') {
+if ($schedule_title == '') {
     setcookie('schedule_title', 'タイトルは必須です', time()+1);
 }
-elseif ($schedule_detail == '') {
+if ($schedule_detail == '') {
     setcookie('schedule_detail', '詳細は必須です', time()+1);
 }
-elseif (strtotime($start_day) > strtotime($end_day)) {
+if (strtotime($start_day) > strtotime($end_day)) {
     setcookie('error_compare_date', '開始日時が終了日時より遅く設定されています', time()+1);
 }
 
@@ -229,7 +229,8 @@ $sql=<<<END
     UPDATE
          cal_schedules
      SET
-        deleted_at=NOW()
+         update_at=NOW(),
+         deleted_at=NOW()
      WHERE
         schedule_id="$id"
 END;
