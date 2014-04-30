@@ -158,9 +158,7 @@ if (isset($_COOKIE['error_id'])) {
 }
 
 //バリデート
-// $error_flg = false;
 if ($post_data['start_hour'] == '' || $post_data['start_min'] == '' || $post_data['end_hour'] == '' || $post_data['end_min'] == '') {
-    // $error_flg = true;
     setcookie('error_hour', '時間は必須です', time()+1);
 }
 elseif ($post_data['start_ym'] == '' || $post_data['start_day'] == '' || $post_data['end_ym'] == '' || $post_data['end_day'] == '') {
@@ -173,10 +171,17 @@ elseif ($schedule_detail == '') {
     setcookie('schedule_detail', '詳細は必須です', time()+1);
 }
 
+//無効な日付化チェックする
+$explode_start_ym = explode('-', $post_data['start_ym']);
+$explode_end_ym = explode('-', $post_data['end_ym']);
+$check_start_ym = checkdate($explode_start_ym[1], $post_data['start_day'], intval($explode_start_ym[0]));
+$check_end_ym = checkdate($explode_end_ym[1], $post_data['end_day'], intval($explode_end_ym[0]));
+if ($check_start_ym == false || $check_end_ym == false) {
+    setcookie('date_error', '無効な日付です', time()+1);
+}
 //再度入力フォームに戻す
 if (isset($post_data['insert']) || isset($post_data['update'])) {
-    if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail)) {
-        //setcookie('error', 'ここは必須項目です！');//フォームでエラー表示させるため
+    if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail) || $check_start_ym == false || $check_end_ym == false ) {
         header("Location: http://kensyu.aucfan.com/error.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
         exit;
     }

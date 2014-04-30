@@ -15,10 +15,12 @@ if (isset($schedule_id)) {
     setcookie("get_parameter", "?year=$year&month=$month&day=$day", time()+10);
 }
 
+//エラーメッセージの受け取り
 $error_hour = $_COOKIE['error_hour'];
 $error_ymd = $_COOKIE['ymd'];
 $error_schedule_title = $_COOKIE['schedule_title'];
 $error_schedule_detail = $_COOKIE['schedule_detail'];
+$error_date =  $_COOKIE['date_error'];
 
 /*
 *DB接続
@@ -126,8 +128,15 @@ for ($i=-12; $i<=12; $i++) {
                 <option id="select_year_month" value="<?php echo $year.'-'.$month;?>"><?php echo $ym[$i]?></option>
             <?php endfor; ?>
             </select>
-            <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日<br />
+            <!-- <input type="text" id="start_day" name="start_day" value="<?php //echo $day;?>" />日<br /> -->
+            <!-- TODO:月によって日付が違うのでJSで直す -->
+            <select name="start_day">
+            <?php for ($i=1; $i<=31; $i++):?>
+                <option id="select_start_day" value="<?php echo $i;?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo $i?>日</option>
+            <?php endfor; ?>
+            </select>
             <?php echo $error_ymd;?><br />
+            <?php echo $error_date;?><br />
             <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分
             <br /><?php echo $error_hour;?>
@@ -141,8 +150,14 @@ for ($i=-12; $i<=12; $i++) {
                 <option id="select_year_month" value="<?php echo $end_year.'-'.$end_month;?>"><?php echo $ym[$i]?></option>
             <?php endfor; ?>
             </select>
-            <input type="text" id="end_day" name="end_day" value="<?php echo $end_day;?>" />日<br />
+            <!-- TODO:月によって日付が違うのでJSで直す -->
+            <select name="end_day">
+            <?php for ($i=1; $i<=31; $i++):?>
+                <option id="select_end_day" value="<?php echo $i;?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo $i?>日</option>
+            <?php endfor; ?>
+            </select>
             <?php echo $error_ymd;?><br />
+            <?php echo $error_date;?><br />
             <input type="text" id="end_hour" name="end_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="end_min" name="end_min" value="<?php echo date('i');?>" />分
             <br /><?php echo $error_hour;?>
