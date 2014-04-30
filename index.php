@@ -41,7 +41,7 @@ $next_month = array(
   'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
-// Y-nを取得。$now_yearの前後1年
+// Y-mを取得。$now_yearの前後1年
 for ($i=-12; $i<=12; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
 }
@@ -170,6 +170,9 @@ elseif ($schedule_title == '') {
 elseif ($schedule_detail == '') {
     setcookie('schedule_detail', '詳細は必須です', time()+1);
 }
+elseif (strtotime($start_day) > strtotime($end_day)) {
+    setcookie('error_compare_date', '開始日時が終了日時より遅く設定されています', time()+1);
+}
 
 //無効な日付化チェックする
 $explode_start_ym = explode('-', $post_data['start_ym']);
@@ -181,7 +184,7 @@ if ($check_start_ym == false || $check_end_ym == false) {
 }
 //再度入力フォームに戻す
 if (isset($post_data['insert']) || isset($post_data['update'])) {
-    if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail) || $check_start_ym == false || $check_end_ym == false ) {
+    if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail) || $check_start_ym == false || $check_end_ym == false || strtotime($start_day) > strtotime($end_day)) {
         header("Location: http://kensyu.aucfan.com/error.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
         exit;
     }

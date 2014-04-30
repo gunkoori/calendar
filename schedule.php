@@ -20,7 +20,7 @@ $error_hour = $_COOKIE['error_hour'];
 $error_ymd = $_COOKIE['ymd'];
 $error_schedule_title = $_COOKIE['schedule_title'];
 $error_schedule_detail = $_COOKIE['schedule_detail'];
-$error_date =  $_COOKIE['date_error'];
+$error_date =  $_COOKIE['error_compare_date'];
 
 /*
 *DB接続
@@ -85,10 +85,10 @@ if (!isset($schedule_id)) {
     $end_day = $end_schedule_day;
 }
 
-setcookie('error_year', $year, time()+10);
-setcookie('error_month', $month, time()+10);
-setcookie('error_day', $day, time()+10);
-setcookie('error_id', $schedule_id, time()+10);
+setcookie('error_year', $year, time()+20000);
+setcookie('error_month', $month, time()+20000);
+setcookie('error_day', $day, time()+20000);
+setcookie('error_id', $schedule_id, time()+20000);
 
 
 /*
@@ -136,10 +136,8 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <?php echo $error_ymd;?><br />
             <?php echo $error_date;?><br />
-            <!-- <input type="text" id="start_hour" name="start_hour" value="<?php //echo date('G');?>" />時 -->
-            <!-- <input type="text" id="start_min" name="start_min" value="<?php //echo date('i');?>" />分 -->
             <select name="start_hour">
-            <?php for ($i=1; $i<=24; $i++):?>
+            <?php for ($i=1; $i<24; $i++):?>
                 <option id="start_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
             <?php endfor; ?>
             </select>
@@ -166,10 +164,8 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <?php echo $error_ymd;?><br />
             <?php echo $error_date;?><br />
-            <!-- <input type="text" id="end_hour" name="end_hour" value="<?php //echo date('H');?>" />時 -->
-            <!-- <input type="text" id="end_min" name="end_min" value="<?php //echo date('i');?>" />分 -->
             <select name="end_hour">
-            <?php for ($i=1; $i<=24; $i++):?>
+            <?php for ($i=1; $i<24; $i++):?>
                 <option id="end_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
             <?php endfor; ?>
             </select>
