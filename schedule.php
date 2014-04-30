@@ -15,6 +15,11 @@ if (isset($schedule_id)) {
     setcookie("get_parameter", "?year=$year&month=$month&day=$day", time()+10);
 }
 
+$error_hour = $_COOKIE['error_hour'];
+$error_ymd = $_COOKIE['ymd'];
+$error_schedule_title = $_COOKIE['schedule_title'];
+$error_schedule_detail = $_COOKIE['schedule_detail'];
+
 /*
 *DB接続
 */
@@ -57,8 +62,6 @@ if ($result = mysqli_query($db, $schedule_sql)) {
         $schedules[$end_schedule_year][$end_schedule_month][$end_schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
         $schedules[$end_schedule_year][$end_schedule_month][$end_schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
     }
-
-
     mysqli_free_result($result);
 }
 mysqli_close($db);
@@ -80,11 +83,17 @@ if (!isset($schedule_id)) {
     $end_day = $end_schedule_day;
 }
 
+setcookie('error_year', $year, time()+10);
+setcookie('error_month', $month, time()+10);
+setcookie('error_day', $day, time()+10);
+setcookie('error_id', $schedule_id, time()+10);
+
+
 /*
 *コンボボックス
 */
 for ($i=-12; $i<=12; $i++) {
-    list($years, $months, $days) = explode('-', date('Y-n-t', mktime(0, 0, 0, $month+($i), 1, $year)));
+    list($years, $months, $days) = explode('-', date('Y-n-t', mktime(0, 0, 0, $month+($i), 1, intval($year)) ));
     $ym[] = $years.'年'.$months.'月';
     // $d[] = $days;
     $combo[$years][$months]=$days;
@@ -117,11 +126,11 @@ for ($i=-12; $i<=12; $i++) {
                 <option id="select_year_month" value="<?php echo $year.'-'.$month;?>"><?php echo $ym[$i]?></option>
             <?php endfor; ?>
             </select>
-
-
             <input type="text" id="start_day" name="start_day" value="<?php echo $day;?>" />日<br />
+            <?php echo $error_ymd;?><br />
             <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分
+            <br /><?php echo $error_hour;?>
         </td>
     </tr>
     <tr>
@@ -129,25 +138,28 @@ for ($i=-12; $i<=12; $i++) {
         <td>
             <select name="end_ym">
             <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo $end_year.'-'.$end_month;?>"><?php echo $ym[$i]?>日</option>
+                <option id="select_year_month" value="<?php echo $end_year.'-'.$end_month;?>"><?php echo $ym[$i]?></option>
             <?php endfor; ?>
             </select>
-
             <input type="text" id="end_day" name="end_day" value="<?php echo $end_day;?>" />日<br />
+            <?php echo $error_ymd;?><br />
             <input type="text" id="end_hour" name="end_hour" value="<?php echo date('G');?>" />時
             <input type="text" id="end_min" name="end_min" value="<?php echo date('i');?>" />分
+            <br /><?php echo $error_hour;?>
         </td>
     </tr>
     <tr>
         <th>タイトル</th>
         <td>
             <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['title'];?>" /><br />
+            <?php echo $error_schedule_title;?>
         </td>
     </tr>
     <tr>
         <th>詳細</th>
         <td>
             <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['detail'];?></textarea>
+            <br /><?php echo $error_schedule_detail;?>
         </td>
     </tr>
 

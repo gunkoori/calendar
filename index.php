@@ -134,14 +134,12 @@ if (mysqli_connect_errno()) {
 /*
 *フォームからPOSTされたデータ
 */
-
 $post_data = $_POST;
 //開始時間と終了時間
 $start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
 $end_time = $post_data['end_hour'].':'.$post_data['end_min'].':00';
 //開始日と終了日
 $start_day = $post_data['start_ym'].'-'.$post_data['start_day'].' '.$start_time;
-print_r($post_data);
 $end_day = $post_data['end_ym'].'-'.$post_data['end_day'].' '.$end_time;
 //予定のタイトルと詳細
 $schedule_title = $post_data['schedule_title'];
@@ -150,13 +148,40 @@ $id = $post_data['schedule_id'];
 $between_begin = $calendars[1].'-01 00:00:01';
 $between_end = $calendars[3].'-'.$end_days[3].' 23:59:59';
 
-$post_data = $_POST;
+//エラー（入力漏れがあった）場合は
+$error_year = $_COOKIE['error_year'];
+$error_month = $_COOKIE['error_month'];
+$error_day = $_COOKIE['error_day'];
+$error_id = '';
+if (isset($_COOKIE['error_id'])) {
+    $error_id = '&id='.$_COOKIE['error_id'];
+}
+
+//バリデート
+// $error_flg = false;
+if ($post_data['start_hour'] == '' || $post_data['start_min'] == '' || $post_data['end_hour'] == '' || $post_data['end_min'] == '') {
+    // $error_flg = true;
+    setcookie('error_hour', '時間は必須です', time()+1);
+}
+elseif ($post_data['start_ym'] == '' || $post_data['start_day'] == '' || $post_data['end_ym'] == '' || $post_data['end_day'] == '') {
+    setcookie('ymd', '年月日は必須です', time()+1);
+}
+elseif ($schedule_title == '') {
+    setcookie('schedule_title', 'タイトルは必須です', time()+1);
+}
+elseif ($schedule_detail == '') {
+    setcookie('schedule_detail', '詳細は必須です', time()+1);
+}
+
+//再度入力フォームに戻す
 if (isset($post_data['insert']) || isset($post_data['update'])) {
     if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail)) {
-            header("Location: http://kensyu.aucfan.com/error.php");
-            exit;
+        //setcookie('error', 'ここは必須項目です！');//フォームでエラー表示させるため
+        header("Location: http://kensyu.aucfan.com/error.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
+        exit;
     }
 }
+
 //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
 if (empty($id) && ($schedule_title != null)) {
 

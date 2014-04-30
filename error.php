@@ -1,5 +1,6 @@
 <?php
-$url = "schedule.php".$_COOKIE['get_parameter']
+include_once('schedule.php');
+// $url = "schedule.php".$_COOKIE['get_parameter']
 ?>
 
 
@@ -11,7 +12,5 @@ $url = "schedule.php".$_COOKIE['get_parameter']
 <link href="calendar.css" rel="stylesheet">
 </head>
 <body>
-入力漏れがあります！<br />
-<a href="<?php echo $url;?>">戻る</a>
 </body>
 </html>
