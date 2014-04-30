@@ -128,7 +128,6 @@ for ($i=-12; $i<=12; $i++) {
                 <option id="select_year_month" value="<?php echo $year.'-'.$month;?>"><?php echo $ym[$i]?></option>
             <?php endfor; ?>
             </select>
-            <!-- <input type="text" id="start_day" name="start_day" value="<?php //echo $day;?>" />日<br /> -->
             <!-- TODO:月によって日付が違うのでJSで直す -->
             <select name="start_day">
             <?php for ($i=1; $i<=31; $i++):?>
@@ -137,8 +136,17 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <?php echo $error_ymd;?><br />
             <?php echo $error_date;?><br />
-            <input type="text" id="start_hour" name="start_hour" value="<?php echo date('G');?>" />時
-            <input type="text" id="start_min" name="start_min" value="<?php echo date('i');?>" />分
+            <!-- <input type="text" id="start_hour" name="start_hour" value="<?php //echo date('G');?>" />時 -->
+            <!-- <input type="text" id="start_min" name="start_min" value="<?php //echo date('i');?>" />分 -->
+            <select name="start_hour">
+            <?php for ($i=1; $i<=24; $i++):?>
+                <option id="start_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
+            <?php endfor; ?>
+            </select>
+            <select name="start_min">
+                <option class="start_min" value="00">00分</option>
+                <option class="start_min" value="30">30分</option>
+            </select>
             <br /><?php echo $error_hour;?>
         </td>
     </tr>
@@ -158,8 +166,17 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <?php echo $error_ymd;?><br />
             <?php echo $error_date;?><br />
-            <input type="text" id="end_hour" name="end_hour" value="<?php echo date('G');?>" />時
-            <input type="text" id="end_min" name="end_min" value="<?php echo date('i');?>" />分
+            <!-- <input type="text" id="end_hour" name="end_hour" value="<?php //echo date('H');?>" />時 -->
+            <!-- <input type="text" id="end_min" name="end_min" value="<?php //echo date('i');?>" />分 -->
+            <select name="end_hour">
+            <?php for ($i=1; $i<=24; $i++):?>
+                <option id="end_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
+            <?php endfor; ?>
+            </select>
+            <select name="end_min">
+                <option class="end_min" value="00">00分</option>
+                <option class="end_min" value="30">30分</option>
+            </select>
             <br /><?php echo $error_hour;?>
         </td>
     </tr>
