@@ -129,6 +129,18 @@ function aucTopi() {
 }
 
 /*
+*文字数の制限
+*/
+function shortStr ($str, $length = 15) {
+    if (mb_strlen($str) <= $length) {
+        return $str;
+    } else {
+        return mb_substr($str, 0, $length, 'utf-8');
+    }
+}
+
+
+/*
 *DB接続
 */
 $host = 'localhost';
@@ -390,13 +402,7 @@ mysqli_close($db);
                         <!-- オクトピ出力 -->
                         <span>
                             <br /><a href="<?php echo $auc_topi['link'][$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
-                            <?php
-                                $auc_topi_feed = mb_substr($auc_topi_feed, 0, 15, 'utf-8');//始めの文字から15文字取得
-                                if (mb_strlen($auc_topi_feed) >= 15) {//15文字以上なら...表示
-                                    $auc_topi_feed .= '...';
-                                }
-                                echo $auc_topi_feed;
-                            ?>
+                            <?php echo shortStr($auc_topi_feed);?>
                             </a>
                         </span><br />
 
