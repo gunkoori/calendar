@@ -58,9 +58,14 @@ for ($i=1; $i<=$display_count; $i++) {
     $end_days[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
 }
 
+
+
+$holiday = getHoliday($last_month, $next_month, $end_days);
+
 /*
 * Googlle Calendar API 祝日取得
 */
+function getHoliday($last_month, $next_month, $end_days) {
 $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
 $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_days[2];
 $holidays_url = sprintf(
@@ -70,7 +75,7 @@ $holidays_url = sprintf(
         "$max_date" ,  // 取得終了日
         50             // 最大取得数
         );
-if ( $results = file_get_contents($holidays_url) ) {
+if ($results = file_get_contents($holidays_url)) {
         $results = json_decode($results, true);
 
         $holidays = array();
@@ -92,6 +97,10 @@ foreach ($holidays as $date => $holiday) {
         $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
     }
 }
+
+return $holiday_list;
+}
+
 
 /*
 *オークショントピック
@@ -354,9 +363,9 @@ mysqli_close($db);
                 <?php endif;?>
 
                 <?php $holiday_name = ''; ?><!-- 祝日 -->
-                <?php if(isset($holiday_list[$value.'-'.$days])):?>
+                <?php if(isset($holiday[$value.'-'.$days])):?>
                     <?php $class = 'holiday'; ?>
-                    <?php $holiday_name = '<br />'.$holiday_list[$value.'-'.$days]; ?>
+                    <?php $holiday_name = '<br />'.$holiday[$value.'-'.$days]; ?>
                 <?php endif;?>
 
                 <?php $auc_topi_feed = '';?><!-- オークショントピック -->
