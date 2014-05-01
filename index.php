@@ -58,71 +58,75 @@ for ($i=1; $i<=$display_count; $i++) {
     $end_days[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
 }
 
-
-
+//祝日
 $holiday = getHoliday($last_month, $next_month, $end_days);
+
+//オークショントピック
+$auc_topi = aucTopi();
+
 
 /*
 * Googlle Calendar API 祝日取得
 */
 function getHoliday($last_month, $next_month, $end_days) {
-$min_date = $last_month['year'].'-'.$last_month['month'].'-01';
-$max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_days[2];
-$holidays_url = sprintf(
-        "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
-        "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
-        "$min_date" ,  // 取得開始日
-        "$max_date" ,  // 取得終了日
-        50             // 最大取得数
-        );
-if ($results = file_get_contents($holidays_url)) {
-        $results = json_decode($results, true);
+    $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
+    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_days[2];
+    $holidays_url = sprintf(
+            "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
+            "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
+            "$min_date" ,  // 取得開始日
+            "$max_date" ,  // 取得終了日
+            50             // 最大取得数
+            );
+    if ($results = file_get_contents($holidays_url)) {
+            $results = json_decode($results, true);
 
-        $holidays = array();
-        foreach ($results['feed']['entry'] as $key =>$val ) {
-                $date  = $val['gd$when'][0]['startTime'];
-                $title = $val['title']['$t'];
-                $holidays[$date] = $title;// [2007-01-01] => 元日 / Ganjitsu / New Year's Day
-        }
-        ksort($holidays);
-}
-
-$explode_date = array();
-$explode_holidays = array();
-$holiday_list = array();
-foreach ($holidays as $date => $holiday) {
-    $explode_date[]  = explode('-', $date);
-    $explode_holidays[] = explode(' / ', $holiday);
-    foreach ($explode_holidays as $key => $value) {
-        $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
+            $holidays = array();
+            foreach ($results['feed']['entry'] as $key =>$val ) {
+                    $date  = $val['gd$when'][0]['startTime'];
+                    $title = $val['title']['$t'];
+                    $holidays[$date] = $title;// [2007-01-01] => 元日 / Ganjitsu / New Year's Day
+            }
+            ksort($holidays);
     }
-}
 
-return $holiday_list;
+    $explode_date = array();
+    $explode_holidays = array();
+    $holiday_list = array();
+    foreach ($holidays as $date => $holiday) {
+        $explode_date[]  = explode('-', $date);
+        $explode_holidays[] = explode(' / ', $holiday);
+        foreach ($explode_holidays as $key => $value) {
+            $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
+        }
+    }
+    return $holiday_list;
 }
 
 
 /*
 *オークショントピック
 */
-$rss = simplexml_load_file('http://aucfan.com/article/feed/');
-$data = get_object_vars($rss);
-if (empty($rss)) {
-    return;
-}
+function aucTopi() {
+    $rss = simplexml_load_file('http://aucfan.com/article/feed/');
+    $data = get_object_vars($rss);
+    if (empty($rss)) {
+        return;
+    }
 
-$title = array();
-$date = array();
-$link = array();
-$auc_topi_title = array();
-foreach ($rss->channel->item as $key => $value) {
-    $title = (string)$value->title;
-    $date = date('Y-m-d', strtotime((string)$value->pubDate));
-    $link = (string)$value->link;
-    $auc_topi_title[$date] = $title;
-    $auc_topi_link[$date] = $link;
+    $title = array();
+    $date = array();
+    $link = array();
+    $auc_topi_title = array();
+    foreach ($rss->channel->item as $key => $value) {
+        $title = (string)$value->title;
+        $date = date('Y-m-d', strtotime((string)$value->pubDate));
+        $link = (string)$value->link;
+        $auc_topi['title'][$date] = $title;
+        $auc_topi['link'][$date] = $link;
+    }
+    return $auc_topi;
 }
-
 
 /*
 *DB接続
@@ -369,9 +373,9 @@ mysqli_close($db);
                 <?php endif;?>
 
                 <?php $auc_topi_feed = '';?><!-- オークショントピック -->
-                <?php if (isset($auc_topi_title[$value.'-'.$days])):?>
+                <?php if (isset($auc_topi['title'][$value.'-'.$days])):?>
                     <?php $class = 'auc_topi';?>
-                    <?php $auc_topi_feed = $auc_topi_title[$value.'-'.$days];?>
+                    <?php $auc_topi_feed = $auc_topi['title'][$value.'-'.$days];?>
                 <?php endif;?>
 
                     <td class="<?php echo $class; ?>">
@@ -385,7 +389,7 @@ mysqli_close($db);
                         </span>
                         <!-- オクトピ出力 -->
                         <span>
-                            <br /><a href="<?php echo $auc_topi_link[$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
+                            <br /><a href="<?php echo $auc_topi['link'][$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
                             <?php
                                 $auc_topi_feed = mb_substr($auc_topi_feed, 0, 15, 'utf-8');//始めの文字から15文字取得
                                 if (mb_strlen($auc_topi_feed) >= 15) {//15文字以上なら...表示
