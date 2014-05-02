@@ -106,7 +106,7 @@ function formValidate($post_data, $form_data ) {
     //再度入力フォームに戻す
     if (isset($post_data['insert']) || isset($post_data['update'])) {
         if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail) || $check_start_ym == false || $check_end_ym == false || strtotime($start_day) > strtotime($end_day)) {
-            $header = header("Location: http://kensyu.aucfan.com/error.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
+            $header = header("Location: http://kensyu.aucfan.com/schedule.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
             exit;
         }
     }
@@ -114,7 +114,7 @@ function formValidate($post_data, $form_data ) {
 }
 
 /*
-*SQL文の生成
+*登録編集削除、DBからの抽出
 */
 function sqlResult($form_data, $connect_db) {
     $db = $connect_db['db'];
