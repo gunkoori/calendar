@@ -21,6 +21,7 @@ $error_ymd = $_COOKIE['ymd'];
 $error_schedule_title = $_COOKIE['schedule_title'];
 $error_schedule_detail = $_COOKIE['schedule_detail'];
 $error_date =  $_COOKIE['error_compare_date'];
+$date_error = $_COOKIE['date_error'];//無効な日付
 
 /*
 *DB接続
@@ -136,6 +137,7 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <span class="error"><?php echo $error_ymd;?></span><br />
             <span class="error"><?php echo $error_date;?></span><br />
+            <span class="error"><?php echo $date_error;?></span><br />
             <select name="start_hour">
             <?php for ($i=1; $i<24; $i++):?>
                 <option id="start_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
@@ -164,6 +166,7 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <span class="error"><?php echo $error_ymd;?></span><br />
             <span class="error"><?php echo $error_date;?></span><br />
+            <span class="error"><?php echo $date_error;?></span><br />
             <select name="end_hour">
             <?php for ($i=1; $i<24; $i++):?>
                 <option id="end_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>

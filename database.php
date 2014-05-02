@@ -8,15 +8,8 @@ $connect_db = connectDB();
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 
 $form_data = formData($post_data, $make_calendar);
-// var_dump($form_data);
 
-// $form_validate = formValidate($post_data, $form_data);
-
-// $sql_create = sqlResult($form_data, $connect_db);
-// var_dump($sql_create);
-
-// $sql_result = sqlResult($connect_db, $form_data, $sql_create);
-// var_dump($sql_result);
+$form_validate = formValidate($post_data, $form_data);
 
 /*
 *DB接続
@@ -92,17 +85,17 @@ function formValidate($post_data, $form_data ) {
     if ($post_data['start_ym'] == '' || $post_data['start_day'] == '' || $post_data['end_ym'] == '' || $post_data['end_day'] == '') {
         setcookie('ymd', '年月日は必須です', time()+1);
     }
-    if ($schedule_title == '') {
+    if ($form_data['schedule_title'] == '') {
         setcookie('schedule_title', 'タイトルは必須です', time()+1);
     }
-    if ($schedule_detail == '') {
+    if ($form_data['schedule_detail'] == '') {
         setcookie('schedule_detail', '詳細は必須です', time()+1);
     }
-    if (strtotime($start_day) > strtotime($end_day)) {
+    if (strtotime($form_data['start_day']) > strtotime($form_data['end_day'])) {
         setcookie('error_compare_date', '開始日時が終了日時より遅く設定されています', time()+1);
     }
 
-    //無効な日付かチェックする
+    //無効な日付かチェックする ex.)2月３１日には登録できない
     $explode_start_ym = explode('-', $post_data['start_ym']);
     $explode_end_ym = explode('-', $post_data['end_ym']);
     $check_start_ym = checkdate($explode_start_ym[1], $post_data['start_day'], intval($explode_start_ym[0]));
@@ -198,16 +191,9 @@ $schedule_sql=<<<END
 
 END;
 
-/*return array(
-    'sql' => $sql,
-    'schedule_sql' => $schedule_sql
-    );
-}*/
-
-/*
-*SQL実行
-*/
-// function sqlResult($connect_db, $form_data, $sql_create) {
+    /*
+    *SQL実行
+    */
     //SQL実行
     if (isset($form_data['start_day']) && !empty($sql)) {
         $sql_results = mysqli_query($db, $sql);
@@ -230,4 +216,3 @@ END;
 
     return $schedules;
 }
-// exit;
