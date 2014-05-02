@@ -2,58 +2,6 @@
 require_once 'database.php';
 require_once 'function.php';
 
-// $hoge = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
-// var_dump($hoge);
-/*
-define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
-//日付のタームゾーンを変更
-ini_set("date.timezone", "Asia/Tokyo");
-
-//現在の年月日、曜日の取得
-$year = date('Y');
-$month = date('m');
-//月のスタート
-$start_date = 1;
-//カレンダー数
-$display_count = 3;
-$calendars = array();
-$end_days = array();
-$before_cell = array();
-$after_cell  = array();
-
-//GET値がある場合。ない場合は現在の年月
-$ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);//2014-04-01
-$explode_ym = explode('-', $ym);//[0] => 2014 [1] => 04
-$year_of_ym = $explode_ym[0];//2014
-$month_of_ym = $explode_ym[1];//04
-if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
-    header('Location: http://kensyu.aucfan.com/');
-    exit;
-}
-
-//先月
-$last_month = array(
-  'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
-  'month' => date('m', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
-);
-//来月
-$next_month = array(
-  'year' => date('Y', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
-  'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
-);
-
-// Y-mを取得。$now_yearの前後1年
-for ($i=-12; $i<=12; $i++) {
-    $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
-}
-
-//// $prev_month  = $month_of_ym -1;はつかわない
-$prev_month = $last_month['month'];
-$prev_month2 = $last_month['month'];
-$prev_month3 = $last_month['month'];
-$prev_month4 = $last_month['month'];
-*/
-
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 
@@ -62,6 +10,9 @@ $holiday = getHoliday($last_month, $next_month, $end_days);
 
 //オークショントピック
 $auc_topi = aucTopi();
+
+//DBに登録、編集、削除、予定取り出し
+$schedules = sqlResult($form_data, $connect_db);
 
 ?>
 

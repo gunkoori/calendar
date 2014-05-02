@@ -12,10 +12,11 @@ $form_data = formData($post_data, $make_calendar);
 
 // $form_validate = formValidate($post_data, $form_data);
 
-$sql_create = sqlCreate($form_data);
+// $sql_create = sqlResult($form_data, $connect_db);
 // var_dump($sql_create);
 
-$sql_result = sqlResult($connect_db, $form_data, $sql_create);
+// $sql_result = sqlResult($connect_db, $form_data, $sql_create);
+// var_dump($sql_result);
 
 /*
 *DB接続
@@ -36,7 +37,7 @@ function connectDB() {
     }
     return array(
         'db' => $db,
-        'return' =>$return
+        'return' => $return
         );
 }
 
@@ -54,8 +55,10 @@ function formData($post_data, $make_calendar) {
     $schedule_title = $post_data['schedule_title'];
     $schedule_detail = $post_data['schedule_detail'];
     $id = $post_data['schedule_id'];
+    $delete = $post_data['delete'];
+    $schedule_id = $post_data['schedule_id'];
     $between_begin = $make_calendar['calendars'][1].'-01 00:00:01';
-    $between_end = $make_calendar['calendars'][3].'-'.$end_days[3].' 23:59:59';
+    $between_end = $make_calendar['calendars'][3].'-'.$make_calendar['end_days'][3].' 23:59:59';
     return array(
         'start_time' => $start_time,
         'end_time' => $end_time,
@@ -64,6 +67,8 @@ function formData($post_data, $make_calendar) {
         'schedule_title' => $schedule_title,
         'schedule_detail' => $schedule_detail,
         'id' => $id,
+        'delete' => $delete,
+        'schedule_id' => $schedule_id,
         'between_begin' => $between_begin,
         'between_end' => $between_end
         );
@@ -115,9 +120,11 @@ function formValidate($post_data, $form_data ) {
     return $header;
 }
 
-
-function sqlCreate($form_data) {
-    // print_r($form_data);
+/*
+*SQL文の生成
+*/
+function sqlResult($form_data, $connect_db) {
+    $db = $connect_db['db'];
     $start_day = $form_data['start_day'];
     $end_day = $form_data['end_day'];
     $schedule_title = $form_data['schedule_title'];
@@ -126,7 +133,7 @@ function sqlCreate($form_data) {
     $between_end = $form_data['between_end'];
 
     //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
-    if (empty($id) && ($schedule_title != null)) {
+    if (empty($form_data['id']) && ($form_data['schedule_title'] != null)) {
 
 $sql=<<<END
     INSERT INTO
@@ -142,7 +149,7 @@ $sql=<<<END
 END;
 
     }
-    elseif (isset($id) && !isset($post_data['delete'])) {
+    elseif (isset($form_data['id']) && !isset($form_data['delete'])) {
 
 $sql=<<<END
     UPDATE
@@ -158,7 +165,7 @@ $sql=<<<END
 END;
 
     }
-    elseif ($post_data['delete'] == 'delete') {
+    elseif ($form_data['delete'] == 'delete') {
 
 $sql=<<<END
     UPDATE
@@ -191,18 +198,21 @@ $schedule_sql=<<<END
 
 END;
 
-return array(
+/*return array(
     'sql' => $sql,
     'schedule_sql' => $schedule_sql
     );
-}
+}*/
 
-function sqlResult($connect_db, $form_data, $sql_create) {
+/*
+*SQL実行
+*/
+// function sqlResult($connect_db, $form_data, $sql_create) {
     //SQL実行
-    if (isset($form_data['start_day']) && !empty($sql_create['sql'])) {
-        $sql_results = mysqli_query($connect_db['db'], $sql_create['sql']);
+    if (isset($form_data['start_day']) && !empty($sql)) {
+        $sql_results = mysqli_query($db, $sql);
     }
-    if ($result = mysqli_query($connect_db['db'], $sql_create['schedule_sql'])) {
+    if ($result = mysqli_query($db, $schedule_sql)) {
         while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
             list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
             list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
@@ -216,7 +226,7 @@ function sqlResult($connect_db, $form_data, $sql_create) {
         }
         mysqli_free_result($result);
     }
-    mysqli_close($connect_db['db']);
+    mysqli_close($db);
 
     return $schedules;
 }
