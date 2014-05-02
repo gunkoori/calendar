@@ -1,4 +1,5 @@
 <?php
+require_once 'database.php';
 define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
@@ -25,11 +26,6 @@ if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
     exit;
 }
 
-$prev_month  = $month_of_ym -1;
-$prev_month2 = $month_of_ym -1;
-$prev_month3 = $month_of_ym -1;
-$prev_month4 = $month_of_ym -1;
-
 //先月
 $last_month = array(
   'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
@@ -46,23 +42,42 @@ for ($i=-12; $i<=12; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
 }
 
-$calendar_year = array();
-$calendar_month = array();
-//3ヶ月分の空セル等を取得
-for ($i=1; $i<=$display_count; $i++) {
-    $position = $i-(floor($display_count/2)+1);
-    $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
-    $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month2++, 1, $year_of_ym));
-    $after_cell[$i]  = date('w', mktime(0, 0, 0, $prev_month3+1, 0, $year_of_ym));
-    $prev_month3++;
-    $end_days[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
-}
+//// $prev_month  = $month_of_ym -1;はつかわない
+$prev_month = $last_month['month'];
+$prev_month2 = $last_month['month'];
+$prev_month3 = $last_month['month'];
+$prev_month4 = $last_month['month'];
 
+//カレンダー生成
+$make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
+// print_r($make_calendar['before_cell']);
 //祝日
 $holiday = getHoliday($last_month, $next_month, $end_days);
 
 //オークショントピック
 $auc_topi = aucTopi();
+
+
+/*
+*カレンダー生成
+*/
+function makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym) {
+    global $end_days;
+    //3ヶ月分の空セル等を取得
+    for ($i=1; $i<=$display_count; $i++) {
+        $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
+        $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month2++, 1, $year_of_ym));
+        $after_cell[$i]  = date('w', mktime(0, 0, 0, $prev_month3+1, 0, $year_of_ym));
+        $prev_month3++;
+        $end_days[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
+    }
+    return array(
+        'calendars' => $calendars,
+        'before_cell' => $before_cell,
+        'after_cell' => $after_cell,
+        'end_days' => $end_days
+        );
+}
 
 
 /*
@@ -128,6 +143,7 @@ function aucTopi() {
     return $auc_topi;
 }
 
+
 /*
 *文字数の制限
 */
@@ -138,169 +154,6 @@ function shortStr ($str, $length = 15) {
         return mb_substr($str, 0, $length, 'utf-8');
     }
 }
-
-
-/*
-*DB接続
-*/
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'calendar';
-
-// MySQL に接続し、データベースを選択
-$db = mysqli_connect($host, $user, $password, $database);
-
-// 接続状況をチェック
-if (mysqli_connect_errno()) {
-    die(mysqli_connect_error());
-}
-
-/*
-*フォームからPOSTされたデータ
-*/
-$post_data = $_POST;
-//開始時間と終了時間
-$start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
-$end_time = $post_data['end_hour'].':'.$post_data['end_min'].':00';
-//開始日と終了日
-$start_day = $post_data['start_ym'].'-'.$post_data['start_day'].' '.$start_time;
-$end_day = $post_data['end_ym'].'-'.$post_data['end_day'].' '.$end_time;
-//予定のタイトルと詳細
-$schedule_title = $post_data['schedule_title'];
-$schedule_detail = $post_data['schedule_detail'];
-$id = $post_data['schedule_id'];
-$between_begin = $calendars[1].'-01 00:00:01';
-$between_end = $calendars[3].'-'.$end_days[3].' 23:59:59';
-
-//エラー（入力漏れがあった）場合は
-$error_year = $_COOKIE['error_year'];
-$error_month = $_COOKIE['error_month'];
-$error_day = $_COOKIE['error_day'];
-$error_id = '';
-if (isset($_COOKIE['error_id'])) {
-    $error_id = '&id='.$_COOKIE['error_id'];
-}
-
-//バリデート
-if ($post_data['start_hour'] == '' || $post_data['start_min'] == '' || $post_data['end_hour'] == '' || $post_data['end_min'] == '') {
-    setcookie('error_hour', '時間は必須です', time()+1);
-}
-if ($post_data['start_ym'] == '' || $post_data['start_day'] == '' || $post_data['end_ym'] == '' || $post_data['end_day'] == '') {
-    setcookie('ymd', '年月日は必須です', time()+1);
-}
-if ($schedule_title == '') {
-    setcookie('schedule_title', 'タイトルは必須です', time()+1);
-}
-if ($schedule_detail == '') {
-    setcookie('schedule_detail', '詳細は必須です', time()+1);
-}
-if (strtotime($start_day) > strtotime($end_day)) {
-    setcookie('error_compare_date', '開始日時が終了日時より遅く設定されています', time()+1);
-}
-
-//無効な日付化チェックする
-$explode_start_ym = explode('-', $post_data['start_ym']);
-$explode_end_ym = explode('-', $post_data['end_ym']);
-$check_start_ym = checkdate($explode_start_ym[1], $post_data['start_day'], intval($explode_start_ym[0]));
-$check_end_ym = checkdate($explode_end_ym[1], $post_data['end_day'], intval($explode_end_ym[0]));
-if ($check_start_ym == false || $check_end_ym == false) {
-    setcookie('date_error', '無効な日付です', time()+1);
-}
-//再度入力フォームに戻す
-if (isset($post_data['insert']) || isset($post_data['update'])) {
-    if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail) || $check_start_ym == false || $check_end_ym == false || strtotime($start_day) > strtotime($end_day)) {
-        header("Location: http://kensyu.aucfan.com/error.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
-        exit;
-    }
-}
-
-//UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
-if (empty($id) && ($schedule_title != null)) {
-
-$sql=<<<END
-    INSERT INTO
-         cal_schedules
-     SET
-        start_date="$start_day",
-        end_date="$end_day",
-        schedule_title="$schedule_title",
-        schedule_detail="$schedule_detail",
-        update_at=NOW(),
-        created_at=NOW(),
-        deleted_at=null
-END;
-
-}
-elseif (isset($id) && !isset($post_data['delete'])) {
-
-$sql=<<<END
-    UPDATE
-         cal_schedules
-     SET
-        start_date="$start_day",
-        end_date="$end_day",
-        schedule_title="$schedule_title",
-        schedule_detail="$schedule_detail",
-        update_at=NOW()
-     WHERE
-        schedule_id="$id"
-END;
-
-}
-elseif ($post_data['delete'] == 'delete') {
-
-$sql=<<<END
-    UPDATE
-         cal_schedules
-     SET
-         update_at=NOW(),
-         deleted_at=NOW()
-     WHERE
-        schedule_id="$id"
-END;
-
-}
-
-//予定を3ヶ月分取得
-$schedule_sql=<<<END
-    SELECT
-         schedule_id, start_date, end_date, schedule_title, schedule_detail
-     FROM
-         cal_schedules
-     WHERE
-         deleted_at
-     IS
-         null
-     AND
-         start_date
-     BETWEEN
-         "$between_begin"
-     AND
-         "$between_end"
-
-END;
-
-//SQL実行
-if (isset($start_day) && !empty($sql)) {
-    $sql_result = mysqli_query($db, $sql);
-}
-if ($result = mysqli_query($db, $schedule_sql)) {
-    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-        list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
-        list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-        if ($row['start_date'] != $row['end_date']) {
-            for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
-                $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
-            }
-        }
-    }
-    mysqli_free_result($result);
-}
-mysqli_close($db);
-
 
 ?>
 
@@ -329,7 +182,7 @@ mysqli_close($db);
 </div><!--header-->
 
 <!-- カレンダーループ 3回ループ -->
-<?php foreach ($calendars as $key => $value) :?>
+<?php foreach (/*$calendars*/$make_calendar['calendars'] as $key => $value) :?>
 <table class="calendar">
     <thead>
     <tr>
@@ -355,12 +208,12 @@ mysqli_close($db);
     <tbody>
     <tr>
         <!-- 空セル挿入 -->
-        <?php for($i=1; $i<=$before_cell[$key]; $i++) :?>
+        <?php for($i=1; $i<=/*$before_cell[$key]*/$make_calendar['before_cell'][$key]; $i++) :?>
             <td></td>
         <?php endfor ;?>
 
         <!-- 日付挿入 -->
-        <?php for ($day=$start_date; $day<=$end_days[$key]; $day++):?>
+        <?php for ($day=$start_date; $day<=/*$end_days[$key]*/$make_calendar['end_days'][$key]; $day++):?>
 
             <!-- 桁数を揃える -->
             <?php $days = sprintf('%02d', $day) ;?>
@@ -429,7 +282,7 @@ mysqli_close($db);
         <?php endfor ;?>
 
         <!-- 空セル挿入 -->
-        <?php for ($i=1; $i<(7-$after_cell[$key]); $i++) :?>
+        <?php for ($i=1; $i<(7-/*$after_cell[$key])*/$make_calendar['after_cell'][$key]); $i++) :?>
             <td></td>
         <?php endfor ;?>
     </tbody>
