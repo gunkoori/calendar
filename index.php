@@ -2,6 +2,9 @@
 require_once 'database.php';
 require_once 'function.php';
 
+$post_data = $_POST;
+// var_dump($post_data);
+
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 
@@ -11,8 +14,11 @@ $holiday = getHoliday($last_month, $next_month, $end_days);
 //オークショントピック
 $auc_topi = aucTopi();
 
-//DBに登録、編集、削除、予定取り出し
-$schedules = sqlResult($form_data, $connect_db);
+//予定抽出
+$sql_result = sqlResult($form_data, $connect_db, $sql_create);
+$schedules_3months = $sql_result['schedules_3months'];
+//var_dump($schedules_3months);
+
 
 ?>
 
@@ -41,7 +47,7 @@ $schedules = sqlResult($form_data, $connect_db);
 </div><!--header-->
 
 <!-- カレンダーループ 3回ループ -->
-<?php foreach (/*$calendars*/$make_calendar['calendars'] as $key => $value) :?>
+<?php foreach ($make_calendar['calendars'] as $key => $value) :?>
 <table class="calendar">
     <thead>
     <tr>
@@ -67,12 +73,12 @@ $schedules = sqlResult($form_data, $connect_db);
     <tbody>
     <tr>
         <!-- 空セル挿入 -->
-        <?php for($i=1; $i<=/*$before_cell[$key]*/$make_calendar['before_cell'][$key]; $i++) :?>
+        <?php for($i=1; $i<=$make_calendar['before_cell'][$key]; $i++) :?>
             <td></td>
         <?php endfor ;?>
 
         <!-- 日付挿入 -->
-        <?php for ($day=$start_date; $day<=/*$end_days[$key]*/$make_calendar['end_days'][$key]; $day++):?>
+        <?php for ($day=$start_date; $day<=$make_calendar['end_days'][$key]; $day++):?>
 
             <!-- 桁数を揃える -->
             <?php $days = sprintf('%02d', $day) ;?>
@@ -122,8 +128,8 @@ $schedules = sqlResult($form_data, $connect_db);
                         <span>
                             <br /><span class="schedule">
 
-                            <?php if (isset($schedules[$cal_year][$cal_month][$day])):?>
-                                <?php foreach ($schedules[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
+                            <?php if (isset($schedules_3months[$cal_year][$cal_month][$day])):?>
+                                <?php foreach ($schedules_3months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
                                     <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day.'&id='.$schedule_id;?>"
                                     title="<?php echo $schedule['detail'];?>">
                                     <?php echo $schedule['title'];?><br />
@@ -140,7 +146,7 @@ $schedules = sqlResult($form_data, $connect_db);
         <?php endfor ;?>
 
         <!-- 空セル挿入 -->
-        <?php for ($i=1; $i<(7-/*$after_cell[$key])*/$make_calendar['after_cell'][$key]); $i++) :?>
+        <?php for ($i=1; $i<(7-$make_calendar['after_cell'][$key]); $i++) :?>
             <td></td>
         <?php endfor ;?>
     </tbody>

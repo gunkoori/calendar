@@ -2,7 +2,7 @@
 require_once 'function.php';
 
 $post_data = $_POST;
-
+//var_dump($post_data);
 $connect_db = connectDB();
 
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
@@ -10,6 +10,9 @@ $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_m
 $form_data = formData($post_data, $make_calendar);
 
 $form_validate = formValidate($post_data, $form_data);
+
+$sql_create = sqlCreate($form_data);
+
 
 /*
 *DB接続
@@ -49,7 +52,7 @@ function formData($post_data, $make_calendar) {
     $schedule_detail = $post_data['schedule_detail'];
     $id = $post_data['schedule_id'];
     $delete = $post_data['delete'];
-    $schedule_id = $post_data['schedule_id'];
+    $schedule_id = $_COOKIE['schedule_id'];
     $between_begin = $make_calendar['calendars'][1].'-01 00:00:01';
     $between_end = $make_calendar['calendars'][3].'-'.$make_calendar['end_days'][3].' 23:59:59';
     return array(
@@ -116,14 +119,15 @@ function formValidate($post_data, $form_data ) {
 /*
 *登録編集削除、DBからの抽出
 */
-function sqlResult($form_data, $connect_db) {
-    $db = $connect_db['db'];
+function sqlCreate($form_data) {
     $start_day = $form_data['start_day'];
     $end_day = $form_data['end_day'];
     $schedule_title = $form_data['schedule_title'];
     $schedule_detail = $form_data['schedule_detail'];
+    $id = $form_data['id'];
     $between_begin = $form_data['between_begin'];
     $between_end = $form_data['between_end'];
+    $schedule_id = $_GET['id'];
 
     //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
     if (empty($form_data['id']) && ($form_data['schedule_title'] != null)) {
@@ -154,7 +158,7 @@ $sql=<<<END
         schedule_detail="$schedule_detail",
         update_at=NOW()
      WHERE
-        schedule_id="$id"
+        schedule_id="$schedule_id"
 END;
 
     }
@@ -167,13 +171,13 @@ $sql=<<<END
          update_at=NOW(),
          deleted_at=NOW()
      WHERE
-        schedule_id="$id"
+        schedule_id="$schedule_id"
 END;
 
 }
 
 //予定を3ヶ月分取得
-$schedule_sql=<<<END
+$schedule_3months=<<<END
     SELECT
          schedule_id, start_date, end_date, schedule_title, schedule_detail
      FROM
@@ -191,15 +195,54 @@ $schedule_sql=<<<END
 
 END;
 
-    /*
-    *SQL実行
-    */
+$schedule_sql=<<<END
+    SELECT
+         schedule_id, start_date, end_date, schedule_title, schedule_detail
+     FROM
+         cal_schedules
+     WHERE
+         schedule_id="$schedule_id"
+
+     AND
+         deleted_at
+     IS
+         null
+
+END;
+
+return array(
+    'sql' => $sql,
+    'schedule_3months' => $schedule_3months,
+    'schedule_sql' => $schedule_sql
+    );
+}
+
+
+/*
+*SQL実行
+*/
+function sqlResult($form_data, $connect_db, $sql_create) {
+    $db = $connect_db['db'];
     //SQL実行
-    if (isset($form_data['start_day']) && !empty($sql)) {
-        $sql_results = mysqli_query($db, $sql);
+    if (isset($form_data['start_day']) && !empty($sql_create['sql'])) {
+        $insert_or_update = mysqli_query($db, $sql_create['sql']);
     }
-    if ($result = mysqli_query($db, $schedule_sql)) {
+    if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
         while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+            list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
+            list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
+            $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+            $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
+            if ($row['start_date'] != $row['end_date']) {
+                for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
+                    $schedules_3months[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+                }
+            }
+        }
+        mysqli_free_result($result);
+    }
+    if ($result2 = mysqli_query($db, $sql_create['schedule_sql'])) {
+        while ($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
             list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
             list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
             $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
@@ -210,9 +253,13 @@ END;
                 }
             }
         }
-        mysqli_free_result($result);
+        mysqli_free_result($result2);
     }
     mysqli_close($db);
 
-    return $schedules;
+    return array(
+        'insert_or_update' => $insert_or_update,
+        'schedules_3months' =>$schedules_3months,
+        'schedules' => $schedules
+        );
 }

@@ -1,4 +1,7 @@
 <?php
+require_once 'database.php';
+// require_once 'function.php';
+
 $year = isset($_GET['year']) ? $_GET['year']:'';
 $month = '';
 $day = '';
@@ -8,9 +11,9 @@ $month = $_GET['month'];
 $day = $_GET['day'];
 $schedule_id = $_GET['id'];
 $date = sprintf('%02d', $day);
-
 if (isset($schedule_id)) {
     setcookie("get_parameter", "?year=".$year."&month=".$month."&day=".$day."&id=".$schedule_id, time()+10);
+    setcookie('schedule_id', $schedule_id);
 } else {
     setcookie("get_parameter", "?year=$year&month=$month&day=$day", time()+10);
 }
@@ -23,9 +26,15 @@ $error_schedule_detail = $_COOKIE['schedule_detail'];
 $error_date =  $_COOKIE['error_compare_date'];
 $date_error = $_COOKIE['date_error'];//無効な日付
 
+//$sql = $sql_create['schedule_sql'];
+$sql_result = sqlResult($form_data, $connect_db, $sql_create);
+$schedule_sql = $sql_result['schedules'];
+print_r($schedule_sql);
+
 /*
 *DB接続
 */
+/*
 $host = 'localhost';
 $user = 'root';
 $password = '';
@@ -68,9 +77,11 @@ if ($result = mysqli_query($db, $schedule_sql)) {
     mysqli_free_result($result);
 }
 mysqli_close($db);
+*/
+
 
 //新規登録のとき
-if (!isset($schedule_id)) {
+/*if (!isset($schedule_id)) {
     $year = $_GET['year'];
     $month = $_GET['month'];
     $day = $_GET['day'];
@@ -84,7 +95,7 @@ if (!isset($schedule_id)) {
     $end_year = $end_schedule_year;
     $end_month = $end_schedule_month;
     $end_day = $end_schedule_day;
-}
+}*/
 
 setcookie('error_year', $year, time()+20000);
 setcookie('error_month', $month, time()+20000);
@@ -92,9 +103,12 @@ setcookie('error_day', $day, time()+20000);
 setcookie('error_id', $schedule_id, time()+20000);
 
 
+//print_r($year.$month.$day.$schedule_id);
+
 /*
 *コンボボックス
 */
+$ym = array();
 for ($i=-12; $i<=12; $i++) {
     list($years, $months, $days) = explode('-', date('Y-n-t', mktime(0, 0, 0, $month+($i), 1, intval($year)) ));
     $ym[] = $years.'年'.$months.'月';
@@ -102,7 +116,7 @@ for ($i=-12; $i<=12; $i++) {
     $combo[$years][$months]=$days;
 
     for ($j=1; $j<=$days; $j++) {
-            $combos[$years][$months] = $j;
+        $combos[$years][$months] = $j;
     }
 }
 
@@ -118,7 +132,7 @@ for ($i=-12; $i<=12; $i++) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-<form method="post" action="http://kensyu.aucfan.com/">
+<form method="post" action="database.php">
 
 <table>
     <tr>
@@ -182,14 +196,14 @@ for ($i=-12; $i<=12; $i++) {
     <tr>
         <th>タイトル<br />※必須</th>
         <td>
-            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['title'];?>" /><br />
+            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedule_sql[$year][$month][$day][$schedule_id]['title'];?>" /><br />
             <span class="error"><?php echo $error_schedule_title;?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
-            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['detail'];?></textarea>
+            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedule_sql[$year][$month][$day][$schedule_id]['detail'];?></textarea>
             <br /><span class="error"><?php echo $error_schedule_detail;?></span>
         </td>
     </tr>
