@@ -1,4 +1,9 @@
 <?php
+require_once 'database.php';
+
+//$form_validate = formValidate($post_data, $form_data);
+
+
 $year = isset($_GET['year']) ? $_GET['year']:'';
 $month = '';
 $day = '';
@@ -8,9 +13,9 @@ $month = $_GET['month'];
 $day = $_GET['day'];
 $schedule_id = $_GET['id'];
 $date = sprintf('%02d', $day);
-
 if (isset($schedule_id)) {
     setcookie("get_parameter", "?year=".$year."&month=".$month."&day=".$day."&id=".$schedule_id, time()+10);
+    setcookie('schedule_id', $schedule_id);
 } else {
     setcookie("get_parameter", "?year=$year&month=$month&day=$day", time()+10);
 }
@@ -21,69 +26,29 @@ $error_ymd = $_COOKIE['ymd'];
 $error_schedule_title = $_COOKIE['schedule_title'];
 $error_schedule_detail = $_COOKIE['schedule_detail'];
 $error_date =  $_COOKIE['error_compare_date'];
+$date_error = $_COOKIE['date_error'];//無効な日付
 
-/*
-*DB接続
-*/
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'calendar';
-
-// MySQL に接続し、データベースを選択
-$db = mysqli_connect($host, $user, $password, $database);
-
-// 接続状況をチェック
-if (mysqli_connect_errno()) {
-    die(mysqli_connect_error());
-}
-
-$schedule_sql =<<<END
-    SELECT
-         schedule_id, start_date, end_date, schedule_title, schedule_detail
-     FROM
-         cal_schedules
-     WHERE
-         schedule_id="$schedule_id"
-
-     AND
-         deleted_at
-     IS
-         null
-
-END;
+$sql_result = sqlResult($form_data, $connect_db, $sql_create);
+$schedule_sql = $sql_result['schedules'];
 
 
-//SQL実行
-if ($result = mysqli_query($db, $schedule_sql)) {
-    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-        list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
-        list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-        $schedules[$end_schedule_year][$end_schedule_month][$end_schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-        $schedules[$end_schedule_year][$end_schedule_month][$end_schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-    }
-    mysqli_free_result($result);
-}
-mysqli_close($db);
 
 //新規登録のとき
-if (!isset($schedule_id)) {
+//if (!isset($schedule_id)) {
     $year = $_GET['year'];
     $month = $_GET['month'];
     $day = $_GET['day'];
     $end_year = $year;
     $end_month = $month;
     $end_day = $day;
-} else {//編集のとき
+/*} else {//編集のとき
     $year = $schedule_year;
     $month = $schedule_month;
     $day = $schedule_day;
     $end_year = $end_schedule_year;
     $end_month = $end_schedule_month;
     $end_day = $end_schedule_day;
-}
+}*/
 
 setcookie('error_year', $year, time()+20000);
 setcookie('error_month', $month, time()+20000);
@@ -91,9 +56,11 @@ setcookie('error_day', $day, time()+20000);
 setcookie('error_id', $schedule_id, time()+20000);
 
 
+
 /*
 *コンボボックス
 */
+$ym = array();
 for ($i=-12; $i<=12; $i++) {
     list($years, $months, $days) = explode('-', date('Y-n-t', mktime(0, 0, 0, $month+($i), 1, intval($year)) ));
     $ym[] = $years.'年'.$months.'月';
@@ -101,7 +68,7 @@ for ($i=-12; $i<=12; $i++) {
     $combo[$years][$months]=$days;
 
     for ($j=1; $j<=$days; $j++) {
-            $combos[$years][$months] = $j;
+        $combos[$years][$months] = $j;
     }
 }
 
@@ -117,7 +84,7 @@ for ($i=-12; $i<=12; $i++) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-<form method="post" action="http://kensyu.aucfan.com/">
+<form method="post" action="http://kensyu.aucfan.com/database.php">
 
 <table>
     <tr>
@@ -136,6 +103,7 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <span class="error"><?php echo $error_ymd;?></span><br />
             <span class="error"><?php echo $error_date;?></span><br />
+            <span class="error"><?php echo $date_error;?></span><br />
             <select name="start_hour">
             <?php for ($i=1; $i<24; $i++):?>
                 <option id="start_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
@@ -164,6 +132,7 @@ for ($i=-12; $i<=12; $i++) {
             </select>
             <span class="error"><?php echo $error_ymd;?></span><br />
             <span class="error"><?php echo $error_date;?></span><br />
+            <span class="error"><?php echo $date_error;?></span><br />
             <select name="end_hour">
             <?php for ($i=1; $i<24; $i++):?>
                 <option id="end_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
@@ -179,14 +148,14 @@ for ($i=-12; $i<=12; $i++) {
     <tr>
         <th>タイトル<br />※必須</th>
         <td>
-            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['title'];?>" /><br />
+            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedule_sql[$year][$month][$day][$schedule_id]['title'];?>" /><br />
             <span class="error"><?php echo $error_schedule_title;?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
-            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedules[$schedule_year][$schedule_month][$schedule_day][$schedule_id]['detail'];?></textarea>
+            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedule_sql[$year][$month][$day][$schedule_id]['detail'];?></textarea>
             <br /><span class="error"><?php echo $error_schedule_detail;?></span>
         </td>
     </tr>
