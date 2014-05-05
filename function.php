@@ -1,7 +1,4 @@
 <?php
-// require_once 'index.php';
-// require_once 'database.php';
-
 define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");

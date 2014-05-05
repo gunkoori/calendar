@@ -1,6 +1,8 @@
 <?php
 require_once 'database.php';
-// require_once 'function.php';
+
+//$form_validate = formValidate($post_data, $form_data);
+
 
 $year = isset($_GET['year']) ? $_GET['year']:'';
 $month = '';
@@ -26,69 +28,20 @@ $error_schedule_detail = $_COOKIE['schedule_detail'];
 $error_date =  $_COOKIE['error_compare_date'];
 $date_error = $_COOKIE['date_error'];//無効な日付
 
-//$sql = $sql_create['schedule_sql'];
 $sql_result = sqlResult($form_data, $connect_db, $sql_create);
 $schedule_sql = $sql_result['schedules'];
-print_r($schedule_sql);
 
-/*
-*DB接続
-*/
-/*
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'calendar';
-
-// MySQL に接続し、データベースを選択
-$db = mysqli_connect($host, $user, $password, $database);
-
-// 接続状況をチェック
-if (mysqli_connect_errno()) {
-    die(mysqli_connect_error());
-}
-
-$schedule_sql =<<<END
-    SELECT
-         schedule_id, start_date, end_date, schedule_title, schedule_detail
-     FROM
-         cal_schedules
-     WHERE
-         schedule_id="$schedule_id"
-
-     AND
-         deleted_at
-     IS
-         null
-
-END;
-
-
-//SQL実行
-if ($result = mysqli_query($db, $schedule_sql)) {
-    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-        list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
-        list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-        $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-        $schedules[$end_schedule_year][$end_schedule_month][$end_schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-        $schedules[$end_schedule_year][$end_schedule_month][$end_schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-    }
-    mysqli_free_result($result);
-}
-mysqli_close($db);
-*/
 
 
 //新規登録のとき
-/*if (!isset($schedule_id)) {
+//if (!isset($schedule_id)) {
     $year = $_GET['year'];
     $month = $_GET['month'];
     $day = $_GET['day'];
     $end_year = $year;
     $end_month = $month;
     $end_day = $day;
-} else {//編集のとき
+/*} else {//編集のとき
     $year = $schedule_year;
     $month = $schedule_month;
     $day = $schedule_day;
@@ -103,7 +56,6 @@ setcookie('error_day', $day, time()+20000);
 setcookie('error_id', $schedule_id, time()+20000);
 
 
-//print_r($year.$month.$day.$schedule_id);
 
 /*
 *コンボボックス
@@ -132,7 +84,7 @@ for ($i=-12; $i<=12; $i++) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-<form method="post" action="database.php">
+<form method="post" action="http://kensyu.aucfan.com/database.php">
 
 <table>
     <tr>

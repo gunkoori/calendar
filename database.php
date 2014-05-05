@@ -2,7 +2,7 @@
 require_once 'function.php';
 
 $post_data = $_POST;
-//var_dump($post_data);
+
 $connect_db = connectDB();
 
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
@@ -13,6 +13,13 @@ $form_validate = formValidate($post_data, $form_data);
 
 $sql_create = sqlCreate($form_data);
 
+//INSERT UPDATEの実行
+if (isset($sql_create['sql'])) {
+    $insert_update =  sqlResult($form_data, $connect_db, $sql_create); 
+    $insert_update['insert_or_update'];
+    header('Location: http://kensyu.aucfan.com/');
+    exit;
+}
 
 /*
 *DB接続
@@ -36,6 +43,7 @@ function connectDB() {
         'return' => $return
         );
 }
+
 
 /*
 *フォームからPOSTされたデータ
@@ -69,9 +77,9 @@ function formData($post_data, $make_calendar) {
         'between_end' => $between_end
         );
 }
+ 
 
-
-function formValidate($post_data, $form_data ) {
+function formValidate($post_data, $form_data) {
     //エラー（入力漏れがあった）場合は受け取る
     $error_year = $_COOKIE['error_year'];
     $error_month = $_COOKIE['error_month'];
@@ -108,12 +116,15 @@ function formValidate($post_data, $form_data ) {
     }
     //再度入力フォームに戻す
     if (isset($post_data['insert']) || isset($post_data['update'])) {
-        if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($schedule_title) || empty($schedule_detail) || $check_start_ym == false || $check_end_ym == false || strtotime($start_day) > strtotime($end_day)) {
-            $header = header("Location: http://kensyu.aucfan.com/schedule.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
+        if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($post_data['schedule_title']) || empty($post_data['schedule_detail']) || $check_start_ym == false || $check_end_ym == false || (strtotime($start_day) > strtotime($end_day))) {
+            $return = header("Location: http://kensyu.aucfan.com/schedule.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
             exit;
         }
     }
-    return $header;
+    else {
+        $return = 'true';
+    }
+    return $return;
 }
 
 /*
@@ -158,7 +169,7 @@ $sql=<<<END
         schedule_detail="$schedule_detail",
         update_at=NOW()
      WHERE
-        schedule_id="$schedule_id"
+        schedule_id="$id"
 END;
 
     }
@@ -171,7 +182,7 @@ $sql=<<<END
          update_at=NOW(),
          deleted_at=NOW()
      WHERE
-        schedule_id="$schedule_id"
+        schedule_id="$id"
 END;
 
 }

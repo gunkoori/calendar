@@ -3,7 +3,6 @@ require_once 'database.php';
 require_once 'function.php';
 
 $post_data = $_POST;
-// var_dump($post_data);
 
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
@@ -17,7 +16,6 @@ $auc_topi = aucTopi();
 //予定抽出
 $sql_result = sqlResult($form_data, $connect_db, $sql_create);
 $schedules_3months = $sql_result['schedules_3months'];
-//var_dump($schedules_3months);
 
 
 ?>
