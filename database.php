@@ -13,6 +13,8 @@ $form_validate = formValidate($post_data, $form_data);
 
 $sql_create = sqlCreate($form_data);
 
+$sql_escape = sqlEscape($connect_db, $sql_create);
+
 //INSERT UPDATEの実行
 if (isset($sql_create['sql'])) {
     $insert_update =  sqlResult($form_data, $connect_db, $sql_create); 
@@ -37,6 +39,7 @@ function connectDB() {
     // 接続状況をチェック
     if (mysqli_connect_errno()) {
         die(mysqli_connect_error());
+        $return = false;
     }
     return array(
         'db' => $db,
@@ -190,20 +193,19 @@ END;
 //予定を3ヶ月分取得
 $schedule_3months=<<<END
     SELECT
-         schedule_id, start_date, end_date, schedule_title, schedule_detail
-     FROM
-         cal_schedules
-     WHERE
-         deleted_at
-     IS
-         null
-     AND
-         start_date
-     BETWEEN
-         "$between_begin"
-     AND
-         "$between_end"
-
+        schedule_id, start_date, end_date, schedule_title, schedule_detail
+    FROM
+        cal_schedules
+    WHERE
+        deleted_at
+    IS
+        null
+    AND
+        start_date
+    BETWEEN
+        "$between_begin"
+    AND
+        "$between_end"
 END;
 
 $schedule_sql=<<<END
@@ -228,17 +230,32 @@ return array(
     );
 }
 
+/*
+ *エスケープ処理
+ */
+function sqlEscape($connect_db, $sql_create) {
+    $db = $connect_db['db'];
+    $return = array(
+        'sql' => mysqli_real_escape_string($db, $sql_create['sql']),
+        'schedule_3months' => mysqli_real_escape_string($db, $sql_create['schedules_3months']),
+        'schedule_sql' => mysqli_real_escape_string($db, $sql_create['schedule_sql'])
+    );
+    return $return;
+}
+
 
 /*
 *SQL実行
 */
-function sqlResult($form_data, $connect_db, $sql_create) {
+function sqlResult($form_data, $connect_db, /*$sql_create*/$sql_escape) {
     $db = $connect_db['db'];
+    
+
     //SQL実行
-    if (isset($form_data['start_day']) && !empty($sql_create['sql'])) {
-        $insert_or_update = mysqli_query($db, $sql_create['sql']);
+    if (isset($form_data['start_day']) && !empty($sql_escape['sql'])) {
+        $insert_or_update = mysqli_query($db, $sql_escape['sql']);
     }
-    if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
+    if ($result = mysqli_query($db, $sql_escape['schedule_3months'])) {
         while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
             list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
             list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
@@ -252,7 +269,7 @@ function sqlResult($form_data, $connect_db, $sql_create) {
         }
         mysqli_free_result($result);
     }
-    if ($result2 = mysqli_query($db, $sql_create['schedule_sql'])) {
+    if ($result2 = mysqli_query($db, $sql_escape['schedule_sql'])) {
         while ($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
             list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
             list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
