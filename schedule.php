@@ -1,8 +1,9 @@
 <?php
 require_once 'database.php';
+require_once 'function.php';
 
-//$form_validate = formValidate($post_data, $form_data);
-
+//ワンタイムトークンの生成
+$token = getToken($key = '');
 
 $year = isset($_GET['year']) ? $_GET['year']:'';
 $month = '';
@@ -161,16 +162,18 @@ for ($i=-12; $i<=12; $i++) {
     </tr>
 
     <?php if(!empty($schedule_id)):?>
-            <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
-
-            <input type="submit" name="update" value="更新" />
+        <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
+        <input type="hidden" name="token" value="<?php echo h($token);?>" />
+        <input type="submit" name="update" value="更新" />
     <?php else:?>
-            <input type="submit" name="insert" value="登録" />
+        <input type="hidden" name="token" value="<?php echo h($token);?>" />
+        <input type="submit" name="insert" value="登録" />
     <?php endif;?>
 
 </table>
 </form>
 <form method="post" action="http://kensyu.aucfan.com/">
+    <input type="hidden" name="token" value="<?php echo h($token);?>" />
     <input type="hidden" id="delete" name="delete" value="delete" />
     <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />
     <input type="submit" value="削除" />

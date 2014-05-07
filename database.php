@@ -19,8 +19,14 @@ $form_validate = formValidate($post_data, $form_data);
 //フォームデータのエスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
 
+//ワンタイムトークン生成
+$get_token = getToken($key = '');
+
+//ワンタイムトークンチェックする
+$check_token = checkToken($form_data['token']);
+
 //SQL文の生成
-$sql_create = sqlCreate($escape_formdata);
+$sql_create = sqlCreate($escape_formdata, $check_token);
 
 //INSERT UPDATEの実行
 if (isset($sql_create['sql'])) {
@@ -29,6 +35,7 @@ if (isset($sql_create['sql'])) {
     header('Location: http://kensyu.aucfan.com/');
     exit;
 }
+
 
 /*
 *DB接続
@@ -59,6 +66,8 @@ function connectDB() {
 *フォームからPOSTされたデータ
 */
 function formData($post_data, $make_calendar) {
+    //ワンタイムトークン
+    $token = $post_data['token'];
     //開始時間と終了時間
     $start_hour = $post_data['start_hour'];
     $start_min = $post_data['start_min'];
@@ -88,6 +97,7 @@ function formData($post_data, $make_calendar) {
         $update = 'update';
     }
     return array(
+        'token' => $token,
         'start_hour' => $start_hour,
         'start_min' => $start_min,
         'end_hour' => $end_hour,
@@ -174,12 +184,11 @@ function escapeFormdata($connect_db, $form_data) {
     return $escape_value;
 }
 
-
 /*
 *登録編集削除、DBからの抽出
 *エスケープした$escape_formdataを用いている
 */
-function sqlCreate($escape_formdata) {
+function sqlCreate($escape_formdata, $check_token) {
     $start_day = $escape_formdata['start_day'];
     $end_day = $escape_formdata['end_day'];
     $schedule_title = $escape_formdata['schedule_title'];
@@ -190,7 +199,7 @@ function sqlCreate($escape_formdata) {
     $schedule_id = $_GET['id'];
 
     //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
-    if (empty($id) && $escape_formdata['insert'] == 'insert') {
+    if ($check_token == true && empty($id) && $escape_formdata['insert'] == 'insert') {
 
 $sql=<<<END
     INSERT INTO
@@ -206,7 +215,7 @@ $sql=<<<END
 END;
 
     }
-    elseif (isset($id) && $escape_formdata['update'] == 'update') {
+    elseif ($check_token == true && isset($id) && $escape_formdata['update'] == 'update') {
 
 $sql=<<<END
     UPDATE
@@ -222,7 +231,7 @@ $sql=<<<END
 END;
 
     }
-    elseif ($escape_formdata['delete'] == 'delete') {
+    elseif ($check_token == true && $escape_formdata['delete'] == 'delete') {
 
 $sql=<<<END
     UPDATE

@@ -158,3 +158,22 @@ function shortStr ($str, $length = 15) {
 function h($str) {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
+
+
+/*
+*ワンタイムトークンを生成する
+*
+*/
+function getToken($key = '') {
+    $_SESSION['key'] = $key;
+    $token = sha1($key);//ハッシュ化する
+    return $token;
+}
+
+/*
+*ワンタイムトークンをチェックする
+*
+*/
+function checkToken($token = '') {
+    return ($token === sha1($_SESSION['key']));
+}
