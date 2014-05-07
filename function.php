@@ -142,3 +142,19 @@ function shortStr ($str, $length = 15) {
         return mb_substr($str, 0, $length, 'utf-8');
     }
 }
+
+
+/*
+*XSS対策
+*HTML特殊文字をエスケープする
+* < → &lt;
+* > → &gt;
+* & → &amp;
+* " → &quot;
+*
+*ENT_QUOTES
+* ' → &apos;
+*/
+function h($str) {
+    return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+}

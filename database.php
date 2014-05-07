@@ -19,6 +19,7 @@ $form_validate = formValidate($post_data, $form_data);
 //フォームデータのエスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
 
+//SQL文の生成
 $sql_create = sqlCreate($escape_formdata);
 
 //INSERT UPDATEの実行
@@ -81,10 +82,10 @@ function formData($post_data, $make_calendar) {
     $between_begin = $make_calendar['calendars'][1].'-01 00:00:01';
     $between_end = $make_calendar['calendars'][3].'-'.$make_calendar['end_days'][3].' 23:59:59';
     if (isset($post_data['insert'])) {
-        $insert = /*$post_data['insert']*/'insert';
+        $insert = 'insert';
     }
     if (isset($post_data['update'])) {
-        $update = /*$post_data['update']*/'update';
+        $update = 'update';
     }
     return array(
         'start_hour' => $start_hour,
@@ -172,7 +173,6 @@ function escapeFormdata($connect_db, $form_data) {
     }
     return $escape_value;
 }
-
 
 
 /*

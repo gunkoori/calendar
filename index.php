@@ -30,14 +30,14 @@ $schedules_3months = $sql_result['schedules_3months'];
 <body>
 <div id="header">
 <h3>郡カレンダー</h3>
-<div id="prev"><a href="?ym=<?php echo $last_month['year'].'-'.$last_month['month'];?>">前月</a></div>
+<div id="prev"><a href="?ym=<?php echo h($last_month['year'].'-'.$last_month['month']);?>">前月</a></div>
 <div id="this"><a href="/">今月</a></div>
-<div id="next"><a href="?ym=<?php echo $next_month['year'].'-'.$next_month['month']; ?>">次月</a></div>
-<form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
+<div id="next"><a href="?ym=<?php echo h($next_month['year'].'-'.$next_month['month']);?>">次月</a></div>
+<form method="get" action="<?php $_SERVER['PHP_SELF'];?>">
     <select name="ym">
     <option>選択してください</option>
     <?php for ($i=0; $i<=24; $i++):?>
-    <option id="select_year_month" value="<?php echo $months[$i];?>"><?php echo $months[$i] ;?></option>
+    <option id="select_year_month" value="<?php echo h($months[$i]);?>"><?php echo h($months[$i]);?></option>
     <?php endfor; ?>
     </select>
     <input type="submit" value="表示する">
@@ -55,7 +55,7 @@ $schedules_3months = $sql_result['schedules_3months'];
             $cal_year = $explode_cal[0];
             $cal_month = $explode_cal[1];
         ?>
-        <?php echo $cal_year.'年'.$cal_month.'月';?>
+        <?php echo h($cal_year.'年'.$cal_month.'月');?>
         </th>
     </tr>
     <tr>
@@ -97,7 +97,7 @@ $schedules_3months = $sql_result['schedules_3months'];
                 <?php $holiday_name = ''; ?><!-- 祝日 -->
                 <?php if(isset($holiday[$value.'-'.$days])):?>
                     <?php $class = 'holiday'; ?>
-                    <?php $holiday_name = '<br />'.$holiday[$value.'-'.$days]; ?>
+                    <?php $holiday_name = $holiday[$value.'-'.$days]; ?>
                 <?php endif;?>
 
                 <?php $auc_topi_feed = '';?><!-- オークショントピック -->
@@ -106,19 +106,19 @@ $schedules_3months = $sql_result['schedules_3months'];
                     <?php $auc_topi_feed = $auc_topi['title'][$value.'-'.$days];?>
                 <?php endif;?>
 
-                    <td class="<?php echo $class; ?>">
+                    <td class="<?php echo h($class); ?>">
                         <!-- 日付出力 -->
                         <span class="day">
-                            <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day;?>"><?php echo $day;?></a>
+                            <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
                         </span>
                         <!-- 祝日出力 -->
                         <span>
-                            <?php echo $holiday_name;?>
+                            <?php echo h($holiday_name);?>
                         </span>
                         <!-- オクトピ出力 -->
                         <span>
-                            <br /><a href="<?php echo $auc_topi['link'][$value.'-'.$days];?>" title="<?php echo $auc_topi_feed;?>" target="_blank">
-                            <?php echo shortStr($auc_topi_feed);?>
+                            <br /><a href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="<?php echo h($auc_topi_feed);?>" target="_blank">
+                            <?php echo h(shortStr($auc_topi_feed));?>
                             </a>
                         </span><br />
 
@@ -128,9 +128,9 @@ $schedules_3months = $sql_result['schedules_3months'];
 
                             <?php if (isset($schedules_3months[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules_3months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
-                                    <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo $cal_year;?>&month=<?php echo $cal_month;?>&day=<?php echo $day.'&id='.$schedule_id;?>"
-                                    title="<?php echo $schedule['detail'];?>">
-                                    <?php echo $schedule['title'];?><br />
+                                    <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
+                                    title="<?php echo h($schedule['detail']);?>">
+                                    <?php echo h($schedule['title']);?><br />
                                 <?php endforeach;?>
                             <?php endif;?>
 

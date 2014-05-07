@@ -92,28 +92,28 @@ for ($i=-12; $i<=12; $i++) {
         <td>
             <select name="start_ym">
             <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo $year.'-'.$month;?>"><?php echo $ym[$i]?></option>
+                <option id="select_year_month" value="<?php echo h($year.'-'.$month);?>"><?php echo h($ym[$i]);?></option>
             <?php endfor; ?>
             </select>
             <!-- TODO:月によって日付が違うのでJSで直す -->
             <select name="start_day">
             <?php for ($i=1; $i<=31; $i++):?>
-                <option id="select_start_day" value="<?php echo $i;?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo $i?>日</option>
+                <option id="select_start_day" value="<?php echo h($i);?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
             <?php endfor; ?>
             </select>
-            <span class="error"><?php echo $error_ymd;?></span><br />
-            <span class="error"><?php echo $error_date;?></span><br />
-            <span class="error"><?php echo $date_error;?></span><br />
+            <span class="error"><?php echo h($error_ymd);?></span><br />
+            <span class="error"><?php echo h($error_date);?></span><br />
+            <span class="error"><?php echo h($date_error);?></span><br />
             <select name="start_hour">
             <?php for ($i=1; $i<24; $i++):?>
-                <option id="start_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
+                <option id="start_hour" value="<?php echo h($i);?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo h($i);?>時</option>
             <?php endfor; ?>
             </select>
             <select name="start_min">
                 <option class="start_min" value="00">00分</option>
                 <option class="start_min" value="30">30分</option>
             </select>
-            <br /><span class="error"><?php echo $error_hour;?></span>
+            <br /><span class="error"><?php echo h($error_hour);?></span>
         </td>
     </tr>
     <tr>
@@ -121,47 +121,47 @@ for ($i=-12; $i<=12; $i++) {
         <td>
             <select name="end_ym">
             <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo $end_year.'-'.$end_month;?>"><?php echo $ym[$i]?></option>
+                <option id="select_year_month" value="<?php echo h($end_year.'-'.$end_month);?>"><?php echo h($ym[$i]);?></option>
             <?php endfor; ?>
             </select>
             <!-- TODO:月によって日付が違うのでJSで直す -->
             <select name="end_day">
             <?php for ($i=1; $i<=31; $i++):?>
-                <option id="select_end_day" value="<?php echo $i;?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo $i?>日</option>
+                <option id="select_end_day" value="<?php echo h($i);?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
             <?php endfor; ?>
             </select>
-            <span class="error"><?php echo $error_ymd;?></span><br />
-            <span class="error"><?php echo $error_date;?></span><br />
-            <span class="error"><?php echo $date_error;?></span><br />
+            <span class="error"><?php echo h($error_ymd);?></span><br />
+            <span class="error"><?php echo h($error_date);?></span><br />
+            <span class="error"><?php echo h($date_error);?></span><br />
             <select name="end_hour">
             <?php for ($i=1; $i<24; $i++):?>
-                <option id="end_hour" value="<?php echo $i;?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo $i?>時</option>
+                <option id="end_hour" value="<?php echo h($i);?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo h($i);?>時</option>
             <?php endfor; ?>
             </select>
             <select name="end_min">
                 <option class="end_min" value="00">00分</option>
                 <option class="end_min" value="30">30分</option>
             </select>
-            <br /><span class="error"><?php echo $error_hour;?></span>
+            <br /><span class="error"><?php echo h($error_hour);?></span>
         </td>
     </tr>
     <tr>
         <th>タイトル<br />※必須</th>
         <td>
-            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedule_sql[$year][$month][$day][$schedule_id]['title'];?>" /><br />
-            <span class="error"><?php echo $error_schedule_title;?></span>
+            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);?>" /><br />
+            <span class="error"><?php echo h($error_schedule_title);?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
-            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo $schedule_sql[$year][$month][$day][$schedule_id]['detail'];?></textarea>
-            <br /><span class="error"><?php echo $error_schedule_detail;?></span>
+            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']);?></textarea>
+            <br /><span class="error"><?php echo h($error_schedule_detail);?></span>
         </td>
     </tr>
 
     <?php if(!empty($schedule_id)):?>
-            <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
+            <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
 
             <input type="submit" name="update" value="更新" />
     <?php else:?>
@@ -172,7 +172,7 @@ for ($i=-12; $i<=12; $i++) {
 </form>
 <form method="post" action="http://kensyu.aucfan.com/">
     <input type="hidden" id="delete" name="delete" value="delete" />
-    <input type="hidden"  name="schedule_id" value="<?php echo $schedule_id;?>" />
+    <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />
     <input type="submit" value="削除" />
 </form>
 
