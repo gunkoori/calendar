@@ -1,23 +1,29 @@
 <?php
 require_once 'function.php';
 
+//フォームからPOSTされたデータ
 $post_data = $_POST;
 
+//DB接続
 $connect_db = connectDB();
 
+//カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 
+//フォームのデータ整形
 $form_data = formData($post_data, $make_calendar);
 
+//フォーム、バリデート
 $form_validate = formValidate($post_data, $form_data);
 
-$sql_create = sqlCreate($form_data);
+//フォームデータのエスケープ
+$escape_formdata = escapeFormdata($connect_db, $form_data);
 
-$sql_escape = sqlEscape($connect_db, $sql_create);
+$sql_create = sqlCreate($escape_formdata);
 
 //INSERT UPDATEの実行
 if (isset($sql_create['sql'])) {
-    $insert_update =  sqlResult($form_data, $connect_db, $sql_create); 
+    $insert_update =  sqlResult($escape_formdata, $connect_db, $sql_create);
     $insert_update['insert_or_update'];
     header('Location: http://kensyu.aucfan.com/');
     exit;
@@ -74,9 +80,11 @@ function formData($post_data, $make_calendar) {
     $schedule_id = $_COOKIE['schedule_id'];
     $between_begin = $make_calendar['calendars'][1].'-01 00:00:01';
     $between_end = $make_calendar['calendars'][3].'-'.$make_calendar['end_days'][3].' 23:59:59';
-    if (isset($post_data['insert']) || isset($post_data['update'])) {
-        $insert = $post_data['insert'];
-        $update = $post_data['update'];
+    if (isset($post_data['insert'])) {
+        $insert = /*$post_data['insert']*/'insert';
+    }
+    if (isset($post_data['update'])) {
+        $update = /*$post_data['update']*/'update';
     }
     return array(
         'start_hour' => $start_hour,
@@ -99,10 +107,10 @@ function formData($post_data, $make_calendar) {
         'between_begin' => $between_begin,
         'between_end' => $between_end,
         'insert' => $insert,
-        'update' => $update 
+        'update' => $update
         );
 }
- 
+
 /*
  *バリデート
  */
@@ -154,20 +162,35 @@ function formValidate($form_data) {
 }
 
 /*
-*登録編集削除、DBからの抽出
+*formData()のエスケープ
 */
-function sqlCreate($form_data) {
-    $start_day = $form_data['start_day'];
-    $end_day = $form_data['end_day'];
-    $schedule_title = $form_data['schedule_title'];
-    $schedule_detail = $form_data['schedule_detail'];
-    $id = $form_data['id'];
-    $between_begin = $form_data['between_begin'];
-    $between_end = $form_data['between_end'];
+function escapeFormdata($connect_db, $form_data) {
+    $db = $connect_db['db'];
+    $escape_value = array();
+    foreach ($form_data as $name => $data) {
+        $escape_value[$name] = mysqli_real_escape_string($db, $data);
+    }
+    return $escape_value;
+}
+
+
+
+/*
+*登録編集削除、DBからの抽出
+*エスケープした$escape_formdataを用いている
+*/
+function sqlCreate($escape_formdata) {
+    $start_day = $escape_formdata['start_day'];
+    $end_day = $escape_formdata['end_day'];
+    $schedule_title = $escape_formdata['schedule_title'];
+    $schedule_detail = $escape_formdata['schedule_detail'];
+    $id = $escape_formdata['id'];
+    $between_begin = $escape_formdata['between_begin'];
+    $between_end = $escape_formdata['between_end'];
     $schedule_id = $_GET['id'];
 
     //UPDATEじゃないとき、そして予定のタイトルが空じゃないとき
-    if (empty($form_data['id']) && ($form_data['schedule_title'] != null)) {
+    if (empty($id) && $escape_formdata['insert'] == 'insert') {
 
 $sql=<<<END
     INSERT INTO
@@ -183,7 +206,7 @@ $sql=<<<END
 END;
 
     }
-    elseif (isset($form_data['id']) && !isset($form_data['delete'])) {
+    elseif (isset($id) && $escape_formdata['update'] == 'update') {
 
 $sql=<<<END
     UPDATE
@@ -199,7 +222,7 @@ $sql=<<<END
 END;
 
     }
-    elseif ($form_data['delete'] == 'delete') {
+    elseif ($escape_formdata['delete'] == 'delete') {
 
 $sql=<<<END
     UPDATE
@@ -253,32 +276,17 @@ return array(
     );
 }
 
-/*
- *エスケープ処理
- */
-function sqlEscape($connect_db, $sql_create) {
-    $db = $connect_db['db'];
-    $return = array(
-        'sql' => mysqli_real_escape_string($db, $sql_create['sql']),
-        'schedule_3months' => mysqli_real_escape_string($db, $sql_create['schedules_3months']),
-        'schedule_sql' => mysqli_real_escape_string($db, $sql_create['schedule_sql'])
-    );
-    return $return;
-}
-
 
 /*
 *SQL実行
 */
-function sqlResult($form_data, $connect_db, $sql_escape) {
+function sqlResult($escape_formdata, $connect_db, $sql_create) {
     $db = $connect_db['db'];
-    
-
     //SQL実行
-    if (isset($form_data['start_day']) && !empty($sql_escape['sql'])) {
-        $insert_or_update = mysqli_query($db, $sql_escape['sql']);
+    if (isset($escape_formdata['start_day']) && !empty($sql_create['sql'])) {
+        $insert_or_update = mysqli_query($db, $sql_create['sql']);
     }
-    if ($result = mysqli_query($db, $sql_escape['schedule_3months'])) {
+    if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
         while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
             list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
             list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
@@ -292,7 +300,7 @@ function sqlResult($form_data, $connect_db, $sql_escape) {
         }
         mysqli_free_result($result);
     }
-    if ($result2 = mysqli_query($db, $sql_escape['schedule_sql'])) {
+    if ($result2 = mysqli_query($db, $sql_create['schedule_sql'])) {
         while ($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
             list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
             list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
