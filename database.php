@@ -36,6 +36,11 @@ if (isset($sql_create['sql'])) {
     exit;
 }
 
+//セッション内のワンタイムトークン用文字列削除
+if (isset($_SESSION['key']) === true) {
+    unset($_SESSION['key']);
+}
+
 
 /*
 *DB接続
