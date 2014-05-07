@@ -53,11 +53,19 @@ function connectDB() {
 */
 function formData($post_data, $make_calendar) {
     //開始時間と終了時間
-    $start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
-    $end_time = $post_data['end_hour'].':'.$post_data['end_min'].':00';
+    $start_hour = $post_data['start_hour'];
+    $start_min = $post_data['start_min'];
+    $end_hour = $post_data['end_hour'];
+    $end_min = $post_data['end_min'];
+    $start_time = $start_hour.':'.$start_min.':00';
+    $end_time = $end_hour.':'.$end_min.':00';
     //開始日と終了日
-    $start_day = $post_data['start_ym'].'-'.$post_data['start_day'].' '.$start_time;
-    $end_day = $post_data['end_ym'].'-'.$post_data['end_day'].' '.$end_time;
+    $start_ym = $post_data['start_ym'];
+    $start_day = $post_data['start_day'];
+    $end_ym = $post_data['end_ym'];
+    $end_day = $post_data['end_day'];
+    $start_day = $start_ym.'-'.$post_data['start_day'].' '.$start_time;
+    $end_day = $end_ym.'-'.$end_day.' '.$end_time;
     //予定のタイトルと詳細
     $schedule_title = $post_data['schedule_title'];
     $schedule_detail = $post_data['schedule_detail'];
@@ -66,7 +74,19 @@ function formData($post_data, $make_calendar) {
     $schedule_id = $_COOKIE['schedule_id'];
     $between_begin = $make_calendar['calendars'][1].'-01 00:00:01';
     $between_end = $make_calendar['calendars'][3].'-'.$make_calendar['end_days'][3].' 23:59:59';
+    if (isset($post_data['insert']) || isset($post_data['update'])) {
+        $insert = $post_data['insert'];
+        $update = $post_data['update'];
+    }
     return array(
+        'start_hour' => $start_hour,
+        'start_min' => $start_min,
+        'end_hour' => $end_hour,
+        'end_min' => $end_min,
+        'start_ym' => $start_ym,
+        'start_day' => $start_day,
+        'end_ym' => $end_ym,
+        'end_day' => $end_day,
         'start_time' => $start_time,
         'end_time' => $end_time,
         'start_day' => $start_day,
@@ -77,12 +97,16 @@ function formData($post_data, $make_calendar) {
         'delete' => $delete,
         'schedule_id' => $schedule_id,
         'between_begin' => $between_begin,
-        'between_end' => $between_end
+        'between_end' => $between_end,
+        'insert' => $insert,
+        'update' => $update 
         );
 }
  
-
-function formValidate($post_data, $form_data) {
+/*
+ *バリデート
+ */
+function formValidate($form_data) {
     //エラー（入力漏れがあった）場合は受け取る
     $error_year = $_COOKIE['error_year'];
     $error_month = $_COOKIE['error_month'];
@@ -92,11 +116,10 @@ function formValidate($post_data, $form_data) {
         $error_id = '&id='.$_COOKIE['error_id'];
     }
 
-    //バリデート
-    if ($post_data['start_hour'] == '' || $post_data['start_min'] == '' || $post_data['end_hour'] == '' || $post_data['end_min'] == '') {
+    if ($form_data['start_hour'] == '' || $form_data['start_min'] == '' || $form_data['end_hour'] == '' || $form_data['end_min'] == '') {
         setcookie('error_hour', '時間は必須です', time()+1);
     }
-    if ($post_data['start_ym'] == '' || $post_data['start_day'] == '' || $post_data['end_ym'] == '' || $post_data['end_day'] == '') {
+    if ($form_data['start_ym'] == '' || $form_data['start_day'] == '' || $form_data['end_ym'] == '' || $form_data['end_day'] == '') {
         setcookie('ymd', '年月日は必須です', time()+1);
     }
     if ($form_data['schedule_title'] == '') {
@@ -110,16 +133,16 @@ function formValidate($post_data, $form_data) {
     }
 
     //無効な日付かチェックする ex.)2月３１日には登録できない
-    $explode_start_ym = explode('-', $post_data['start_ym']);
-    $explode_end_ym = explode('-', $post_data['end_ym']);
-    $check_start_ym = checkdate($explode_start_ym[1], $post_data['start_day'], intval($explode_start_ym[0]));
-    $check_end_ym = checkdate($explode_end_ym[1], $post_data['end_day'], intval($explode_end_ym[0]));
+    $explode_start_ym = explode('-', $form_data['start_ym']);
+    $explode_end_ym = explode('-', $form_data['end_ym']);
+    $check_start_ym = checkdate($explode_start_ym[1], $form_data['start_day'], intval($explode_start_ym[0]));
+    $check_end_ym = checkdate($explode_end_ym[1], $form_data['end_day'], intval($explode_end_ym[0]));
     if ($check_start_ym == false || $check_end_ym == false) {
         setcookie('date_error', '無効な日付です', time()+1);
     }
     //再度入力フォームに戻す
-    if (isset($post_data['insert']) || isset($post_data['update'])) {
-        if (empty($post_data['start_ym']) || empty($post_data['start_day']) || empty($post_data['start_hour']) || empty($post_data['start_min']) ||empty($post_data['end_ym']) || empty($post_data['end_day']) || empty($post_data['end_hour']) || empty($post_data['end_min']) || empty($post_data['schedule_title']) || empty($post_data['schedule_detail']) || $check_start_ym == false || $check_end_ym == false || (strtotime($start_day) > strtotime($end_day))) {
+    if (isset($form_data['insert']) || isset($form_data['update'])) {
+        if (empty($form_data['start_ym']) || empty($form_data['start_day']) || empty($form_data['start_hour']) || empty($form_data['start_min']) ||empty($form_data['end_ym']) || empty($form_data['end_day']) || empty($form_data['end_hour']) || empty($form_data['end_min']) || empty($form_data['schedule_title']) || empty($form_data['schedule_detail']) || $check_start_ym == false || $check_end_ym == false || (strtotime($start_day) > strtotime($end_day))) {
             $return = header("Location: http://kensyu.aucfan.com/schedule.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id);
             exit;
         }
@@ -247,7 +270,7 @@ function sqlEscape($connect_db, $sql_create) {
 /*
 *SQL実行
 */
-function sqlResult($form_data, $connect_db, /*$sql_create*/$sql_escape) {
+function sqlResult($form_data, $connect_db, $sql_escape) {
     $db = $connect_db['db'];
     
 
