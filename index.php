@@ -1,6 +1,7 @@
 <?php
 require_once 'database.php';
 require_once 'function.php';
+require_once 'unset_session.php';
 
 $post_data = $_POST;
 
@@ -17,7 +18,7 @@ $auc_topi = aucTopi();
 $sql_result = sqlResult($form_data, $connect_db, $sql_create);
 $schedules_3months = $sql_result['schedules_3months'];
 
-
+$unset_session = unsetSession();
 ?>
 
 <!DOCTYPE html>
