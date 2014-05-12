@@ -3,7 +3,6 @@ require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
 
-$post_data = $_POST;
 
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
@@ -14,10 +13,26 @@ $holiday = getHoliday($last_month, $next_month, $end_days);
 //オークショントピック
 $auc_topi = aucTopi();
 
-//予定抽出
-$sql_result = sqlResult($form_data, $connect_db, $sql_create);
+//DB接続
+$connect_db = connectDB();
+
+//カレンダー生成
+$make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
+
+//フォームのデータ整形
+$form_data = formData($post_data, $make_calendar);
+
+//エスケープ
+$escape_formdata = escapeFormdata($connect_db, $form_data);
+
+//SQL文の生成
+$sql_create = sqlCreate($escape_formdata, $check_token = true);
+
+//SQL実行
+$sql_result = sqlResult($escape_formdata, $connect_db, $sql_create);
 $schedules_3months = $sql_result['schedules_3months'];
 
+//SESSION初期化
 $unset_session = unsetSession();
 ?>
 

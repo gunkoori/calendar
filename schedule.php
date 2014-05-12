@@ -1,8 +1,12 @@
 <?php
 // session_start();
-
-require 'database.php';
 require_once 'function.php';
+require_once 'database.php';
+
+
+$post_data = $_POST;
+// var_dump($post_data);
+// var_dump($_SESSION);
 // require_once 'validate.php';
 
 // $form_validate = formValidate($form_data);
@@ -10,7 +14,42 @@ require_once 'function.php';
 
 // var_dump($form_data);
 //ワンタイムトークンの生成
-$token = getToken($key = '');
+// $token = getToken($key = '');
+
+
+//DB接続
+$connect_db = connectDB();
+
+//カレンダー生成
+$make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
+
+//フォームのデータ整形
+$form_data = formData($post_data, $make_calendar);
+
+//フォーム、バリデート
+$form_validate = formValidate($form_data);
+// var_dump($form_data);
+//フォームデータのエスケープ
+$escape_formdata = escapeFormdata($connect_db, $form_data);
+
+//ワンタイムトークン生成
+$get_token = getToken();
+
+//ワンタイムトークンチェックする
+$check_token = checkToken($form_data['token']);
+var_dump($check_token);
+//SQL文の生成
+$sql_create = sqlCreate($escape_formdata, $check_token);
+// var_dump($sql_create);
+//INSERT UPDATEの実行
+if (isset($sql_create['sql'])) {
+    $insert_update =  sqlResult($escape_formdata, $connect_db, $sql_create);
+    $insert_update['insert_or_update'];
+    header('Location: http://kensyu.aucfan.com/');
+    return;
+}
+
+
 
 $year = isset($_GET['year']) ? $_GET['year']:'';
 $month = '';
@@ -92,7 +131,7 @@ for ($i=-12; $i<=12; $i++) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-<form method="post" action="http://kensyu.aucfan.com/database.php">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 
 <table>
     <tr>
