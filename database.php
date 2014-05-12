@@ -280,7 +280,7 @@ END;
     }
     elseif ($check_token == true && $escape_formdata['delete'] == 'delete') {
 
-$sql=<<<END
+$delete=<<<END
     UPDATE
          cal_schedules
      SET
@@ -327,6 +327,7 @@ END;
 
 return array(
     'sql' => $sql,
+    'delete' => $delete,
     'schedule_3months' => $schedule_3months,
     'schedule_sql' => $schedule_sql
     );
@@ -341,6 +342,9 @@ function sqlResult($escape_formdata, $connect_db, $sql_create) {
     //SQL実行
     if (isset($escape_formdata['start_day']) && !empty($sql_create['sql'])) {
         $insert_or_update = mysqli_query($db, $sql_create['sql']);
+    }
+    if (isset($sql_create['delete'])) {
+        $delete = mysqli_query($db, $sql_create['delete']);
     }
     if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
         while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
@@ -374,6 +378,7 @@ function sqlResult($escape_formdata, $connect_db, $sql_create) {
 
     return array(
         'insert_or_update' => $insert_or_update,
+        'delete' => $delete,
         'schedules_3months' =>$schedules_3months,
         'schedules' => $schedules
         );

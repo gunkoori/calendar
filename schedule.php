@@ -1,21 +1,8 @@
 <?php
-// session_start();
 require_once 'function.php';
 require_once 'database.php';
 
-
 $post_data = $_POST;
-// var_dump($post_data);
-// var_dump($_SESSION);
-// require_once 'validate.php';
-
-// $form_validate = formValidate($form_data);
-// var_dump($form_validate);
-
-// var_dump($form_data);
-//ワンタイムトークンの生成
-// $token = getToken($key = '');
-
 
 //DB接続
 $connect_db = connectDB();
@@ -27,8 +14,8 @@ $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_m
 $form_data = formData($post_data, $make_calendar);
 
 //フォーム、バリデート
-$form_validate = formValidate($form_data);
-// var_dump($form_data);
+// $form_validate = formValidate($form_data);
+
 //フォームデータのエスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
 
@@ -37,10 +24,10 @@ $get_token = getToken();
 
 //ワンタイムトークンチェックする
 $check_token = checkToken($form_data['token']);
-var_dump($check_token);
+
 //SQL文の生成
 $sql_create = sqlCreate($escape_formdata, $check_token);
-// var_dump($sql_create);
+
 //INSERT UPDATEの実行
 if (isset($sql_create['sql'])) {
     $insert_update =  sqlResult($escape_formdata, $connect_db, $sql_create);
@@ -48,6 +35,15 @@ if (isset($sql_create['sql'])) {
     header('Location: http://kensyu.aucfan.com/');
     return;
 }
+
+if (isset($post_data['delete'])) {
+    $delete = sqlResult($escape_formdata, $connect_db, $sql_create);
+    $delete['delete'];
+    header('Location: http://kensyu.aucfan.com/');
+    return;
+}
+
+
 
 
 
@@ -131,7 +127,7 @@ for ($i=-12; $i<=12; $i++) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+<form method="post" action="<?php echo h($_SERVER['PHP_SELF']); ?>">
 
 <table>
     <tr>
@@ -209,17 +205,17 @@ for ($i=-12; $i<=12; $i++) {
 
     <?php if(!empty($schedule_id)):?>
         <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
-        <input type="hidden" name="token" value="<?php echo h($token);?>" />
+        <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
         <input type="submit" name="update" value="更新" />
     <?php else:?>
-        <input type="hidden" name="token" value="<?php echo h($token);?>" />
+        <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
         <input type="submit" name="insert" value="登録" />
     <?php endif;?>
 
 </table>
 </form>
-<form method="post" action="http://kensyu.aucfan.com/">
-    <input type="hidden" name="token" value="<?php echo h($token);?>" />
+<form method="post" action="<?php echo h($_SERVER['PHP_SELF']); ?>">
+    <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
     <input type="hidden" id="delete" name="delete" value="delete" />
     <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />
     <input type="submit" value="削除" />
