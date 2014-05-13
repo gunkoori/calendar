@@ -12,6 +12,13 @@ function unsetSession() {
     if(isset($_SESSION['error']['error_date']) === true) {
         unset($_SESSION['error']['error_date']);
     }
+
+    if(isset($SESSION['keep_value']['schedule_detail']) === true) {
+        unset($SESSION['keep_value']['schedule_detail']);
+    }
+    if(isset($SESSION['keep_value']['schedule_title']) === true) {
+        unset($SESSION['keep_value']['schedule_title']);
+    }
     /*if(isset($_SESSION['count']) === true) {
         unset($_SESSION['count']);
     }*/

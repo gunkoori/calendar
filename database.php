@@ -127,17 +127,18 @@ function formValidate() {
     if ($_POST) {
         //タイトルが空のとき
         if (empty($session_form_data['schedule_title'])) {
-            $error_schedule_title = 'タイトルは必須です';
+            $error_schedule_title = 'タイトルは必須です';// エラーメッセージ
+            $keep_detail = $session_form_data['schedule_detail'];// 値を保持させるために代入
         }
         //詳細が空のとき
         if (empty($session_form_data['schedule_detail'])) {
-            $error_schedule_detail = '詳細は必須です';
+            $error_schedule_detail = '詳細は必須です';// エラーメッセージ
+            $keep_title = $session_form_data['schedule_title'];// 値を保持させるために代入
         }
         //開始時間が終了時間よりも遅いとき
         if (strtotime($start_date) > strtotime($end_date)) {
             $error_compare_date = '開始日時が終了日時より遅く設定されています';
         }
-
         //無効な日付かチェックする ex.)2月３１日には登録できない
         $explode_start_ym = explode('-', $session_form_data['start_ym']);
         $explode_end_ym = explode('-', $session_form_data['end_ym']);
@@ -151,7 +152,9 @@ function formValidate() {
             'error_schedule_title' => $error_schedule_title,
             'error_schedule_detail' => $error_schedule_detail,
             'error_compare_date' => $error_compare_date,
-            'error_date' => $error_date
+            'error_date' => $error_date,
+            'keep_detail' => $keep_detail,
+            'keep_title' => $keep_title
         );
         // １つでも文章が入っていればfalse
         foreach ($_SESSION['error'] as $is_error) {
@@ -286,39 +289,43 @@ return array(
 function sqlResult($escape_formdata, $connect_db, $sql_create) {
     $db = $connect_db['db'];
     //SQL実行
-    if (isset($escape_formdata['start_day']) && !empty($sql_create['sql'])) {
+    if (isset($sql_create['sql'])) {
         $insert_or_update = mysqli_query($db, $sql_create['sql']);
     }
     if (isset($sql_create['delete'])) {
         $delete = mysqli_query($db, $sql_create['delete']);
     }
-    if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
-        while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-            list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
-            list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-            $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-            $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-            if ($row['start_date'] != $row['end_date']) {
-                for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
-                    $schedules_3months[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+    if (isset($sql_create['schedule_3months'])) {
+        if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
+            while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
+                list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
+                $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+                $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
+                if ($row['start_date'] != $row['end_date']) {
+                    for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
+                        $schedules_3months[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+                    }
                 }
             }
+            mysqli_free_result($result);
         }
-        mysqli_free_result($result);
     }
-    if ($result2 = mysqli_query($db, $sql_create['schedule_sql'])) {
-        while ($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
-            list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
-            list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-            $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-            $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-            if ($row['start_date'] != $row['end_date']) {
-                for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
-                    $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+    if (isset($sql_create['schedule_sql'])) {
+        if ($result2 = mysqli_query($db, $sql_create['schedule_sql'])) {
+            while ($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
+                list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
+                list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
+                $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+                $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
+                if ($row['start_date'] != $row['end_date']) {
+                    for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
+                        $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+                    }
                 }
             }
+            mysqli_free_result($result2);
         }
-        mysqli_free_result($result2);
     }
     mysqli_close($db);
 

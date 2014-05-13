@@ -3,7 +3,6 @@ require_once 'function.php';
 require_once 'database.php';
 require_once 'unset_session.php';
 
-$unset_session = unsetSession();
 
 //DB接続
 $connect_db = connectDB();
@@ -20,7 +19,7 @@ $_SESSION['form_data'] = $form_data;
 
 //フォーム、バリデート
 $is_form_valid = formValidate();
-
+// var_dump($is_form_valid);
 //フォームデータのエスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
 
@@ -32,14 +31,15 @@ $check_token = checkToken($form_data['token']);
 
 //SQL文の生成
 //バリデート通ったときと、削除のときはなにかをPOSTするわけではないので、$escape_formdata['delete']があった時点で削除SQL生成
-if ($is_form_valid == true || isset($escape_formdata['delete'])) {
+if ($is_form_valid === true  /*isset($escape_formdata['delete'])*/) {
     $sql_create = sqlCreate($escape_formdata, $check_token);
 }
-
 //INSERTまたはUPDATEのSQLがある場合、実行
-if (!isset($_SESSION['error']) && isset($sql_create['sql'])) {
+if (!isset($_SESSION['error']['error_schedule_title']) && !isset($_SESSION['error']['error_schedule_detail']) && isset($sql_create['sql'])) {
     $insert_update =  sqlResult($escape_formdata, $connect_db, $sql_create);
     $insert_update['insert_or_update'];
+    unset($_SESSION['error']['keep_title']);
+    unset($_SESSION['error']['keep_detail']);
     header('Location: http://kensyu.aucfan.com/');
     return;
 }
@@ -51,6 +51,7 @@ if (isset($sql_create['delete'])) {
     header('Location: http://kensyu.aucfan.com/');
     return;
 }
+
 
 $year = !empty($_GET['year']) ? $_GET['year'] : $form_data['year'];
 $month = !empty($_GET['month']) ? $_GET['month'] : $form_data['month'];
@@ -165,14 +166,14 @@ for ($i=-12; $i<=12; $i++) {
     <tr>
         <th>タイトル<br />※必須</th>
         <td>
-            <input type="text" id="schedule_title" name="schedule_title" value="<?php echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);?>" /><br />
+            <input type="text" id="schedule_title" name="schedule_title" value="<?php if (isset($_SESSION['error']['keep_title'])) { echo $_SESSION['error']['keep_title'];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
             <span class="error"><?php echo h($_SESSION['error']['error_schedule_title']);?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
-            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']);?></textarea>
+            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail'])) { echo $_SESSION['error']['keep_detail']; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
             <br /><span class="error"><?php echo h($_SESSION['error']['error_schedule_detail']);?></span>
         </td>
     </tr>
