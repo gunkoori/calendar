@@ -166,14 +166,14 @@ for ($i=-12; $i<=12; $i++) {
     <tr>
         <th>タイトル<br />※必須</th>
         <td>
-            <input type="text" id="schedule_title" name="schedule_title" value="<?php if (isset($_SESSION['error']['keep_title'])) { echo $_SESSION['error']['keep_title'];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
+            <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="<?php if (isset($_SESSION['error']['keep_title'])) { echo $_SESSION['error']['keep_title'];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
             <span class="error"><?php echo h($_SESSION['error']['error_schedule_title']);?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
-            <textarea id="schedule_detail" name="schedule_detail" rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail'])) { echo $_SESSION['error']['keep_detail']; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
+            <textarea id="schedule_detail" name="schedule_detail"  placeholder="詳細を入力してください"　rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail'])) { echo $_SESSION['error']['keep_detail']; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
             <br /><span class="error"><?php echo h($_SESSION['error']['error_schedule_detail']);?></span>
         </td>
     </tr>

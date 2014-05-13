@@ -73,9 +73,10 @@ function makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $
 /*
 * Googlle Calendar API 祝日取得
 */
-function getHoliday($last_month, $next_month, $end_days) {
+function getHoliday($last_month, $next_month) {
+    $make_calendar =  makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
     $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
-    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_days[2];
+    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][2];
     $holidays_url = sprintf(
             "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
             "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,

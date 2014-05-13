@@ -18,8 +18,7 @@ function connectDB() {
 
     // 接続状況をチェック
     if (mysqli_connect_errno()) {
-        die(mysqli_connect_error());
-        // $return = false;
+        die('DB接続失敗しました。。。'.mysqli_connect_error());
     }
     return array(
         'db' => $db,

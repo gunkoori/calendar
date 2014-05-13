@@ -7,7 +7,7 @@ require_once 'unset_session.php';
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 
 //祝日
-$holiday = getHoliday($last_month, $next_month, $end_days);
+$holiday = getHoliday($last_month, $next_month);
 
 //オークショントピック
 $auc_topi = aucTopi();
