@@ -4,7 +4,6 @@ require_once 'database.php';
 require_once 'unset_session.php';
 
 $unset_session = unsetSession();
-// session_destroy();
 
 //DB接続
 $connect_db = connectDB();
@@ -14,17 +13,17 @@ $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_m
 
 //フォームのデータ整形
 $form_data = formData($make_calendar);
-// print_r($form_data);
+
 
 //POSTされたデータをSESSIONに保存
 $_SESSION['form_data'] = $form_data;
-// print_r($_SESSION['form_data']);
+
 //フォーム、バリデート
 $is_form_valid = formValidate();
-var_dump($is_form_valid);
+
 //フォームデータのエスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
-// print_r($escape_formdata);
+
 //ワンタイムトークン生成
 $get_token = getToken();
 
@@ -32,21 +31,21 @@ $get_token = getToken();
 $check_token = checkToken($form_data['token']);
 
 //SQL文の生成
-if ($is_form_valid == true) {
+//バリデート通ったときと、削除のときはなにかをPOSTするわけではないので、$escape_formdata['delete']があった時点で削除SQL生成
+if ($is_form_valid == true || isset($escape_formdata['delete'])) {
     $sql_create = sqlCreate($escape_formdata, $check_token);
 }
-var_dump($sql_create['sql']);
 
-//INSERT UPDATEの実行
-if (/*empty($_SESSION['error']) &&*/ isset($sql_create['sql'])) {
+//INSERTまたはUPDATEのSQLがある場合、実行
+if (!isset($_SESSION['error']) && isset($sql_create['sql'])) {
     $insert_update =  sqlResult($escape_formdata, $connect_db, $sql_create);
     $insert_update['insert_or_update'];
     header('Location: http://kensyu.aucfan.com/');
     return;
 }
 
-
-if (empty($_SESSION['error']) && isset($post_data['delete'])) {
+//DELETEのSQLがある場合、deleted_atにNOW()を入れる
+if (isset($sql_create['delete'])) {
     $delete = sqlResult($escape_formdata, $connect_db, $sql_create);
     $delete['delete'];
     header('Location: http://kensyu.aucfan.com/');

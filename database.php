@@ -139,12 +139,12 @@ function formValidate() {
         }
 
         //無効な日付かチェックする ex.)2月３１日には登録できない
-        $explode_start_ym = explode('-', $_SESSION['start_ym']);
-        $explode_end_ym = explode('-', $_SESSION['end_ym']);
+        $explode_start_ym = explode('-', $session_form_data['start_ym']);
+        $explode_end_ym = explode('-', $session_form_data['end_ym']);
         $check_start_ym = checkdate($explode_start_ym[1], intval($session_form_data['start_day']), intval($explode_start_ym[0]));
         $check_end_ym = checkdate($explode_end_ym[1], intval($session_form_data['end_day']), intval($explode_end_ym[0]));
         if ($check_start_ym == false || $check_end_ym == false) {
-            $error_message = '無効な日付です';
+            $error_date = '無効な日付です';
         }
 
         $_SESSION['error'] = array(
@@ -170,8 +170,6 @@ function formValidate() {
 */
 function escapeFormdata($connect_db, $form_data) {
     $db = $connect_db['db'];
-    // $form_data = $_SESSION['form_data'];
-    // var_dump($form_data);
     $escape_value = array();
     foreach ($form_data as $name => $data) {
         $escape_value[$name] = mysqli_real_escape_string($db, $data);
@@ -184,8 +182,8 @@ function escapeFormdata($connect_db, $form_data) {
 *エスケープした$escape_formdataを用いている
 */
 function sqlCreate($escape_formdata, $check_token) {
-    $start_day = $escape_formdata['start_day'];
-    $end_day = $escape_formdata['end_day'];
+    $start_day = $escape_formdata['start_timestamp'];
+    $end_day = $escape_formdata['end_timestamp'];
     $schedule_title = $escape_formdata['schedule_title'];
     $schedule_detail = $escape_formdata['schedule_detail'];
     $id = $escape_formdata['id'];
