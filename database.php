@@ -19,7 +19,7 @@ function connectDB() {
     // 接続状況をチェック
     if (mysqli_connect_errno()) {
         die(mysqli_connect_error());
-        $return = false;
+        // $return = false;
     }
     return array(
         'db' => $db,
@@ -112,22 +112,25 @@ function formData($make_calendar) {
 function formValidate() {
 
 
-    $form_data = $_SESSION['form_data'];
-    $start_time = date('H:i:s', strtotime($form_data['start_hour'].':'.$form_data['start_min'].':00'));
-    $start_date = date('Y-m-d H:i:s', strtotime($form_data['start_ym'].'-'.$form_data['start_day'].' '.$start_time));
+    $session_form_data = $_SESSION['form_data'];
 
-    $end_time = date('H:i:s', strtotime($form_data['end_hour'].':'.$form_data['end_min'].':00'));
-    $end_date = date('Y-m-d H:i:s', strtotime($form_data['end_ym'].'-'.$form_data['end_day'].' '.$end_time));
+    $start_time = date('H:i:s', strtotime($session_form_data['start_hour'].':'.$session_form_data['start_min'].':00'));
+    $start_date = date('Y-m-d H:i:s', strtotime($session_form_data['start_ym'].'-'.$session_form_data['start_day'].' '.$start_time));
 
+    $end_time = date('H:i:s', strtotime($session_form_data['end_hour'].':'.$session_form_data['end_min'].':00'));
+    $end_date = date('Y-m-d H:i:s', strtotime($session_form_data['end_ym'].'-'.$session_form_data['end_day'].' '.$end_time));
 
+    $error_schedule_title = '';
+    $error_schedule_detail = '';
+    $error_compare_date = '';
     // idが空じゃないとき
     if ($_POST) {
         //タイトルが空のとき
-        if (empty($form_data['schedule_title'])) {
+        if (empty($session_form_data['schedule_title'])) {
             $error_schedule_title = 'タイトルは必須です';
         }
         //詳細が空のとき
-        if (empty($form_data['schedule_detail'])) {
+        if (empty($session_form_data['schedule_detail'])) {
             $error_schedule_detail = '詳細は必須です';
         }
         //開始時間が終了時間よりも遅いとき
@@ -138,8 +141,8 @@ function formValidate() {
         //無効な日付かチェックする ex.)2月３１日には登録できない
         $explode_start_ym = explode('-', $_SESSION['start_ym']);
         $explode_end_ym = explode('-', $_SESSION['end_ym']);
-        $check_start_ym = checkdate($explode_start_ym[1], intval($form_data['start_day']), intval($explode_start_ym[0]));
-        $check_end_ym = checkdate($explode_end_ym[1], intval($form_data['end_day']), intval($explode_end_ym[0]));
+        $check_start_ym = checkdate($explode_start_ym[1], intval($session_form_data['start_day']), intval($explode_start_ym[0]));
+        $check_end_ym = checkdate($explode_end_ym[1], intval($session_form_data['end_day']), intval($explode_end_ym[0]));
         if ($check_start_ym == false || $check_end_ym == false) {
             $error_message = '無効な日付です';
         }
@@ -167,6 +170,8 @@ function formValidate() {
 */
 function escapeFormdata($connect_db, $form_data) {
     $db = $connect_db['db'];
+    // $form_data = $_SESSION['form_data'];
+    // var_dump($form_data);
     $escape_value = array();
     foreach ($form_data as $name => $data) {
         $escape_value[$name] = mysqli_real_escape_string($db, $data);

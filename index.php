@@ -2,10 +2,10 @@
 require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
-print_r($_SESSION);
 //SESSION初期化
 // $unset_session = unsetSession();
-session_destroy();
+// session_destroy();
+
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 
@@ -19,17 +19,17 @@ $auc_topi = aucTopi();
 $connect_db = connectDB();
 
 //カレンダー生成
-$make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
-
+// $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 //フォームのデータ整形
-$form_data = formData($post_data, $make_calendar);
-
+$form_data = formData(/*$post_data, */$make_calendar);
+// var_dump($form_data);
 //エスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
-
+// var_dump($escape_formdata);
+// var_dump(__LINE__, $_SESSION);
 //SQL文の生成
 $sql_create = sqlCreate($escape_formdata, $check_token = true);
-
+// var_dump($sql_create);
 //SQL実行
 $sql_result = sqlResult($escape_formdata, $connect_db, $sql_create);
 $schedules_3months = $sql_result['schedules_3months'];

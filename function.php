@@ -3,6 +3,7 @@ define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
 
+
 //現在の年月日、曜日の取得
 $year = date('Y');
 $month = date('m');
