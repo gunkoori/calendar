@@ -2,8 +2,10 @@
 require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
-
-
+print_r($_SESSION);
+//SESSION初期化
+// $unset_session = unsetSession();
+session_destroy();
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 

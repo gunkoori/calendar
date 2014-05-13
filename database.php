@@ -1,60 +1,7 @@
 <?php
 session_start();
 require_once 'function.php';
-
-//フォームからPOSTされたデータ
-// $post_data = $_POST;
-// print_r($_POST);
-
-/*$_SESSION['post'] = array(
-    'schedule_title' => $_POST['schedule_title'],
-    'schedule_detail' => $_POST['schedule_detail']
-    );
-*/
-//DB接続
-// $connect_db = connectDB();
-
-
-//カレンダー生成
-// $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
-
-//フォームのデータ整形
-// $form_data = formData($post_data, $make_calendar);
-
-//フォーム、バリデート
-// $form_validate = formValidate($form_data);
-
-
-//フォームデータのエスケープ
-// $escape_formdata = escapeFormdata($connect_db, $form_data);
-
-
-//ワンタイムトークン生成
-// $get_token = getToken();
-
-
-//ワンタイムトークンチェックする
-// $check_token = checkToken($form_data['token']);
-
-
-//SQL文の生成
-// $sql_create = sqlCreate($escape_formdata, $check_token);
-
-//INSERT UPDATEの実行
-/*
-if (isset($sql_create['sql'])) {
-    $insert_update =  sqlResult($escape_formdata, $connect_db, $sql_create);
-    $insert_update['insert_or_update'];
-    header('Location: http://kensyu.aucfan.com/');
-    return;
-}
-*/
-
-//セッション内のワンタイムトークン用文字列削除
-/*if (isset($_SESSION['key']) === true) {
-    unset($_SESSION['key']);
-}*/
-
+require_once 'unset_session.php';
 
 /*
 *DB接続
@@ -80,11 +27,15 @@ function connectDB() {
         );
 }
 
+function splitYM($ym) {
+    return explode('-', $ym);
+}
 
 /*
 *フォームからPOSTされたデータ
 */
-function formData($post_data, $make_calendar) {
+function formData($make_calendar) {
+    $post_data = $_POST;
     //ワンタイムトークン
     $token = $post_data['token'];
     //開始時間と終了時間
@@ -99,14 +50,21 @@ function formData($post_data, $make_calendar) {
     $start_day = $post_data['start_day'];
     $end_ym = $post_data['end_ym'];
     $end_day = $post_data['end_day'];
-    $start_day = $start_ym.'-'.$post_data['start_day'].' '.$start_time;
-    $end_day = $end_ym.'-'.$end_day.' '.$end_time;
+    $start_timestamp = $start_ym.'-'.$post_data['start_day'].' '.$start_time;
+    $end_timestamp = $end_ym.'-'.$end_day.' '.$end_time;
+
+    $split_ym = splitYM($start_ym);
+    $year = $split_ym[0];
+    $month = $split_ym[1];
+    $end_split_ym = splitYM($end_ym);
+    $end_year = $end_split_ym[0];
+    $end_month = $end_split_ym[1];
+    $day = $post_data['day'];
     //予定のタイトルと詳細
     $schedule_title = $post_data['schedule_title'];
     $schedule_detail = $post_data['schedule_detail'];
     $id = $post_data['schedule_id'];
     $delete = $post_data['delete'];
-    $schedule_id = $_COOKIE['schedule_id'];
     $between_begin = $make_calendar['calendars'][1].'-01 00:00:01';
     $between_end = $make_calendar['calendars'][3].'-'.$make_calendar['end_days'][3].' 23:59:59';
     if (isset($post_data['insert'])) {
@@ -116,6 +74,11 @@ function formData($post_data, $make_calendar) {
         $update = 'update';
     }
     return array(
+        'year' => $year,
+        'month' => $month,
+        'end_year' => $end_year,
+        'end_month' => $end_month,
+        'day' => $day,
         'token' => $token,
         'start_hour' => $start_hour,
         'start_min' => $start_min,
@@ -126,7 +89,9 @@ function formData($post_data, $make_calendar) {
         'end_ym' => $end_ym,
         'end_day' => $end_day,
         'start_time' => $start_time,
+        'start_timestamp' => $start_timestamp,
         'end_time' => $end_time,
+        'end_timestamp' => $end_timestamp,
         'start_day' => $start_day,
         'end_day' => $end_day,
         'schedule_title' => $schedule_title,
@@ -141,83 +106,61 @@ function formData($post_data, $make_calendar) {
         );
 }
 
-/*
+/*ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);
  *バリデート
  */
-
-function formValidate($form_data) {
-    //エラー（入力漏れがあった）場合は受け取る
-    $error_year = $_COOKIE['error_year'];
-    $error_month = $_COOKIE['error_month'];
-    $error_day = $_COOKIE['error_day'];
-    $error_id = '';
-    if (isset($_COOKIE['error_id'])) {
-        $error_id = '&id='.$_COOKIE['error_id'];
-    }
-    // var_dump($form_data);
-//    if ($_GET['status'] == 'error') {
+function formValidate() {
 
 
-        if ($form_data['start_hour'] == '' || $form_data['start_min'] == '' || $form_data['end_hour'] == '' || $form_data['end_min'] == '') {
-            // setcookie('error_hour', '時間は必須です', time()+1);
-            $_SESSION['error_hour'] = '時間は必須です';
-        }
-        if ($form_data['start_ym'] == '' || $form_data['start_day'] == '' || $form_data['end_ym'] == '' || $form_data['end_day'] == '') {
-            // setcookie('ymd', '年月日は必須です', time()+1);
-            $_SESSION['ymd'] = '年月日は必須です';
-        }
+    $form_data = $_SESSION['form_data'];
+    $start_time = date('H:i:s', strtotime($form_data['start_hour'].':'.$form_data['start_min'].':00'));
+    $start_date = date('Y-m-d H:i:s', strtotime($form_data['start_ym'].'-'.$form_data['start_day'].' '.$start_time));
 
+    $end_time = date('H:i:s', strtotime($form_data['end_hour'].':'.$form_data['end_min'].':00'));
+    $end_date = date('Y-m-d H:i:s', strtotime($form_data['end_ym'].'-'.$form_data['end_day'].' '.$end_time));
+
+
+    // idが空じゃないとき
+    if ($_POST) {
         //タイトルが空のとき
-        if (!isset($form_data['schedule_title'])) {
-            // setcookie('schedule_title', 'タイトルは必須です', time()+1);
-            $_SESSION['error_schedule_title'] = 'タイトルは必須です';
-
-        } else {
-            unset($_SESSION['error_schedule_title']);
-            $_SESSION['schedule_title'] = $form_data['schedule_title'];
+        if (empty($form_data['schedule_title'])) {
+            $error_schedule_title = 'タイトルは必須です';
         }
         //詳細が空のとき
-        if (!isset($form_data['schedule_detail'])) {
-            // setcookie('schedule_detail', '詳細は必須です', time()+1);
-            $_SESSION['error_schedule_detail'] = '詳細は必須です';
-        } else {
-            unset($_SESSION['error_schedule_detail']);
-            $_SESSION['schedule_detail'] = $form_data['schedule_detail'];
+        if (empty($form_data['schedule_detail'])) {
+            $error_schedule_detail = '詳細は必須です';
         }
-
-
-        if (strtotime($form_data['start_day']) > strtotime($form_data['end_day'])) {
-            // setcookie('error_compare_date', '開始日時が終了日時より遅く設定されています', time()+1);
-            $_SESSION['error_compare_date'] = '開始日時が終了日時より遅く設定されています';
+        //開始時間が終了時間よりも遅いとき
+        if (strtotime($start_date) > strtotime($end_date)) {
+            $error_compare_date = '開始日時が終了日時より遅く設定されています';
         }
-
 
         //無効な日付かチェックする ex.)2月３１日には登録できない
-        $explode_start_ym = explode('-', $form_data['start_ym']);
-        $explode_end_ym = explode('-', $form_data['end_ym']);
+        $explode_start_ym = explode('-', $_SESSION['start_ym']);
+        $explode_end_ym = explode('-', $_SESSION['end_ym']);
         $check_start_ym = checkdate($explode_start_ym[1], intval($form_data['start_day']), intval($explode_start_ym[0]));
         $check_end_ym = checkdate($explode_end_ym[1], intval($form_data['end_day']), intval($explode_end_ym[0]));
-        // var_dump($check_start_ym);
         if ($check_start_ym == false || $check_end_ym == false) {
-            setcookie('date_error', '無効な日付です', time()+1);
+            $error_message = '無効な日付です';
         }
 
-
-//    }
-    // var_dump($form_data);
-    //再度入力フォームに戻す
-    if (isset($form_data['insert']) || isset($form_data['update'])) {
-        if (empty($form_data['start_ym']) || empty($form_data['start_day']) || empty($form_data['start_hour']) || empty($form_data['start_min']) ||empty($form_data['end_ym']) || empty($form_data['end_day']) || empty($form_data['end_hour']) || empty($form_data['end_min']) || empty($form_data['schedule_title']) || empty($form_data['schedule_detail']) || $check_start_ym == false || $check_end_ym == false || (strtotime($start_day) > strtotime($end_day))) {
-            $return = header("Location: http://kensyu.aucfan.com/schedule.php?year=".$error_year."&month=".$error_month."&day=".$error_day.$error_id.'&status=error');
-            exit;
+        $_SESSION['error'] = array(
+            'error_schedule_title' => $error_schedule_title,
+            'error_schedule_detail' => $error_schedule_detail,
+            'error_compare_date' => $error_compare_date,
+            'error_date' => $error_date
+        );
+        // １つでも文章が入っていればfalse
+        foreach ($_SESSION['error'] as $is_error) {
+            if ($is_error) {
+                return false;
+            }
         }
     }
-    else {
-        $return = 'true';
-    }
-    return $return;
+    // $_POSTがないとき＝新規登録時はtrue
+    return true;
 }
-//
+
 
 /*
 *formData()のエスケープ

@@ -18,8 +18,8 @@ function unsetSession() {
     if(isset($_SESSION['date_error']) === true) {
         unset($_SESSION['date_error']);
     }
-    if(isset($_SESSION['count']) === true) {
+    /*if(isset($_SESSION['count']) === true) {
         unset($_SESSION['count']);
-    }
+    }*/
     return $_SESSION;
 }
