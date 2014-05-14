@@ -112,6 +112,9 @@ function formValidate() {
 
 
     $session_form_data = $_SESSION['form_data'];
+    $year = $session_form_data['year'];
+    $month = $session_form_data['month'];
+    $day = $session_form_data['day'];
 
     $start_time = date('H:i:s', strtotime($session_form_data['start_hour'].':'.$session_form_data['start_min'].':00'));
     $start_date = date('Y-m-d H:i:s', strtotime($session_form_data['start_ym'].'-'.$session_form_data['start_day'].' '.$start_time));
@@ -122,17 +125,18 @@ function formValidate() {
     $error_schedule_title = '';
     $error_schedule_detail = '';
     $error_compare_date = '';
+
     // idが空じゃないとき
     if ($_POST) {
         //タイトルが空のとき
         if (empty($session_form_data['schedule_title'])) {
             $error_schedule_title = 'タイトルは必須です';// エラーメッセージ
-            $keep_detail = $session_form_data['schedule_detail'];// 値を保持させるために代入
+            $keep_detail[$year][$month][$day] = $session_form_data['schedule_detail'];// 値を保持させるために代入
         }
         //詳細が空のとき
         if (empty($session_form_data['schedule_detail'])) {
             $error_schedule_detail = '詳細は必須です';// エラーメッセージ
-            $keep_title = $session_form_data['schedule_title'];// 値を保持させるために代入
+            $keep_title[$year][$month][$day] = $session_form_data['schedule_title'];// 値を保持させるために代入
         }
         //開始時間が終了時間よりも遅いとき
         if (strtotime($start_date) > strtotime($end_date)) {

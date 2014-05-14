@@ -3,7 +3,6 @@ require_once 'function.php';
 require_once 'database.php';
 require_once 'unset_session.php';
 
-
 //DB接続
 $connect_db = connectDB();
 
@@ -19,7 +18,7 @@ $_SESSION['form_data'] = $form_data;
 
 //フォーム、バリデート
 $is_form_valid = formValidate();
-// var_dump($is_form_valid);
+
 //フォームデータのエスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
 
@@ -35,7 +34,7 @@ if ($is_form_valid === true  /*isset($escape_formdata['delete'])*/) {
     $sql_create = sqlCreate($escape_formdata, $check_token);
 }
 //INSERTまたはUPDATEのSQLがある場合、実行
-if (!isset($_SESSION['error']['error_schedule_title']) && !isset($_SESSION['error']['error_schedule_detail']) && isset($sql_create['sql'])) {
+if (empty($_SESSION['error']['error_schedule_title']) && empty($_SESSION['error']['error_schedule_detail']) && isset($sql_create['sql'])) {
     $insert_update =  sqlResult($escape_formdata, $connect_db, $sql_create);
     $insert_update['insert_or_update'];
     unset($_SESSION['error']['keep_title']);
@@ -55,6 +54,7 @@ if (isset($sql_create['delete'])) {
 
 $year = !empty($_GET['year']) ? $_GET['year'] : $form_data['year'];
 $month = !empty($_GET['month']) ? $_GET['month'] : $form_data['month'];
+$formatted_month = sprintf('%1d', $month);
 $day = !empty($_GET['day']) ? $_GET['day'] : $form_data['day'];
 
 $end_year = !empty($form_data['end_year']) ? $form_data['end_year'] : $year;
@@ -166,14 +166,14 @@ for ($i=-12; $i<=12; $i++) {
     <tr>
         <th>タイトル<br />※必須</th>
         <td>
-            <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="<?php if (isset($_SESSION['error']['keep_title'])) { echo $_SESSION['error']['keep_title'];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
+            <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="<?php if (isset($_SESSION['error']['keep_title']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_title'][$year][$formatted_month][$day];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
             <span class="error"><?php echo h($_SESSION['error']['error_schedule_title']);?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
-            <textarea id="schedule_detail" name="schedule_detail"  placeholder="詳細を入力してください"　rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail'])) { echo $_SESSION['error']['keep_detail']; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
+            <textarea id="schedule_detail" name="schedule_detail"  placeholder="詳細を入力してください"　rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_detail'][$year][$formatted_month][$day]; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
             <br /><span class="error"><?php echo h($_SESSION['error']['error_schedule_detail']);?></span>
         </td>
     </tr>
