@@ -96,8 +96,16 @@ a {
 .schedule {
     font-size: 7px;
     font-color:red;
-    background-color: #FFB6C1
-;
+    background-color: #FFB6C1;
+}
+
+.popup {
+    width:300px;
+    height:200px;
+    top:300px;
+    left:500px;
+    position: absolute;
+    background-color: #FFCC66;
 }
 
 /**********footer***********/
@@ -147,3 +155,4 @@ a {
 #schedule_detail {
     display: inline;
 }
+

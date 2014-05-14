@@ -100,6 +100,9 @@ for ($i=-12; $i<=12; $i++) {
 <meta charset="utf-8">
 <title></title>
 <link href="calendar.css" rel="stylesheet">
+<script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/js/form.js"></script>
+
 </head>
 <body>
 <h3>スケジュール登録</h3>
@@ -167,14 +170,16 @@ for ($i=-12; $i<=12; $i++) {
         <th>タイトル<br />※必須</th>
         <td>
             <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="<?php if (isset($_SESSION['error']['keep_title']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_title'][$year][$formatted_month][$day];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
-            <span class="error"><?php echo h($_SESSION['error']['error_schedule_title']);?></span>
+            <span id="alert_schedule_title" class="error"></span>
+            <span class="error"><?php //echo h($_SESSION['error']['error_schedule_title']);?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
             <textarea id="schedule_detail" name="schedule_detail"  placeholder="詳細を入力してください"　rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_detail'][$year][$formatted_month][$day]; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
-            <br /><span class="error"><?php echo h($_SESSION['error']['error_schedule_detail']);?></span>
+            <br /><span id="alert_schedule_detail" class="error"></span>
+            <span class="error"><?php //echo h($_SESSION['error']['error_schedule_detail']);?></span>
         </td>
     </tr>
 
@@ -184,7 +189,7 @@ for ($i=-12; $i<=12; $i++) {
         <input type="submit" name="update" value="更新" />
     <?php else:?>
         <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
-        <input type="submit" name="insert" value="登録" />
+        <input type="submit" id="btn-regist" name="insert" value="登録" />
     <?php endif;?>
 
 </table>

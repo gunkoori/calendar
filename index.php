@@ -41,6 +41,7 @@ $unset_session = unsetSession();
 <meta charset="utf-8">
 <title></title>
 <link href="calendar.css" rel="stylesheet">
+<script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
 </head>
 <body>
 <div id="header">
@@ -58,6 +59,14 @@ $unset_session = unsetSession();
     <input type="submit" value="表示する">
 </form>
 </div><!--header-->
+
+<div class="popup">
+<form>
+    <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="" /><br />
+    <input type="submit" value="登録">
+
+</form>
+</div>
 
 <!-- カレンダーループ 3回ループ -->
 <?php foreach ($make_calendar['calendars'] as $key => $value) :?>
@@ -167,7 +176,20 @@ $unset_session = unsetSession();
 </div><!--calendar-->
 <?php endforeach ;?>
 
+
 <div id="footer">
 </div><!--footer-->
+<script>
+$(function() {
+    $('table td').click(function() {
+        $('.popup').slideToggle();
+        return false;
+    });
+    $('.popup').click(function() {
+        $(this).fadeOut();
+    });
+});
+</script>
+
 </body>
 </html>
