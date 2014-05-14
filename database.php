@@ -105,12 +105,10 @@ function formData($make_calendar) {
         );
 }
 
-/*ym = isset($_GET['ym']) ? $_GET['ym']:($year.'-'.$month);
+/*
  *バリデート
  */
 function formValidate() {
-
-
     $session_form_data = $_SESSION['form_data'];
     $year = $session_form_data['year'];
     $month = $session_form_data['month'];

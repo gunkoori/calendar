@@ -2,9 +2,6 @@
 require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
-/*if ($db['errno']) {
-    exit;
-}*/
 
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);

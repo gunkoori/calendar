@@ -3,19 +3,6 @@ body {
     margin: 0 auto;
 }
 
-/*
-td {
-    height: 80px;
-    width: 80px;
-    text-align: center;
-    border: 1px solid #ccc;
-    vertical-align: top;
-}
-
-th {
-    background-color: #eee
-}
-*/
 
 h1 {
 
@@ -160,9 +147,3 @@ a {
 #schedule_detail {
     display: inline;
 }
-
-
-
-
-
-
