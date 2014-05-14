@@ -14,11 +14,11 @@ function connectDB() {
 
     $return = true;
     // MySQL に接続し、データベースを選択
-    $db = mysqli_connect($host, $user, $password, $database);
+    $db = @mysqli_connect($host, $user, $password, $database);
 
     // 接続状況をチェック
     if (mysqli_connect_errno()) {
-        die('DB接続失敗しました。。。'.mysqli_connect_error());
+        $return = false;
     }
     return array(
         'db' => $db,
@@ -175,10 +175,12 @@ function formValidate() {
 *formData()のエスケープ
 */
 function escapeFormdata($connect_db, $form_data) {
-    $db = $connect_db['db'];
-    $escape_value = array();
-    foreach ($form_data as $name => $data) {
-        $escape_value[$name] = mysqli_real_escape_string($db, $data);
+    if ($connect_db['return'] == true) {//接続に成功しているとき
+        $db = $connect_db['db'];
+        $escape_value = array();
+        foreach ($form_data as $name => $data) {
+            $escape_value[$name] = mysqli_real_escape_string($db, $data);
+        }
     }
     return $escape_value;
 }
@@ -290,48 +292,49 @@ return array(
 *SQL実行
 */
 function sqlResult($escape_formdata, $connect_db, $sql_create) {
-    $db = $connect_db['db'];
-    //SQL実行
-    if (isset($sql_create['sql'])) {
-        $insert_or_update = mysqli_query($db, $sql_create['sql']);
-    }
-    if (isset($sql_create['delete'])) {
-        $delete = mysqli_query($db, $sql_create['delete']);
-    }
-    if (isset($sql_create['schedule_3months'])) {
-        if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
-            while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-                list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
-                list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-                $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-                $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-                if ($row['start_date'] != $row['end_date']) {
-                    for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
-                        $schedules_3months[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+    if ($connect_db['return'] == true) {
+        $db = $connect_db['db'];
+        //SQL実行
+        if (isset($sql_create['sql'])) {
+            $insert_or_update = mysqli_query($db, $sql_create['sql']);
+        }
+        if (isset($sql_create['delete'])) {
+            $delete = mysqli_query($db, $sql_create['delete']);
+        }
+        if (isset($sql_create['schedule_3months'])) {
+            if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
+                while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                    list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
+                    list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
+                    $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+                    $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
+                    if ($row['start_date'] != $row['end_date']) {
+                        for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
+                            $schedules_3months[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+                        }
                     }
                 }
+                mysqli_free_result($result);
             }
-            mysqli_free_result($result);
         }
-    }
-    if (isset($sql_create['schedule_sql'])) {
-        if ($result2 = mysqli_query($db, $sql_create['schedule_sql'])) {
-            while ($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
-                list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
-                list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-                $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-                $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
-                if ($row['start_date'] != $row['end_date']) {
-                    for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
-                        $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+        if (isset($sql_create['schedule_sql'])) {
+            if ($result2 = mysqli_query($db, $sql_create['schedule_sql'])) {
+                while ($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
+                    list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
+                    list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
+                    $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+                    $schedules[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
+                    if ($row['start_date'] != $row['end_date']) {
+                        for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
+                            $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+                        }
                     }
                 }
+                mysqli_free_result($result2);
             }
-            mysqli_free_result($result2);
-        }
     }
     mysqli_close($db);
-
+}
     return array(
         'insert_or_update' => $insert_or_update,
         'delete' => $delete,

@@ -2,6 +2,9 @@
 require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
+/*if ($db['errno']) {
+    exit;
+}*/
 
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
@@ -14,6 +17,9 @@ $auc_topi = aucTopi();
 
 //DB接続
 $connect_db = connectDB();
+if ($connect_db['return'] == false) {//接続状況の確認
+    echo 'DB接続失敗';
+}
 
 //フォームのデータ整形
 $form_data = formData(/*$post_data, */$make_calendar);
