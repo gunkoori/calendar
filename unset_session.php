@@ -19,8 +19,5 @@ function unsetSession() {
     if(isset($SESSION['keep_value']['schedule_title']) === true) {
         unset($SESSION['keep_value']['schedule_title']);
     }
-    /*if(isset($_SESSION['count']) === true) {
-        unset($_SESSION['count']);
-    }*/
     return $_SESSION;
 }

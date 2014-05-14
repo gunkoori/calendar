@@ -29,8 +29,8 @@ $get_token = getToken();
 $check_token = checkToken($form_data['token']);
 
 //SQL文の生成
-//バリデート通ったときと、削除のときはなにかをPOSTするわけではないので、$escape_formdata['delete']があった時点で削除SQL生成
-if ($is_form_valid === true  /*isset($escape_formdata['delete'])*/) {
+//バリデート通ったとき
+if ($is_form_valid === true) {
     $sql_create = sqlCreate($escape_formdata, $check_token);
 }
 //INSERTまたはUPDATEのSQLがある場合、実行
