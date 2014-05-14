@@ -140,7 +140,7 @@ a {
     background-color: #eee;
 }
 
-#schedule_form .erro td {
+#schedule_form .error{
     color: red;
 }
 
@@ -160,11 +160,6 @@ a {
 #schedule_detail {
     display: inline;
 }
-
-.error td {
-    color: red;
-}
-
 
 
 

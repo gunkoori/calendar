@@ -3,6 +3,7 @@ define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
 
+
 //現在の年月日、曜日の取得
 $year = date('Y');
 $month = date('m');
@@ -72,9 +73,10 @@ function makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $
 /*
 * Googlle Calendar API 祝日取得
 */
-function getHoliday($last_month, $next_month, $end_days) {
+function getHoliday($last_month, $next_month) {
+    $make_calendar =  makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
     $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
-    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$end_days[2];
+    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][2];
     $holidays_url = sprintf(
             "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
             "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
@@ -141,4 +143,39 @@ function shortStr ($str, $length = 15) {
     } else {
         return mb_substr($str, 0, $length, 'utf-8');
     }
+}
+
+
+/*
+*XSS対策
+*HTML特殊文字をエスケープする
+* < → &lt;
+* > → &gt;
+* & → &amp;
+* " → &quot;
+*
+*ENT_QUOTES
+* ' → &apos;
+*/
+function h($str) {
+    return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+}
+
+
+/*
+*ワンタイムトークンを生成する
+*
+*/
+function getToken($key = '') {
+    $_SESSION['key'] = $key;
+    $token = sha1($key);//ハッシュ化する
+    return $token;
+}
+
+/*
+*ワンタイムトークンをチェックする
+*
+*/
+function checkToken($token = '') {
+    return ($token === sha1($_SESSION['key']));
 }
