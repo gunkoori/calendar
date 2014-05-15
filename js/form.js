@@ -1,6 +1,7 @@
 $(function() {
     $('#btn-regist').click(function() {
         var params = {};
+        var ret = true;
 
         //フォームの値を取得する
         params.schedule_title = $('#schedule_title').val();
@@ -11,13 +12,17 @@ $(function() {
         //空ならばエラー文を表示させる
         if (params.schedule_title == '') {
             $('#alert_schedule_title').text('タイトルを入力してください');
-            // return false;
+            ret = false;
+        } else {
+            $('#alert_schedule_title').text('');
         }
         if (params.schedule_detail == '') {
             $('#alert_schedule_detail').text('詳細を入力してください');
-            return false;
+            ret = false;
+        } else {
+            $('#alert_schedule_detail').text('');
         }
-        console.debug(params.schedule_detail);
+        return ret;
     });
 });
 

@@ -42,6 +42,7 @@ $unset_session = unsetSession();
 <title></title>
 <link href="calendar.css" rel="stylesheet">
 <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/js/register.js"></script>
 </head>
 <body>
 <div id="header">
@@ -179,17 +180,6 @@ $unset_session = unsetSession();
 
 <div id="footer">
 </div><!--footer-->
-<script>
-$(function() {
-    $('table td').click(function() {
-        $('.popup').slideToggle();
-        return false;
-    });
-    $('.popup').click(function() {
-        $(this).fadeOut();
-    });
-});
-</script>
 
 </body>
 </html>
