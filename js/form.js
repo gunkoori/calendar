@@ -7,20 +7,18 @@ $(function() {
         params.schedule_title = $('#schedule_title').val();
         params.schedule_detail = $('#schedule_detail').val();
 
-        $('#alert_schedule_title').text('');
-        $('#alert_schedule_detail').text('');
         //空ならばエラー文を表示させる
         if (params.schedule_title == '') {
-            $('#alert_schedule_title').text('タイトルを入力してください');
+            $('#alert_schedule_title').css('display', 'block');
             ret = false;
         } else {
-            $('#alert_schedule_title').text('');
+            $('#alert_schedule_title').css('display', 'none');
         }
         if (params.schedule_detail == '') {
-            $('#alert_schedule_detail').text('詳細を入力してください');
+            $('#alert_schedule_detail').css('display', 'block');
             ret = false;
         } else {
-            $('#alert_schedule_detail').text('');
+            $('#alert_schedule_detail').css('display', 'none');
         }
         return ret;
     });

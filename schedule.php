@@ -170,7 +170,7 @@ for ($i=-12; $i<=12; $i++) {
         <th>タイトル<br />※必須</th>
         <td>
             <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="<?php if (isset($_SESSION['error']['keep_title']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_title'][$year][$formatted_month][$day];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
-            <span id="alert_schedule_title" class="error"></span>
+            <div id="alert_schedule_title" class="error">タイトルを入力してください</div>
             <span class="error"><?php //echo h($_SESSION['error']['error_schedule_title']);?></span>
         </td>
     </tr>
@@ -178,7 +178,7 @@ for ($i=-12; $i<=12; $i++) {
         <th>詳細<br />※必須</th>
         <td>
             <textarea id="schedule_detail" name="schedule_detail"  placeholder="詳細を入力してください"　rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_detail'][$year][$formatted_month][$day]; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
-            <br /><span id="alert_schedule_detail" class="error"></span>
+            <br /><span id="alert_schedule_detail" class="error">詳細を入力してください</span>
             <span class="error"><?php //echo h($_SESSION['error']['error_schedule_detail']);?></span>
         </td>
     </tr>

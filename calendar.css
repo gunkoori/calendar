@@ -156,3 +156,10 @@ a {
     display: inline;
 }
 
+#alert_schedule_title {
+    display: none;
+}
+
+#alert_schedule_detail {
+    display: none;
+}
