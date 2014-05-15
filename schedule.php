@@ -111,7 +111,7 @@ for ($i=-12; $i<=12; $i++) {
 <input type="hidden" name="year" value="<?php echo $year ?>">
 <input type="hidden" name="month" value="<?php echo $month ?>">
 <input type="hidden" name="day" value="<?php echo $day ?>">
-<table>
+<table id="regist_form">
     <tr>
         <th>開始<br />※必須</th>
         <td>
@@ -186,10 +186,10 @@ for ($i=-12; $i<=12; $i++) {
     <?php if(!empty($schedule_id)):?>
         <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
         <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
-        <input type="submit" name="update" value="更新" />
+        <input type="submit" class="btn" name="update" value="更新" />
     <?php else:?>
         <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
-        <input type="submit" id="btn-regist" name="insert" value="登録" />
+        <span id="btn-regist"><input type="submit"  class="btn" name="insert" value="登録" /></span>
     <?php endif;?>
 
 </table>
@@ -198,7 +198,7 @@ for ($i=-12; $i<=12; $i++) {
     <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
     <input type="hidden" id="delete" name="delete" value="delete" />
     <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />
-    <input type="submit" value="削除" />
+    <span id="btn-delete"><input type="submit" class="btn" value="削除" /></span>
 </form>
 
 </div><!-- schedule_form -->

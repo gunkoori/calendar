@@ -61,13 +61,103 @@ $unset_session = unsetSession();
 </form>
 </div><!--header-->
 
+<!--
+************ ポップアップ ************
+ -->
 <div class="popup">
-<form>
-    <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="" /><br />
-    <input type="submit" value="登録">
+<div="popup_regist_form">
+<form method="post" action="<?php echo h($_SERVER['PHP_SELF']);?>">
+<input type="hidden" name="year" value="<?php echo $year ?>">
+<input type="hidden" name="month" value="<?php echo $month ?>">
+<input type="hidden" name="day" value="<?php echo $day ?>">
+<table id="regist_form">
+    <tr>
+        <th>開始<br />※必須</th>
+        <td>
+            <select name="start_ym">
+            <?php for ($i=0; $i<=24; $i++):?>
+                <option id="select_year_month" value="<?php echo h($ymi[$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($ym[$i]);?></option>
+            <?php endfor; ?>
+            </select>
+            <!-- TODO:月によって日付が違うのでJSで直す -->
+            <select name="start_day">
+            <?php for ($i=1; $i<=31; $i++):?>
+                <option id="select_start_day" value="<?php echo h($i);?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
+            <?php endfor; ?>
+            </select>
+            <span class="error"><?php echo h($_SESSION['error']['error_compare_date']);?></span><br />
+            <span class="error"><?php echo h($_SESSION['error']['error_date']);?></span><br />
+            <select name="start_hour">
+            <?php for ($i=1; $i<24; $i++):?>
+                <option id="start_hour" value="<?php echo h($i);?>" <?php if ($i == $start_time):?>selected<?php endif;?>><?php echo h($i);?>時</option>
+            <?php endfor; ?>
+            </select>
+            <select name="start_min">
+                <option class="start_min" value="00">00分</option>
+                <option class="start_min" value="30">30分</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th>終了<br />※必須</th>
+        <td>
+            <select name="end_ym">
+            <?php for ($i=0; $i<=24; $i++):?>
+                <option id="select_year_month" value="<?php echo h($end_ymi[$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($end_ym[$i]);?></option>
+            <?php endfor; ?>
+            </select>
+            <!-- TODO:月によって日付が違うのでJSで直す -->
+            <select name="end_day">
+            <?php for ($i=1; $i<=31; $i++):?>
+                <option id="select_end_day" value="<?php echo h($i);?>" <?php if ($i == $end_day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
+            <?php endfor; ?>
+            </select>
+            <span class="error"><?php echo h($_SESSION['error']['error_compare_date']);?></span><br />
+            <span class="error"><?php echo h($_SESSION['error']['error_date']);?></span><br />
+            <select name="end_hour">
+            <?php for ($i=1; $i<24; $i++):?>
+                <option id="end_hour" value="<?php echo h($i);?>" <?php if ($i == $end_time):?>selected<?php endif;?>><?php echo h($i);?>時</option>
+            <?php endfor; ?>
+            </select>
+            <select name="end_min">
+                <option class="end_min" value="00">00分</option>
+                <option class="end_min" value="30">30分</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th>タイトル<br />※必須</th>
+        <td>
+            <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="<?php if (isset($_SESSION['error']['keep_title']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_title'][$year][$formatted_month][$day];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
+            <div id="alert_schedule_title" class="error">タイトルを入力してください</div>
+            <span class="error"><?php //echo h($_SESSION['error']['error_schedule_title']);?></span>
+        </td>
+    </tr>
+    <tr>
+        <th>詳細<br />※必須</th>
+        <td>
+            <textarea id="schedule_detail" name="schedule_detail"  placeholder="詳細を入力してください"　rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_detail'][$year][$formatted_month][$day]; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
+            <br /><span id="alert_schedule_detail" class="error">詳細を入力してください</span>
+            <span class="error"><?php //echo h($_SESSION['error']['error_schedule_detail']);?></span>
+        </td>
+    </tr>
 
+    <?php if(!empty($schedule_id)):?>
+        <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
+        <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
+        <input type="submit" class="btn" name="update" value="更新" />
+    <?php else:?>
+        <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
+        <span id="btn-regist"><input type="submit"  class="btn" name="insert" value="登録" /></span>
+    <?php endif;?>
+
+</table>
 </form>
 </div>
+</div>
+<!--
+************ ポップアップEND ************
+ -->
 
 <!-- カレンダーループ 3回ループ -->
 <?php foreach ($make_calendar['calendars'] as $key => $value) :?>
@@ -131,9 +221,9 @@ $unset_session = unsetSession();
                     <?php $auc_topi_feed = $auc_topi['title'][$value.'-'.$days];?>
                 <?php endif;?>
 
-                    <td class="<?php echo h($class); ?>">
+                    <div class="cell"><a href=""><td class="<?php echo h($class); ?>">
                         <!-- 日付出力 -->
-                        <span class="day">
+                        <span class="day" id="<?php echo $cal_year.'-'.$cal_month.'-'.$day;?>">
                             <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
                         </span>
                         <!-- 祝日出力 -->
@@ -161,7 +251,7 @@ $unset_session = unsetSession();
 
                             </a></span>
                         </span>
-                    </td>
+                    </td></a></div>
 
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
                     </tr>

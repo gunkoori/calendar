@@ -12,6 +12,10 @@ a {
     text-decoration: none;
 }
 
+td {
+    overflow: auto;
+}
+
 /**********header***********/
 #header {
     width:100%;
@@ -22,9 +26,14 @@ a {
 
 
 /**********calendar***********/
+.cell {
+    overflow: auto;
+}
+
 .calendar td {
-    height: 80px;
-    width: 80px;
+    height: 100px;
+    width: 100px;
+    overflow: auto;
     text-align: center;
     border: 1px solid #ccc;
     vertical-align: top;
@@ -43,18 +52,14 @@ a {
 }
 #prev {
     display: inline;
-    /*float: left;*/
     margin-top: 20px;
-    /*margin-left: 30px;*/
     margin-bottom: 20px;
 
 }
 
 #next {
     display: inline;
-    /*float: right;*/
     margin-top: 20px;
-    /*margin-right: 30px;*/
     margin-bottom: 20px;
 }
 
@@ -63,7 +68,6 @@ a {
 .calendar {
     display: inline-block;
     vertical-align: top;
-    /*margin: 30px;*/
     margin-bottom: 20px;
 }
 
@@ -100,14 +104,19 @@ a {
 }
 
 .popup {
-    width:300px;
-    height:200px;
+    display: none;
+    z-index: 2;
+    width:500px;
+    height:500px;
     top:300px;
     left:500px;
     position: absolute;
     background-color: #FFCC66;
 }
 
+#popup_regist_form {
+    background-color: white;
+}
 /**********footer***********/
 
 
@@ -115,6 +124,14 @@ a {
 
 /********** schedule.php ***********/
 #schedule_form {
+    text-align: center;
+    margin: 0 auto;
+}
+
+#regist_form {
+    z-index: 3;
+    text-align: center;
+    margin: 0 auto;
 }
 
 #form {
@@ -123,8 +140,6 @@ a {
 }
 
 #schedule_form td {
-    /*height: 80px;*/
-    /*width: 80px;*/
     text-align: left;
     border: 1px solid #ccc;
     vertical-align: top;
@@ -132,7 +147,7 @@ a {
 
 #schedule_form th {
     text-align: left;
-    background-color: #eee;
+    background-color: #FFCC66;
 }
 
 #schedule_form .error{
@@ -162,4 +177,26 @@ a {
 
 #alert_schedule_detail {
     display: none;
+}
+
+.btn {
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    width: 100px;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 12px;
+    border-radius: 2px;
+    background-color: #FFCC66;
+}
+
+#btn-regist {
+    display: inline-block;
+}
+
+#btn-delete {
+    display: inline-block;
 }
