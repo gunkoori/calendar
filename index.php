@@ -3,9 +3,8 @@ require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
 
-
+//年月日、時間の取得
 $get_ymdh = getYmdh($year_of_ym, $month_of_ym);
-print_r($get_ymdh['start_time']);
 
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);

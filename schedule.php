@@ -84,7 +84,6 @@ for ($i=-12; $i<=12; $i++) {
     $ymi[] = $years.'-'.$months;
     $end_ym[] = $end_years.'年'.$end_months.'月';
     $end_ymi[] = $end_years.'-'.$end_months;
-    // $d[] = $days;
     $combo[$years][$months]=$days;
 
     for ($j=1; $j<=$days; $j++) {

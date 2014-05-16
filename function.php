@@ -30,13 +30,13 @@ if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
 
 //先月
 $last_month = array(
-  'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
-  'month' => date('m', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
+    'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
+    'month' => date('m', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 //来月
 $next_month = array(
-  'year' => date('Y', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
-  'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
+    'year' => date('Y', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
+    'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
 // Y-mを取得。$now_yearの前後1年
@@ -72,7 +72,7 @@ function getYmdh($year_of_ym, $month_of_ym) {
 *カレンダー生成
 */
 function makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym) {
-    global $end_days/*, $calendars*/;
+    global $end_days;
     //3ヶ月分の空セル等を取得
     for ($i=1; $i<=$display_count; $i++) {
         $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
@@ -96,7 +96,7 @@ function makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $
 function getHoliday($last_month, $next_month) {
     $make_calendar =  makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
     $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
-    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][2];
+    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][3];
     $holidays_url = sprintf(
             "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
             "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
