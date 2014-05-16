@@ -19,16 +19,30 @@ $(function() {
             return false;
         }
 
-        //ポップアップの表示
-        $('.popup').slideToggle();
+        $.ajax({
+            type: 'POST',
+            url: 'http://kensyu.aucfan.com/schedule.php'+$(this).find('a').attr('href'),
+
+            //ajax通信が成功した場合
+            success: function(data, dataType) {
+                $('.popup').html(data);
+                $('.popup').slideToggle();//ポップアップの表示
+            },
+            //ajax通信が失敗した場合
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                error('Error : ', + errorThrown);
+            }
+        });
 
         //子要素の取得
         ymd = $(this).find('span').attr('id').split('-');// id取得
         year = ymd[0];
         month = ymd[1];
         day = ymd[2];
+    });
 
-        //ポップアップ以外の画面をクリックするとポップアップ消える
+    //ポップアップ以外の画面をクリックするとポップアップ消える
+    $('#shadow').click(function() {
         if ($('.popup').css('display') == 'block') {
             $('#shadow').click(function() {
                 $('.popup').fadeOut();
@@ -61,5 +75,4 @@ $(function() {
         //サブミット後ページをリロードしない
         return false;
     });
-
 });
