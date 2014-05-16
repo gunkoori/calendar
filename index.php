@@ -69,8 +69,8 @@ $unset_session = unsetSession();
 ************ ポップアップ ************
  -->
 <div class="popup">
-<div="popup_regist_form">
-<form method="post" action="<?php echo h($_SERVER['PHP_SELF']);?>">
+
+<form method="post" id="popup_regist_form">
 <input type="hidden" name="year" value="<?php echo $year ?>">
 <input type="hidden" name="month" value="<?php echo $month ?>">
 <input type="hidden" name="day" value="<?php echo $day ?>">
@@ -78,15 +78,15 @@ $unset_session = unsetSession();
     <tr>
         <th>開始<br />※必須</th>
         <td>
-            <select name="start_ym">
+            <select id="start_ym" name="start_ym">
             <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo h($get_ymdh['ymi'][$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($get_ymdh['ym'][$i]);?></option>
+                <option value="<?php echo h($get_ymdh['ymi'][$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($get_ymdh['ym'][$i]);?></option>
             <?php endfor; ?>
             </select>
             <!-- TODO:月によって日付が違うのでJSで直す -->
-            <select name="start_day">
+            <select id="start_day" name="start_day">
             <?php for ($i=1; $i<=31; $i++):?>
-                <option id="select_start_day" value="<?php echo h($i);?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
+                <option  value="<?php echo h($i);?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
             <?php endfor; ?>
             </select>
             <span class="error"><?php echo h($_SESSION['error']['error_compare_date']);?></span><br />
@@ -105,15 +105,15 @@ $unset_session = unsetSession();
     <tr>
         <th>終了<br />※必須</th>
         <td>
-            <select name="end_ym">
+            <select id="end_ym" name="end_ym">
             <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo h($get_ymdh['ymi'][$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($get_ymdh['ym'][$i]);?></option>
+                <option value="<?php echo h($get_ymdh['ymi'][$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($get_ymdh['ym'][$i]);?></option>
             <?php endfor; ?>
             </select>
             <!-- TODO:月によって日付が違うのでJSで直す -->
-            <select name="end_day">
+            <select id="end_day" name="end_day">
             <?php for ($i=1; $i<=31; $i++):?>
-                <option id="select_end_day" value="<?php echo h($i);?>" <?php if ($i == $end_day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
+                <option value="<?php echo h($i);?>" <?php if ($i == $end_day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
             <?php endfor; ?>
             </select>
             <span class="error"><?php echo h($_SESSION['error']['error_compare_date']);?></span><br />
@@ -157,7 +157,6 @@ $unset_session = unsetSession();
 
 </table>
 </form>
-</div>
 </div>
 <!--
 ************ ポップアップEND ************
@@ -231,7 +230,7 @@ $unset_session = unsetSession();
                     <div class="cell"><a href=""><td class="<?php echo h($class); ?>">
                         <!-- 日付出力 -->
                         <span class="day" id="<?php echo $cal_year.'-'.$cal_month.'-'.$day;?>">
-                            <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
+                            <a href="/?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
                         </span>
                         <!-- 祝日出力 -->
                         <span>
@@ -250,7 +249,7 @@ $unset_session = unsetSession();
 
                             <?php if (isset($schedules_3months[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules_3months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
-                                    <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
+                                    <a href="/?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
                                     title="<?php echo h($schedule['detail']);?>">
                                     <?php echo h($schedule['title']);?><br />
                                 <?php endforeach;?>

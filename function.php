@@ -24,7 +24,7 @@ $explode_ym = explode('-', $ym);//[0] => 2014 [1] => 04
 $year_of_ym = $explode_ym[0];//2014
 $month_of_ym = $explode_ym[1];//04
 if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
-    header('Location: http://kensyu.aucfan.com/');
+    header('Location: /');
     exit;
 }
 

@@ -6,6 +6,7 @@ $(function() {
     var years = [];
     var months = [];
     $('table td').click(function(e) {
+        e.preventDefault();//「href="#"」は無効にしたいけれど、親にイベントをバブリングしたいとき
         // 日付が入っていないセルはid取得しない
         if (!$(this).children('span')) {
             return false;
@@ -33,9 +34,32 @@ $(function() {
                 $('.popup').fadeOut();
                 $('#shadow').fadeOut();
             });
-
         }
-
-        e.preventDefault();//「href="#"」は無効にしたいけれど、親にイベントをバブリングしたいとき
     });
+
+    $('#btn-regist').click(function() {
+        //フォームから値をまとめて取得
+        var data = $('#popup_regist_form').serializeArray();
+        //配列の中のvalueを取得
+        for (var i=3; i<=12; i++) {
+            data = data[i][value];
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'database.php',
+            data: data,
+
+            //ajax通信が成功した場合
+            success: function(data, dataType) {
+                alert(data);
+            },
+            //ajax通信が失敗した場合
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                error('Error : ', + errorThrown);
+            }
+        });
+        //サブミット後ページをリロードしない
+        return false;
+    });
+
 });
