@@ -39,7 +39,7 @@ if (empty($_SESSION['error']['error_schedule_title']) && empty($_SESSION['error'
     $insert_update['insert_or_update'];
     unset($_SESSION['error']['keep_title']);
     unset($_SESSION['error']['keep_detail']);
-    header('Location: http://kensyu.aucfan.com/');
+    header('Location: /');
     return;
 }
 
@@ -47,7 +47,7 @@ if (empty($_SESSION['error']['error_schedule_title']) && empty($_SESSION['error'
 if (isset($sql_create['delete'])) {
     $delete = sqlResult($escape_formdata, $connect_db, $sql_create);
     $delete['delete'];
-    header('Location: http://kensyu.aucfan.com/');
+    header('Location: /');
     return;
 }
 
@@ -106,7 +106,7 @@ for ($i=-12; $i<=12; $i++) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-<form method="post" action="<?php echo h($_SERVER['PHP_SELF']);?>">
+<form method="post" action="<?php //echo h($_SERVER['PHP_SELF']);?>">
 <input type="hidden" name="year" value="<?php echo $year ?>">
 <input type="hidden" name="month" value="<?php echo $month ?>">
 <input type="hidden" name="day" value="<?php echo $day ?>">
