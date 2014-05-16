@@ -1,13 +1,41 @@
 $(function() {
+    var ymd;
+    var year;
+    var month;
+    var day;
+    var years = [];
+    var months = [];
     $('table td').click(function(e) {
-        if (!$(this).children('span')) {// 日付が入っていないセルはid取得しない
+        // 日付が入っていないセルはid取得しない
+        if (!$(this).children('span')) {
             return false;
         }
-        $('.popup').slideToggle().show();
-        console.debug($(this).find('span').attr('id'));// id取得
+        //ポップアップ表示時、背景を暗くする
+        $('#shadow').css('display', 'block');
+
+        //ポップアップ出ているときは消さない
+        if($('.popup').css('display') != 'none') {
+            return false;
+        }
+
+        //ポップアップの表示
+        $('.popup').slideToggle();
+
+        //子要素の取得
+        ymd = $(this).find('span').attr('id').split('-');// id取得
+        year = ymd[0];
+        month = ymd[1];
+        day = ymd[2];
+
+        //ポップアップ以外の画面をクリックするとポップアップ消える
+        if ($('.popup').css('display') == 'block') {
+            $('#shadow').click(function() {
+                $('.popup').fadeOut();
+                $('#shadow').fadeOut();
+            });
+
+        }
+
         e.preventDefault();//「href="#"」は無効にしたいけれど、親にイベントをバブリングしたいとき
-    });
-    $('.popup').click(function() {
-        $(this).fadeOut();
     });
 });

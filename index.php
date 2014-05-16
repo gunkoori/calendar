@@ -3,6 +3,10 @@ require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
 
+
+$get_ymdh = getYmdh($year_of_ym, $month_of_ym);
+print_r($get_ymdh['start_time']);
+
 //カレンダー生成
 $make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
 
@@ -19,7 +23,7 @@ if ($connect_db['return'] == false) {//接続状況の確認
 }
 
 //フォームのデータ整形
-$form_data = formData(/*$post_data, */$make_calendar);
+$form_data = formData($make_calendar);
 
 //エスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
@@ -45,6 +49,7 @@ $unset_session = unsetSession();
 <script type="text/javascript" src="/js/register.js"></script>
 </head>
 <body>
+<div id="shadow"></div><!-- shadow -->
 <div id="header">
 <h3>郡カレンダー</h3>
 <div id="prev"><a href="?ym=<?php echo h($last_month['year'].'-'.$last_month['month']);?>">前月</a></div>
@@ -76,7 +81,7 @@ $unset_session = unsetSession();
         <td>
             <select name="start_ym">
             <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo h($ymi[$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($ym[$i]);?></option>
+                <option id="select_year_month" value="<?php echo h($get_ymdh['ymi'][$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($get_ymdh['ym'][$i]);?></option>
             <?php endfor; ?>
             </select>
             <!-- TODO:月によって日付が違うのでJSで直す -->
@@ -89,7 +94,7 @@ $unset_session = unsetSession();
             <span class="error"><?php echo h($_SESSION['error']['error_date']);?></span><br />
             <select name="start_hour">
             <?php for ($i=1; $i<24; $i++):?>
-                <option id="start_hour" value="<?php echo h($i);?>" <?php if ($i == $start_time):?>selected<?php endif;?>><?php echo h($i);?>時</option>
+                <option id="start_hour" value="<?php echo h($i);?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo h($i);?>時</option>
             <?php endfor; ?>
             </select>
             <select name="start_min">
@@ -103,7 +108,7 @@ $unset_session = unsetSession();
         <td>
             <select name="end_ym">
             <?php for ($i=0; $i<=24; $i++):?>
-                <option id="select_year_month" value="<?php echo h($end_ymi[$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($end_ym[$i]);?></option>
+                <option id="select_year_month" value="<?php echo h($get_ymdh['ymi'][$i]);?>" <?php if ($i == 12):?>selected<?php endif;?>><?php echo h($get_ymdh['ym'][$i]);?></option>
             <?php endfor; ?>
             </select>
             <!-- TODO:月によって日付が違うのでJSで直す -->
@@ -116,7 +121,7 @@ $unset_session = unsetSession();
             <span class="error"><?php echo h($_SESSION['error']['error_date']);?></span><br />
             <select name="end_hour">
             <?php for ($i=1; $i<24; $i++):?>
-                <option id="end_hour" value="<?php echo h($i);?>" <?php if ($i == $end_time):?>selected<?php endif;?>><?php echo h($i);?>時</option>
+                <option id="end_hour" value="<?php echo h($i);?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo h($i);?>時</option>
             <?php endfor; ?>
             </select>
             <select name="end_min">
@@ -158,10 +163,13 @@ $unset_session = unsetSession();
 <!--
 ************ ポップアップEND ************
  -->
+ <div></div>
 
+<div clsss="calendar">
 <!-- カレンダーループ 3回ループ -->
 <?php foreach ($make_calendar['calendars'] as $key => $value) :?>
-<table class="calendar">
+
+<table class="calendar_table">
     <thead>
     <tr>
         <th colspan="7">
@@ -263,13 +271,10 @@ $unset_session = unsetSession();
             <td></td>
         <?php endfor ;?>
     </tbody>
+
 </table>
-</div><!--calendar-->
+
 <?php endforeach ;?>
-
-
-<div id="footer">
-</div><!--footer-->
-
+</div><!--calendar-->
 </body>
 </html>

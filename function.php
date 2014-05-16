@@ -1,4 +1,6 @@
 <?php
+require_once 'database.php';
+
 define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
@@ -47,6 +49,24 @@ $prev_month = $last_month['month'];
 $prev_month2 = $last_month['month'];
 $prev_month3 = $last_month['month'];
 $prev_month4 = $last_month['month'];
+
+
+/*
+*
+*/
+function getYmdh($year_of_ym, $month_of_ym) {
+    for ($i=-13; $i<=12; $i++) {
+        list($years, $months, $days) = explode('-', date('Y-n-t', mktime(0, 0, 0, $month_of_ym+($i), 1, intval($year_of_ym)) ));
+        $ym[] = $years.'年'.$months.'月';
+        $ymi[] = $years.'-'.$months;
+    }
+
+    return array(
+        'ym' => $ym,
+        'ymi' => $ymi
+        );
+}
+
 
 /*
 *カレンダー生成

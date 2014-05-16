@@ -182,7 +182,7 @@ for ($i=-12; $i<=12; $i++) {
             <span class="error"><?php //echo h($_SESSION['error']['error_schedule_detail']);?></span>
         </td>
     </tr>
-
+    <tr><td colspan="2" class="center">
     <?php if(!empty($schedule_id)):?>
         <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
         <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
@@ -191,10 +191,10 @@ for ($i=-12; $i<=12; $i++) {
         <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
         <span id="btn-regist"><input type="submit"  class="btn" name="insert" value="登録" /></span>
     <?php endif;?>
-
+    </td></tr>
 </table>
 </form>
-<form method="post" action="<?php echo h($_SERVER['PHP_SELF']);?>">
+<form id="" method="post" action="<?php echo h($_SERVER['PHP_SELF']);?>">
     <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
     <input type="hidden" id="delete" name="delete" value="delete" />
     <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />
