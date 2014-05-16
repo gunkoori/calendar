@@ -90,7 +90,6 @@ for ($i=-12; $i<=12; $i++) {
         $combos[$years][$months] = $j;
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -129,7 +128,7 @@ for ($i=-12; $i<=12; $i++) {
             <span class="error"><?php echo h($_SESSION['error']['error_date']);?></span><br />
             <select name="start_hour">
             <?php for ($i=1; $i<24; $i++):?>
-                <option id="start_hour" value="<?php echo h($i);?>" <?php if ($i == $start_time):?>selected<?php endif;?>><?php echo h($i);?>時</option>
+                <option id="start_hour" value="<?php echo h($i);?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo h($i);?>時</option>
             <?php endfor; ?>
             </select>
             <select name="start_min">
@@ -156,7 +155,7 @@ for ($i=-12; $i<=12; $i++) {
             <span class="error"><?php echo h($_SESSION['error']['error_date']);?></span><br />
             <select name="end_hour">
             <?php for ($i=1; $i<24; $i++):?>
-                <option id="end_hour" value="<?php echo h($i);?>" <?php if ($i == $end_time):?>selected<?php endif;?>><?php echo h($i);?>時</option>
+                <option id="end_hour" value="<?php echo h($i);?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo h($i);?>時</option>
             <?php endfor; ?>
             </select>
             <select name="end_min">
@@ -193,7 +192,7 @@ for ($i=-12; $i<=12; $i++) {
     </td></tr>
 </table>
 </form>
-<form id="" method="post" action="<?php echo h($_SERVER['PHP_SELF']);?>">
+<form id="" method="post" action="<?php //echo h($_SERVER['PHP_SELF']);?>">
     <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
     <input type="hidden" id="delete" name="delete" value="delete" />
     <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />

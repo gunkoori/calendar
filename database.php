@@ -325,6 +325,7 @@ function sqlResult($escape_formdata, $connect_db, $sql_create) {
                     if ($row['start_date'] != $row['end_date']) {
                         for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
                             $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+                            $schedules[$schedule_year][$schedule_month][$i][$row['schedule_id']]['detail'] = $row['schedule_detail'];
                         }
                     }
                 }
