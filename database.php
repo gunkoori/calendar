@@ -304,11 +304,11 @@ function sqlResult($escape_formdata, $connect_db, $sql_create) {
                 while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
                     list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
                     list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));
-                    $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-                    $schedules_3months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
+                    $schedules_months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+                    $schedules_months[$schedule_year][$schedule_month][$schedule_day][$row['schedule_id']]['detail'] = $row['schedule_detail'];
                     if ($row['start_date'] != $row['end_date']) {
                         for ($i=$schedule_day; $i<=$end_schedule_day; $i++) {
-                            $schedules_3months[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+                            $schedules_months[$schedule_year][$schedule_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
                         }
                     }
                 }
@@ -337,7 +337,7 @@ function sqlResult($escape_formdata, $connect_db, $sql_create) {
     return array(
         'insert_or_update' => $insert_or_update,
         'delete' => $delete,
-        'schedules_3months' =>$schedules_3months,
+        'schedules_months' =>$schedules_months,
         'schedules' => $schedules
         );
 }

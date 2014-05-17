@@ -32,7 +32,7 @@ $sql_create = sqlCreate($escape_formdata, $check_token = true);
 
 //SQL実行
 $sql_result = sqlResult($escape_formdata, $connect_db, $sql_create);
-$schedules_3months = $sql_result['schedules_3months'];
+$schedules_months = $sql_result['schedules_months'];
 
 //SESSION初期化
 $unset_session = unsetSession();
@@ -246,8 +246,8 @@ $unset_session = unsetSession();
                         <!-- DBに登録されている予定出力 -->
                         <span>
                             <br />
-                            <?php if (isset($schedules_3months[$cal_year][$cal_month][$day])):?>
-                                <?php foreach ($schedules_3months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
+                            <?php if (isset($schedules_months[$cal_year][$cal_month][$day])):?>
+                                <?php foreach ($schedules_months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
                                     <a class="schedule" href="/schedule?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
                                     title="<?php echo h($schedule['detail']);?>">
                                     <?php echo h($schedule['title']);?><br />
