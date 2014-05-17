@@ -22,9 +22,9 @@ $(function() {
         var url = window.location;
         //条件分岐できていない
         var parameter = url + 'schedule.php' + $(this).find('a').attr('href');
-        if (0 < $('a.schedule').length) {
+        /*if (0 < $('a.schedule').length) {
             var parameter = url + 'schedule.php' + $(this).find('.schedule').attr('href');
-        }
+        }*/
 
         $.ajax({
             type: 'POST',

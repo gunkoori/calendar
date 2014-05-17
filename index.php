@@ -7,7 +7,7 @@ require_once 'unset_session.php';
 $get_ymdh = getYmdh($year_of_ym, $month_of_ym);
 
 //カレンダー生成
-$make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
+$make_calendar = makeCalendar($display_count, $prev_month, $year_of_ym);
 
 //祝日
 $holiday = getHoliday($last_month, $next_month);

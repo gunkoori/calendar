@@ -7,7 +7,7 @@ require_once 'unset_session.php';
 $connect_db = connectDB();
 
 //カレンダー生成
-$make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
+$make_calendar = makeCalendar($display_count, $prev_month, $year_of_ym);
 
 //フォームのデータ整形
 $form_data = formData($make_calendar);
@@ -105,7 +105,7 @@ for ($i=-12; $i<=12; $i++) {
 <body>
 <h3>スケジュール登録</h3>
 <div id="schedule_form">
-<form method="post" action="<?php //echo h($_SERVER['PHP_SELF']);?>">
+<form method="post">
 <input type="hidden" name="year" value="<?php echo $year ?>">
 <input type="hidden" name="month" value="<?php echo $month ?>">
 <input type="hidden" name="day" value="<?php echo $day ?>">
@@ -169,15 +169,13 @@ for ($i=-12; $i<=12; $i++) {
         <td>
             <input type="text" id="schedule_title" name="schedule_title"  placeholder="タイトルを入力してください" value="<?php if (isset($_SESSION['error']['keep_title']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_title'][$year][$formatted_month][$day];} else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['title']);}?>" /><br />
             <div id="alert_schedule_title" class="error">タイトルを入力してください</div>
-            <span class="error"><?php //echo h($_SESSION['error']['error_schedule_title']);?></span>
         </td>
     </tr>
     <tr>
         <th>詳細<br />※必須</th>
         <td>
             <textarea id="schedule_detail" name="schedule_detail"  placeholder="詳細を入力してください"　rows=5 cols=40><?php if (isset($_SESSION['error']['keep_detail']) && !isset($schedule_id)) { echo $_SESSION['error']['keep_detail'][$year][$formatted_month][$day]; } else { echo h($schedule_sql[$year][$month][$day][$schedule_id]['detail']); }?></textarea>
-            <br /><span id="alert_schedule_detail" class="error">詳細を入力してください</span>
-            <span class="error"><?php //echo h($_SESSION['error']['error_schedule_detail']);?></span>
+            <br /><span id="alert_schedule_detail" class="error" class="error">詳細を入力してください</span>
         </td>
     </tr>
     <tr><td colspan="2" class="center">
@@ -192,7 +190,7 @@ for ($i=-12; $i<=12; $i++) {
     </td></tr>
 </table>
 </form>
-<form id="" method="post" action="<?php //echo h($_SERVER['PHP_SELF']);?>">
+<form id="" method="post">
     <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
     <input type="hidden" id="delete" name="delete" value="delete" />
     <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />

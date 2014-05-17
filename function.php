@@ -30,12 +30,12 @@ if (checkdate($month_of_ym, 01, $year_of_ym) == false) {
 
 //先月
 $last_month = array(
-    'year' => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
+    'year'  => date('Y', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
     'month' => date('m', strtotime('last month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 //来月
 $next_month = array(
-    'year' => date('Y', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
+    'year'  => date('Y', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01'))),
     'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
@@ -44,11 +44,7 @@ for ($i=-12; $i<=12; $i++) {
     $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
 }
 
-//// $prev_month  = $month_of_ym -1;はつかわない
 $prev_month = $last_month['month'];
-$prev_month2 = $last_month['month'];
-$prev_month3 = $last_month['month'];
-$prev_month4 = $last_month['month'];
 
 
 /*
@@ -57,12 +53,12 @@ $prev_month4 = $last_month['month'];
 function getYmdh($year_of_ym, $month_of_ym) {
     for ($i=-13; $i<=12; $i++) {
         list($years, $months, $days) = explode('-', date('Y-n-t', mktime(0, 0, 0, $month_of_ym+($i), 1, intval($year_of_ym)) ));
-        $ym[] = $years.'年'.$months.'月';
+        $ym[]  = $years.'年'.$months.'月';
         $ymi[] = $years.'-'.$months;
     }
 
     return array(
-        'ym' => $ym,
+        'ym'  => $ym,
         'ymi' => $ymi
         );
 }
@@ -71,21 +67,20 @@ function getYmdh($year_of_ym, $month_of_ym) {
 /*
 *カレンダー生成
 */
-function makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym) {
+function makeCalendar($display_count, $prev_month,  $year_of_ym) {
     global $end_days;
     //3ヶ月分の空セル等を取得
     for ($i=1; $i<=$display_count; $i++) {
-        $calendars[$i] = date("Y-m", mktime(0, 0, 0, $prev_month++, 1, $year_of_ym));
-        $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month2++, 1, $year_of_ym));
-        $after_cell[$i]  = date('w', mktime(0, 0, 0, $prev_month3+1, 0, $year_of_ym));
-        $prev_month3++;
-        $end_days[$i] = date('t', mktime(0,0,0, $prev_month4++, 1, $year_of_ym));
+        $calendars[$i]   = date("Y-m", mktime(0, 0, 0, $prev_month+$i, 1, $year_of_ym));
+        $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month+$i, 1, $year_of_ym));
+        $after_cell[$i]  = date('w', mktime(0, 0, 0, $prev_month+$i+1, 0, $year_of_ym));
+        $end_days[$i]    = date('t', mktime(0,0,0, $prev_month+$i, 1, $year_of_ym));
     }
     return array(
-        'calendars' => $calendars,
+        'calendars'   => $calendars,
         'before_cell' => $before_cell,
-        'after_cell' => $after_cell,
-        'end_days' => $end_days
+        'after_cell'  => $after_cell,
+        'end_days'    => $end_days
         );
 }
 
@@ -95,9 +90,9 @@ function makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $
 */
 function getHoliday($last_month, $next_month) {
     $make_calendar =  makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
-    $min_date = $last_month['year'].'-'.$last_month['month'].'-01';
-    $max_date = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][3];
-    $holidays_url = sprintf(
+    $min_date      = $last_month['year'].'-'.$last_month['month'].'-01';
+    $max_date      = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][3];
+    $holidays_url  = sprintf(
             "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
             "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,
             "$min_date" ,  // 取得開始日
