@@ -18,11 +18,17 @@ $(function() {
         if($('.popup').css('display') != 'none') {
             return false;
         }
+        //現在のURL
+        var url = window.location;
+        //条件分岐できていない
+        var parameter = url + 'schedule.php' + $(this).find('a').attr('href');
+        if (0 < $('a.schedule').length) {
+            var parameter = url + 'schedule.php' + $(this).find('.schedule').attr('href');
+        }
 
         $.ajax({
             type: 'POST',
-            url: 'http://kensyu.aucfan.com/schedule.php'+$(this).find('a').attr('href'),
-
+            url: parameter,
             //ajax通信が成功した場合
             success: function(data, dataType) {
                 $('.popup').html(data);
@@ -35,11 +41,14 @@ $(function() {
         });
 
         //子要素の取得
+        /*
         ymd = $(this).find('span').attr('id').split('-');// id取得
         year = ymd[0];
         month = ymd[1];
         day = ymd[2];
+        */
     });
+
 
     //ポップアップ以外の画面をクリックするとポップアップ消える
     $('#shadow').click(function() {

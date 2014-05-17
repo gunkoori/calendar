@@ -245,17 +245,15 @@ $unset_session = unsetSession();
 
                         <!-- DBに登録されている予定出力 -->
                         <span>
-                            <br /><span class="schedule">
-
+                            <br />
                             <?php if (isset($schedules_3months[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules_3months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
-                                    <a href="/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
+                                    <a class="schedule" href="/schedule?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
                                     title="<?php echo h($schedule['detail']);?>">
                                     <?php echo h($schedule['title']);?><br />
                                 <?php endforeach;?>
                             <?php endif;?>
-
-                            </a></span>
+                            </a>
                         </span>
                     </td></a></div>
 
