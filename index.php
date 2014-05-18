@@ -161,8 +161,7 @@ $unset_session = unsetSession();
                             <br />
                             <?php if (isset($schedules_months[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules_months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
-                                    <a class="schedule" href="/schedule?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
-                                    title="<?php echo h($schedule['detail']);?>">
+                                    <a class="schedule" href="/schedule?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>" title="<?php echo h($schedule['detail']);?>">
                                     <?php echo h($schedule['title']);?><br />
                                 <?php endforeach;?>
                             <?php endif;?>
