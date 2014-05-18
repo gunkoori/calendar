@@ -89,8 +89,6 @@ $unset_session = unsetSession();
                 <option  value="<?php echo h($i);?>" <?php if ($i == $day):?>selected<?php endif;?>><?php echo h($i);?>日</option>
             <?php endfor; ?>
             </select>
-            <span class="error"><?php echo h($_SESSION['error']['error_compare_date']);?></span><br />
-            <span class="error"><?php echo h($_SESSION['error']['error_date']);?></span><br />
             <select name="start_hour">
             <?php for ($i=1; $i<24; $i++):?>
                 <option id="start_hour" value="<?php echo h($i);?>" <?php if ($i == date('H')):?>selected<?php endif;?>><?php echo h($i);?>時</option>

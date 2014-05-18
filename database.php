@@ -245,7 +245,7 @@ END;
 }
 
 //予定を3ヶ月分取得
-$schedule_3months=<<<END
+$schedule_months=<<<END
     SELECT
         schedule_id, start_date, end_date, schedule_title, schedule_detail
     FROM
@@ -280,7 +280,7 @@ END;
 return array(
     'sql' => $sql,
     'delete' => $delete,
-    'schedule_3months' => $schedule_3months,
+    'schedule_months' => $schedule_months,
     'schedule_sql' => $schedule_sql
     );
 }
@@ -299,8 +299,8 @@ function sqlResult($escape_formdata, $connect_db, $sql_create) {
         if (isset($sql_create['delete'])) {
             $delete = mysqli_query($db, $sql_create['delete']);
         }
-        if (isset($sql_create['schedule_3months'])) {
-            if ($result = mysqli_query($db, $sql_create['schedule_3months'])) {
+        if (isset($sql_create['schedule_months'])) {
+            if ($result = mysqli_query($db, $sql_create['schedule_months'])) {
                 while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
                     list($schedule_year, $schedule_month, $schedule_day) = explode('-', date('Y-m-j',strtotime($row['start_date'])));
                     list($end_schedule_year, $end_schedule_month, $end_schedule_day) = explode('-', date('Y-m-j',strtotime($row['end_date'])));

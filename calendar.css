@@ -128,7 +128,7 @@ td {
     top:300px;
     left:500px;
     position: absolute;
-    background-color: #ff8000;
+    background-color: white;
 }
 
 #popup_regist_form {
@@ -186,6 +186,18 @@ td {
 
 #schedule_detail {
     display: inline;
+}
+
+#alert_start_date {
+    display: none;
+}
+
+#alert_end_date {
+    display: none;
+}
+
+#alert_error_date {
+    display: none;
 }
 
 #alert_schedule_title {
