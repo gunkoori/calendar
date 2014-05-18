@@ -179,7 +179,10 @@ for ($i=-12; $i<=12; $i++) {
     <?php if(!empty($schedule_id)):?>
         <input type="hidden" name="schedule_id" value="<?php echo h($schedule_id);?>" />
         <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
-        <input type="submit" class="btn" name="update" value="更新" />
+        <input type="submit" id="btn-update" class="btn" name="update" value="更新" />
+
+        <input type="hidden" id="delete" name="delete" value="delete" />
+        <span id="btn-delete"><input type="submit" class="btn" value="削除" /></span>
     <?php else:?>
         <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
         <span id="btn-regist"><input type="submit"  class="btn" name="insert" value="登録" /></span>
@@ -187,13 +190,6 @@ for ($i=-12; $i<=12; $i++) {
     </td></tr>
 </table>
 </form>
-<form id="" method="post">
-    <input type="hidden" name="token" value="<?php echo h($get_token);?>" />
-    <input type="hidden" id="delete" name="delete" value="delete" />
-    <input type="hidden"  name="schedule_id" value="<?php echo h($schedule_id);?>" />
-    <span id="btn-delete"><input type="submit" class="btn" value="削除" /></span>
-</form>
-
 </div><!-- schedule_form -->
 </body>
 </html>
