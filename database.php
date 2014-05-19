@@ -10,7 +10,7 @@ function connectDB() {
     $host = 'localhost';
     $user = 'root';
     $password = '';
-    $database = 'calendar';
+    $database = 'cal_koori';
 
     $return = true;
     // MySQL に接続し、データベースを選択
