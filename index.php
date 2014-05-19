@@ -52,7 +52,7 @@ $unset_session = unsetSession();
 <div id="header">
 <h3>郡カレンダー</h3>
 <div id="prev"><a href="?ym=<?php echo h($last_month['year'].'-'.$last_month['month']);?>">前月</a></div>
-<div id="this"><a href="/">今月</a></div>
+<div id="this"><a href="./">今月</a></div>
 <div id="next"><a href="?ym=<?php echo h($next_month['year'].'-'.$next_month['month']);?>">次月</a></div>
 <form method="get" action="<?php $_SERVER['PHP_SELF'];?>">
     <select id="select_year_month" class="btn_medium" name="ym">
