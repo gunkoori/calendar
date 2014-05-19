@@ -3,8 +3,11 @@ require_once 'database.php';
 require_once 'function.php';
 require_once 'unset_session.php';
 
+//年月日、時間の取得
+$get_ymdh = getYmdh($year_of_ym, $month_of_ym);
+
 //カレンダー生成
-$make_calendar = makeCalendar($display_count, $prev_month, $prev_month2, $prev_month3, $prev_month4, $year_of_ym);
+$make_calendar = makeCalendar($display_count, $prev_month, $year_of_ym);
 
 //祝日
 $holiday = getHoliday($last_month, $next_month);
@@ -19,7 +22,7 @@ if ($connect_db['return'] == false) {//接続状況の確認
 }
 
 //フォームのデータ整形
-$form_data = formData(/*$post_data, */$make_calendar);
+$form_data = formData($make_calendar);
 
 //エスケープ
 $escape_formdata = escapeFormdata($connect_db, $form_data);
@@ -29,7 +32,7 @@ $sql_create = sqlCreate($escape_formdata, $check_token = true);
 
 //SQL実行
 $sql_result = sqlResult($escape_formdata, $connect_db, $sql_create);
-$schedules_3months = $sql_result['schedules_3months'];
+$schedules_months = $sql_result['schedules_months'];
 
 //SESSION初期化
 $unset_session = unsetSession();
@@ -41,8 +44,11 @@ $unset_session = unsetSession();
 <meta charset="utf-8">
 <title></title>
 <link href="calendar.css" rel="stylesheet">
+<script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/js/register.js"></script>
 </head>
 <body>
+<div id="shadow"></div><!-- shadow -->
 <div id="header">
 <h3>郡カレンダー</h3>
 <div id="prev"><a href="?ym=<?php echo h($last_month['year'].'-'.$last_month['month']);?>">前月</a></div>
@@ -52,16 +58,29 @@ $unset_session = unsetSession();
     <select name="ym">
     <option>選択してください</option>
     <?php for ($i=0; $i<=24; $i++):?>
-    <option id="select_year_month" value="<?php echo h($months[$i]);?>"><?php echo h($months[$i]);?></option>
+    <option id="select_year_month" value="<?php echo h($get_ymdh['ymi'][$i]);?>"><?php echo h($get_ymdh['ym'][$i]);?></option>
     <?php endfor; ?>
     </select>
     <input type="submit" value="表示する">
 </form>
 </div><!--header-->
 
+<!--
+************ ポップアップ ************
+ -->
+<div class="popup">
+
+</div>
+<!--
+************ ポップアップEND ************
+ -->
+ <div></div>
+
+<div clsss="calendar">
 <!-- カレンダーループ 3回ループ -->
 <?php foreach ($make_calendar['calendars'] as $key => $value) :?>
-<table class="calendar">
+
+<table class="calendar_table">
     <thead>
     <tr>
         <th colspan="7">
@@ -121,36 +140,32 @@ $unset_session = unsetSession();
                     <?php $auc_topi_feed = $auc_topi['title'][$value.'-'.$days];?>
                 <?php endif;?>
 
-                    <td class="<?php echo h($class); ?>">
+                    <td class="day_td <?php echo h($class); ?>">
                         <!-- 日付出力 -->
-                        <span class="day">
-                            <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
+                        <span class="day" id="<?php echo $cal_year.'-'.$cal_month.'-'.$day;?>">
+                            <a href="/?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
                         </span>
                         <!-- 祝日出力 -->
                         <span>
                             <?php echo h($holiday_name);?>
                         </span>
                         <!-- オクトピ出力 -->
+                        <?php if(isset($auc_topi['link'][$value.'-'.$days])):?>
                         <span>
                             <br /><a href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="<?php echo h($auc_topi_feed);?>" target="_blank">
                             <?php echo h(shortStr($auc_topi_feed));?>
                             </a>
                         </span><br />
-
+                        <?php endif;?>
                         <!-- DBに登録されている予定出力 -->
-                        <span>
-                            <br /><span class="schedule">
-
-                            <?php if (isset($schedules_3months[$cal_year][$cal_month][$day])):?>
-                                <?php foreach ($schedules_3months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
-                                    <a href="http://kensyu.aucfan.com/schedule.php?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>"
-                                    title="<?php echo h($schedule['detail']);?>">
+                            <br />
+                            <?php if (isset($schedules_months[$cal_year][$cal_month][$day])):?>
+                                <?php foreach ($schedules_months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
+                                    <a class="schedule" href="/schedule?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>" title="<?php echo h($schedule['detail']);?>">
                                     <?php echo h($schedule['title']);?><br />
                                 <?php endforeach;?>
                             <?php endif;?>
-
-                            </a></span>
-                        </span>
+                            </a>
                     </td>
 
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
@@ -163,11 +178,10 @@ $unset_session = unsetSession();
             <td></td>
         <?php endfor ;?>
     </tbody>
-</table>
-</div><!--calendar-->
-<?php endforeach ;?>
 
-<div id="footer">
-</div><!--footer-->
+</table>
+
+<?php endforeach ;?>
+</div><!--calendar-->
 </body>
 </html>
