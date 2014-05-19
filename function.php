@@ -39,13 +39,7 @@ $next_month = array(
     'month' => date('m', strtotime('next month', strtotime($year_of_ym.'-'.$month_of_ym.'-01')))
 );
 
-// Y-mを取得。$now_yearの前後1年
-for ($i=-12; $i<=12; $i++) {
-    $months[] = date('Y-m', mktime(0, 0, 0, $month_of_ym+($i), 1, $year_of_ym));
-}
-
 $prev_month = $last_month['month']-1;
-
 
 /*
 *

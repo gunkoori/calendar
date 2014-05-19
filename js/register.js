@@ -5,6 +5,11 @@ $(function() {
     var day;
     var years = [];
     var months = [];
+    var click_flg = 0;
+    //予定をクリックしたときはフラグを1に
+    $('a.schedule').click(function() {
+        click_flg = 1;
+    });
     $('table td').click(function(e) {
         e.preventDefault();//「href="#"」は無効にしたいけれど、親にイベントをバブリングしたいとき
         // 日付が入っていないセルはid取得しない
@@ -20,12 +25,15 @@ $(function() {
         }
         //現在のURL
         var url = window.location;
-        //条件分岐できていない
-        var parameter = url + 'schedule.php' + $(this).find('a').attr('href');
-        /*if (0 < $('a.schedule').length) {
+        //新規の予定
+        if(click_flg != 1) {
+            var parameter = url + 'schedule.php' + $(this).find('a').attr('href');
+            click_flg = 0;
+        }
+        //カレンダーの予定をクリックしたとき
+        if (click_flg == 1 && (0 < $(this).find('.schedule').attr('href').length)) {
             var parameter = url + 'schedule.php' + $(this).find('.schedule').attr('href');
-        }*/
-
+        }
         $.ajax({
             type: 'POST',
             url: parameter,
@@ -39,16 +47,7 @@ $(function() {
                 error('Error : ', + errorThrown);
             }
         });
-
-        //子要素の取得
-        /*
-        ymd = $(this).find('span').attr('id').split('-');// id取得
-        year = ymd[0];
-        month = ymd[1];
-        day = ymd[2];
-        */
     });
-
 
     //ポップアップ以外の画面をクリックするとポップアップ消える
     $('#shadow').click(function() {
@@ -60,6 +59,7 @@ $(function() {
         }
     });
 
+    //submit押したとき
     $('#btn-regist').click(function() {
         //フォームから値をまとめて取得
         var data = $('#popup_regist_form').serializeArray();

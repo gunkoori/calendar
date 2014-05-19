@@ -58,7 +58,7 @@ $unset_session = unsetSession();
     <select name="ym">
     <option>選択してください</option>
     <?php for ($i=0; $i<=24; $i++):?>
-    <option id="select_year_month" value="<?php echo h($months[$i]);?>"><?php echo h($months[$i]);?></option>
+    <option id="select_year_month" value="<?php echo h($get_ymdh['ymi'][$i]);?>"><?php echo h($get_ymdh['ym'][$i]);?></option>
     <?php endfor; ?>
     </select>
     <input type="submit" value="表示する">
@@ -140,7 +140,7 @@ $unset_session = unsetSession();
                     <?php $auc_topi_feed = $auc_topi['title'][$value.'-'.$days];?>
                 <?php endif;?>
 
-                    <div class="cell"><a href=""><td class="<?php echo h($class); ?>">
+                    <td class="<?php echo h($class); ?>">
                         <!-- 日付出力 -->
                         <span class="day" id="<?php echo $cal_year.'-'.$cal_month.'-'.$day;?>">
                             <a href="/?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
@@ -157,7 +157,7 @@ $unset_session = unsetSession();
                         </span><br />
 
                         <!-- DBに登録されている予定出力 -->
-                        <span>
+                        <!-- <span> -->
                             <br />
                             <?php if (isset($schedules_months[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules_months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
@@ -166,8 +166,8 @@ $unset_session = unsetSession();
                                 <?php endforeach;?>
                             <?php endif;?>
                             </a>
-                        </span>
-                    </td></a></div>
+                        <!-- </span> -->
+                    </td>
 
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
                     </tr>
