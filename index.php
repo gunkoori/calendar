@@ -140,7 +140,7 @@ $unset_session = unsetSession();
                     <?php $auc_topi_feed = $auc_topi['title'][$value.'-'.$days];?>
                 <?php endif;?>
 
-                    <td class="<?php echo h($class); ?>">
+                    <td class="day_td <?php echo h($class); ?>">
                         <!-- 日付出力 -->
                         <span class="day" id="<?php echo $cal_year.'-'.$cal_month.'-'.$day;?>">
                             <a href="/?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
