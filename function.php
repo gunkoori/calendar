@@ -146,7 +146,7 @@ function aucTopi() {
 /*
 *文字数の制限
 */
-function shortStr ($str, $length = 15) {
+function shortStr ($str, $length = 13) {
     if (mb_strlen($str) <= $length) {
         return $str;
     } else {

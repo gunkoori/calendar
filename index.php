@@ -146,14 +146,14 @@ $unset_session = unsetSession();
                             <a href="/?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day);?>"><?php echo h($day);?></a>
                         </span>
                         <!-- 祝日出力 -->
-                        <span>
+                        <span class="holiday_str">
                             <?php echo h($holiday_name);?>
                         </spans>
                         <!-- オクトピ出力 -->
                         <?php if(isset($auc_topi['link'][$value.'-'.$days])):?>
                         <span >
                             <br /><a class="auc_topi" href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="<?php echo h($auc_topi_feed);?>" target="_blank">
-                            <?php echo h(shortStr($auc_topi_feed));?>
+                            <?php echo h(shortStr($auc_topi_feed).'…');?>
                             </a>
                         </span><br />
                         <?php endif;?>

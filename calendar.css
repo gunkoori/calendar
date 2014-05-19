@@ -140,6 +140,7 @@ td {
     float: left;
     vertical-align: top;
     float: top;
+    margin-left: 5px;
 
 }
 
@@ -162,6 +163,10 @@ td {
 
 th.sunday {
     color: #5a5a5a;
+}
+
+.holiday_str {
+    color: white;
 }
 
 a.auc_topi {

@@ -8,8 +8,6 @@ $(function() {
     var a_click_href = 0;
     //予定をクリックしたときはフラグを1に
     $('table td.day_td a,table td.day_td').click(function(e) {
-        e.preventDefault();//「href="#"」は無効にしたいけれど、親にイベントをバブリングしたいとき
-        $('#shadow').css('display', 'block');//ポップアップ表示時、背景を暗くする
         //ポップアップ出ているときは消さない
         if($('.popup').css('display') != 'none' && a_click_href == 0) {
             return false;
@@ -19,6 +17,13 @@ $(function() {
         if($(this).attr('href') &&  a_click_href == 0) {//クリックした予定のhrefを代入する
             a_click_href = $(this).attr('href');
             return true;
+        }
+        //リンクにオクトピが含まれている場合オクトピのリンクに飛べるように
+        if(a_click_href.indexOf('aucfan.com/article/')!=-1){
+            e.stopPropagation();
+        } else {
+            e.preventDefault();//「href="#"」は無効にしたいけれど、親にイベントをバブリングしたいとき
+            $('#shadow').css('display', 'block');
         }
 
         //新規の予定

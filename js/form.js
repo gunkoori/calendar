@@ -15,7 +15,7 @@ $(function() {
         }
     });
 
-    $('#btn-regist, #btn-update').submit(function() {
+    $('#btn-regist, #btn-update').click(function() {
         var params = {};
         var ret = true;
 
@@ -64,11 +64,8 @@ $(function() {
 
         //空ならばエラー文を表示させる
         if (params.schedule_title == '') {
-            $('#alert_schedule_title').blur(function(){
-                $(this).css('display', 'block');
-                ret = false;
-            });
-
+            $('#alert_schedule_title').css('display', 'block');
+            ret = false;
         } else {
             $('#alert_schedule_title').css('display', 'none');
         }
