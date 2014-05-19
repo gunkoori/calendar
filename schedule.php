@@ -39,7 +39,7 @@ if (empty($_SESSION['error']['error_schedule_title']) && empty($_SESSION['error'
     $insert_update['insert_or_update'];
     unset($_SESSION['error']['keep_title']);
     unset($_SESSION['error']['keep_detail']);
-    header('Location: /');
+    header('Location: ./');
     return;
 }
 
@@ -47,7 +47,7 @@ if (empty($_SESSION['error']['error_schedule_title']) && empty($_SESSION['error'
 if (isset($sql_create['delete'])) {
     $delete = sqlResult($escape_formdata, $connect_db, $sql_create);
     $delete['delete'];
-    header('Location: /');
+    header('Location: ./');
     return;
 }
 
@@ -98,8 +98,8 @@ for ($i=-12; $i<=12; $i++) {
 <meta charset="utf-8">
 <title></title>
 <link href="calendar.css" rel="stylesheet">
-<script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="/js/form.js"></script>
+<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/form.js"></script>
 
 </head>
 <body>
