@@ -44,8 +44,8 @@ $unset_session = unsetSession();
 <meta charset="utf-8">
 <title></title>
 <link href="calendar.css" rel="stylesheet">
-<script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="/js/register.js"></script>
+<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/register.js"></script>
 </head>
 <body>
 <div id="shadow"></div><!-- shadow -->
@@ -55,13 +55,13 @@ $unset_session = unsetSession();
 <div id="this"><a href="/">今月</a></div>
 <div id="next"><a href="?ym=<?php echo h($next_month['year'].'-'.$next_month['month']);?>">次月</a></div>
 <form method="get" action="<?php $_SERVER['PHP_SELF'];?>">
-    <select name="ym">
+    <select id="select_year_month" class="btn_medium" name="ym">
     <option>選択してください</option>
     <?php for ($i=0; $i<=24; $i++):?>
-    <option id="select_year_month" value="<?php echo h($get_ymdh['ymi'][$i]);?>"><?php echo h($get_ymdh['ym'][$i]);?></option>
+    <option value="<?php echo h($get_ymdh['ymi'][$i]);?>"><?php echo h($get_ymdh['ym'][$i]);?></option>
     <?php endfor; ?>
     </select>
-    <input type="submit" value="表示する">
+    <input type="submit" id="select_year_month_submit" class="btn_small" value="表示する">
 </form>
 </div><!--header-->
 
@@ -148,11 +148,11 @@ $unset_session = unsetSession();
                         <!-- 祝日出力 -->
                         <span>
                             <?php echo h($holiday_name);?>
-                        </span>
+                        </spans>
                         <!-- オクトピ出力 -->
                         <?php if(isset($auc_topi['link'][$value.'-'.$days])):?>
-                        <span>
-                            <br /><a href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="<?php echo h($auc_topi_feed);?>" target="_blank">
+                        <span >
+                            <br /><a class="auc_topi" href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="<?php echo h($auc_topi_feed);?>" target="_blank">
                             <?php echo h(shortStr($auc_topi_feed));?>
                             </a>
                         </span><br />
