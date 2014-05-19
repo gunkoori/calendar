@@ -150,14 +150,14 @@ $unset_session = unsetSession();
                             <?php echo h($holiday_name);?>
                         </span>
                         <!-- オクトピ出力 -->
+                        <?php if(isset($auc_topi['link'][$value.'-'.$days])):?>
                         <span>
                             <br /><a href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="<?php echo h($auc_topi_feed);?>" target="_blank">
                             <?php echo h(shortStr($auc_topi_feed));?>
                             </a>
                         </span><br />
-
+                        <?php endif;?>
                         <!-- DBに登録されている予定出力 -->
-                        <!-- <span> -->
                             <br />
                             <?php if (isset($schedules_months[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules_months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
@@ -166,7 +166,6 @@ $unset_session = unsetSession();
                                 <?php endforeach;?>
                             <?php endif;?>
                             </a>
-                        <!-- </span> -->
                     </td>
 
                 <?php if($month_weekend == 6): ?><!-- 土曜日で改行 -->
