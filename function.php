@@ -42,7 +42,7 @@ $next_month = array(
 $prev_month = $last_month['month']-1;
 
 /*
-*
+*年月日取得
 */
 function getYmdh($year_of_ym, $month_of_ym) {
     for ($i=-13; $i<=12; $i++) {

@@ -1,5 +1,21 @@
 $(function() {
-    $('#btn-regist, #btn-update').click(function() {
+    //空のままフォーカス変更するとエラー出す
+    $('#schedule_title').blur(function(){
+        if ( $('#schedule_title').val() == 0 ) {
+            $('#alert_schedule_title').css('display', 'block');
+        } else {
+            $('#alert_schedule_title').css('display', 'none');
+        }
+    });
+    $('#schedule_detail').blur(function(){
+        if ( $('#schedule_detail').val() == 0 ) {
+            $('#alert_schedule_detail').css('display', 'block');
+        } else {
+            $('#alert_schedule_detail').css('display', 'none');
+        }
+    });
+
+    $('#btn-regist, #btn-update').submit(function() {
         var params = {};
         var ret = true;
 
@@ -48,8 +64,11 @@ $(function() {
 
         //空ならばエラー文を表示させる
         if (params.schedule_title == '') {
-            $('#alert_schedule_title').css('display', 'block');
-            ret = false;
+            $('#alert_schedule_title').blur(function(){
+                $(this).css('display', 'block');
+                ret = false;
+            });
+
         } else {
             $('#alert_schedule_title').css('display', 'none');
         }

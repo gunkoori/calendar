@@ -13,12 +13,13 @@ $(function() {
     $('table td').click(function(e) {
         e.preventDefault();//「href="#"」は無効にしたいけれど、親にイベントをバブリングしたいとき
         // 日付が入っていないセルはid取得しない
-        if (!$(this).children('span')) {
+        console.debug($(this).find('a'));
+        if ($(this).find('a').length == 0) {
+            // $('#shadow').css('display', 'none');
             return false;
         }
         //ポップアップ表示時、背景を暗くする
         $('#shadow').css('display', 'block');
-
         //ポップアップ出ているときは消さない
         if($('.popup').css('display') != 'none') {
             return false;
@@ -55,6 +56,7 @@ $(function() {
             $('#shadow').click(function() {
                 $('.popup').fadeOut();
                 $('#shadow').fadeOut();
+                click_flg = 0;
             });
         }
     });
