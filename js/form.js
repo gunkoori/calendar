@@ -1,5 +1,5 @@
 $(function() {
-    $('#btn-regist').click(function() {
+    $('#btn-regist, #btn-update').click(function() {
         var params = {};
         var ret = true;
 
