@@ -42,7 +42,11 @@ $next_month = array(
 $prev_month = $last_month['month']-1;
 
 /*
-*年月日取得
+* 年月日取得
+*
+* @param  string $year_of_ym YYYY形式
+* @param  string $month_of_ym MM形式
+* @return array 'ym' => Y年M月, 'month' => Y-M
 */
 function getYmdh($year_of_ym, $month_of_ym) {
     for ($i=-13; $i<=12; $i++) {
@@ -50,7 +54,6 @@ function getYmdh($year_of_ym, $month_of_ym) {
         $ym[]  = $years.'年'.$months.'月';
         $ymi[] = $years.'-'.$months;
     }
-
     return array(
         'ym'  => $ym,
         'ymi' => $ymi
@@ -59,7 +62,12 @@ function getYmdh($year_of_ym, $month_of_ym) {
 
 
 /*
-*カレンダー生成
+* カレンダー生成
+*
+* @param  int $display_count カレンダー数
+* @param  int $prev_month 先月より1ヶ月前
+* @param  string $year_of_ym YYYY形式
+* @return array カレンダー、前の空セル、後の空セル、月の最終日
 */
 function makeCalendar($display_count, $prev_month,  $year_of_ym) {
     global $end_days;
@@ -81,6 +89,10 @@ function makeCalendar($display_count, $prev_month,  $year_of_ym) {
 
 /*
 * Googlle Calendar API 祝日取得
+*
+* @param  string $last_month 先月の年と月
+* @param  string $next_month 来月の年と月
+* @return array $holiday_list[2007-01-01]:string
 */
 function getHoliday($last_month, $next_month) {
     $make_calendar =  makeCalendar($display_count, $prev_month, $year_of_ym);
@@ -121,6 +133,9 @@ function getHoliday($last_month, $next_month) {
 
 /*
 *オークショントピック
+*
+* @return array $auc_topi['title']['Y-m-d']:string
+* @return array $auc_topi['link']['Y-m-d']:string
 */
 function aucTopi() {
     $rss = simplexml_load_file('http://aucfan.com/article/feed/');
@@ -144,7 +159,9 @@ function aucTopi() {
 }
 
 /*
-*文字数の制限
+* 文字数の制限
+* @param  string  $str 元の文字列
+* @param  string  $str 省略したの文字列
 */
 function shortStr ($str, $length = 13) {
     if (mb_strlen($str) <= $length) {
@@ -156,15 +173,8 @@ function shortStr ($str, $length = 13) {
 
 
 /*
-*XSS対策
-*HTML特殊文字をエスケープする
-* < → &lt;
-* > → &gt;
-* & → &amp;
-* " → &quot;
-*
-*ENT_QUOTES
-* ' → &apos;
+* HTML特殊文字をエスケープする
+* @return  string  $str 文字列のエスケープ
 */
 function h($str) {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
@@ -172,8 +182,8 @@ function h($str) {
 
 
 /*
-*ワンタイムトークンを生成する
-*
+* ワンタイムトークンを生成する
+* @return  string  $token トークン
 */
 function getToken($key = '') {
     $_SESSION['key'] = $key;
@@ -182,8 +192,8 @@ function getToken($key = '') {
 }
 
 /*
-*ワンタイムトークンをチェックする
-*
+* ワンタイムトークンをチェックする
+* @return  trueかfalse
 */
 function checkToken($token = '') {
     return ($token === sha1($_SESSION['key']));

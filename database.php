@@ -4,7 +4,9 @@ require_once 'function.php';
 require_once 'unset_session.php';
 
 /*
-*DB接続
+* DB接続
+*
+* @return array 'db' => 接続情報, 'return' => trueかfalse
 */
 function connectDB() {
     $host = 'localhost';
@@ -26,12 +28,21 @@ function connectDB() {
         );
 }
 
+/*
+* DB接続
+*
+* @param  string $ym 年月文字列
+* @return　string $ym 文字列の分割
+*/
 function splitYM($ym) {
     return explode('-', $ym);
 }
 
 /*
-*フォームからPOSTされたデータ
+* フォームからPOSTされたデータ
+*
+* @param  array $make_calendar カレンダー生成情報
+* @return　array フォームから受け取ったデータ
 */
 function formData($make_calendar) {
     $post_data = $_POST;
@@ -106,7 +117,9 @@ function formData($make_calendar) {
 }
 
 /*
- *バリデート
+ * バリデート
+ *
+ * @return　trueかfalse
  */
 function formValidate() {
     $session_form_data = $_SESSION['form_data'];
@@ -170,7 +183,11 @@ function formValidate() {
 
 
 /*
-*formData()のエスケープ
+* formData()のエスケープ
+*
+* @param  array $connect_db DB接続情報
+* @param  array $form_data POSTされたデータ
+* @return　array $escape_value[name]:name
 */
 function escapeFormdata($connect_db, $form_data) {
     if ($connect_db['return'] == true) {//接続に成功しているとき
@@ -184,8 +201,9 @@ function escapeFormdata($connect_db, $form_data) {
 }
 
 /*
-*登録編集削除、DBからの抽出
-*エスケープした$escape_formdataを用いている
+* SQL文生成
+*
+* @param　array $escape_value エスケープした値
 */
 function sqlCreate($escape_formdata, $check_token) {
     $start_day = $escape_formdata['start_timestamp'];
