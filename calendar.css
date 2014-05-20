@@ -94,8 +94,8 @@ td {
 }
 
 .calendar_table td {
-    height: 100px;
-    width: 140px;
+    height: 70px;
+    width: 110px;
     margin: 0;
     padding: 0;
     overflow: auto;

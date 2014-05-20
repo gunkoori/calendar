@@ -12,8 +12,8 @@ $(function() {
         if($('.popup').css('display') != 'none' && a_click_href == 0) {
             return false;
         }
-
-        var url = window.location;//現在のURL
+        //最後の/の手前を取得する
+        var url = window.location.href.match(/.+\//)[0];
         if($(this).attr('href') &&  a_click_href == 0) {//クリックした予定のhrefを代入する
             a_click_href = $(this).attr('href');
             return true;
