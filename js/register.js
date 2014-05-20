@@ -87,4 +87,23 @@ $(function() {
         return false;
     });
 
+    //何ヶ月分表示するか変更
+    $('#btn_change_month').click(function() {
+        var change_month = $("select[name='change_month']").val();
+        $.ajax({
+            type: 'POST',
+            url: 'function.php',
+            data: change_month,
+
+            //ajax通信が成功した場合
+            success: function(data, dataType) {
+                alert(data);
+            },
+            //ajax通信が失敗した場合
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                error('Error : ', + errorThrown);
+            }
+        });
+    });
+
 });

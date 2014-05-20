@@ -5,14 +5,13 @@ define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
 //日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
 
-
 //現在の年月日、曜日の取得
 $year = date('Y');
 $month = date('m');
 //月のスタート
 $start_date = 1;
 //カレンダー数
-$display_count = 3;
+$display_count = 1;
 $calendars = array();
 $end_days = array();
 $before_cell = array();
@@ -63,7 +62,19 @@ function getYmdh($year_of_ym, $month_of_ym) {
 */
 function makeCalendar($display_count, $prev_month,  $year_of_ym) {
     global $end_days;
-    //3ヶ月分の空セル等を取得
+
+    //何ヶ月分表示するか受け取る
+    if (isset($_POST['change_month'])) {
+        $display_count = $_POST['change_month'];
+    } else {
+        $display_count = 1;
+    }
+
+    //1ヶ月表示の場合、該当月より１ヶ月分前の月を表示してしまうため
+    if ($display_count == 1) {
+       $prev_month = $prev_month + 1;
+    }
+    //◯ヶ月分の空セル等を取得
     for ($i=1; $i<=$display_count; $i++) {
         $calendars[$i]   = date("Y-m", mktime(0, 0, 0, $prev_month+$i, 1, $year_of_ym));
         $before_cell[$i] = date('w', mktime(0, 0, 0, $prev_month+$i, 1, $year_of_ym));
@@ -71,6 +82,7 @@ function makeCalendar($display_count, $prev_month,  $year_of_ym) {
         $end_days[$i]    = date('t', mktime(0,0,0, $prev_month+$i, 1, $year_of_ym));
     }
     return array(
+        'display_count' => $display_count,
         'calendars'   => $calendars,
         'before_cell' => $before_cell,
         'after_cell'  => $after_cell,
@@ -84,8 +96,9 @@ function makeCalendar($display_count, $prev_month,  $year_of_ym) {
 */
 function getHoliday($last_month, $next_month) {
     $make_calendar =  makeCalendar($display_count, $prev_month, $year_of_ym);
+    $display_count = $make_calendar['display_count'];
     $min_date      = $last_month['year'].'-'.$last_month['month'].'-01';
-    $max_date      = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][3];
+    $max_date      = $next_month['year'].'-'.$next_month['month'].'-'.$make_calendar['end_days'][$display_count];
     $holidays_url  = sprintf(
             "http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&start-max=%s&max-results=%d&alt=json" ,
             "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com" , // 'japanese@holiday.calendar.google.com' ,

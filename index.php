@@ -56,12 +56,22 @@ $unset_session = unsetSession();
 <div id="next"><a href="?ym=<?php echo h($next_month['year'].'-'.$next_month['month']);?>">次月</a></div>
 <form method="get" action="<?php $_SERVER['PHP_SELF'];?>">
     <select id="select_year_month" class="btn_medium" name="ym">
-    <option>選択してください</option>
+    <option>年月を指定</option>
     <?php for ($i=0; $i<=24; $i++):?>
     <option value="<?php echo h($get_ymdh['ymi'][$i]);?>"><?php echo h($get_ymdh['ym'][$i]);?></option>
     <?php endfor; ?>
     </select>
     <input type="submit" id="select_year_month_submit" class="btn_small" value="表示する">
+</form>
+<!-- 何ヶ月分表示するか -->
+<form method="post">
+    <select id="change_month" class="btn_medium" name="change_month">
+    <option>◯ヶ月分表示</option>
+    <?php for ($i=1; $i<=3; $i++):?>
+    <option value="<?php echo h($i)?>"><?php echo h($i.'ヶ月表示');?></option>
+    <?php endfor; ?>
+    </select>
+    <input type="submit" id="btn_change_month" class="btn_small" value="切り替える">
 </form>
 </div><!--header-->
 
