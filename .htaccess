@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteBase /
+RewriteRule ^(function|database|unset_session)\.php / [R=301,L]
