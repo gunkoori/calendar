@@ -61,22 +61,30 @@ $(function() {
         }
     });
 
+
     //submit押したとき
-    $('#btn-regist').click(function() {
+    /*$('#btn-regist').click(function() {
+        // $(this).attr('disabled', 'true');
+        // alert('!!!!');
         //フォームから値をまとめて取得
         var data = $('#popup_regist_form').serializeArray();
         //配列の中のvalueを取得
         for (var i=3; i<=12; i++) {
             data = data[i][value];
         }
+        alert(data);
+        console.debug(data);
         $.ajax({
             type: 'POST',
-            url: 'database.php',
+            url: 'test.php',
             data: data,
 
             //ajax通信が成功した場合
             success: function(data, dataType) {
-                alert(data);
+                // alert(data);
+                alert('!!!!!!!!!');
+                $(this).attr('disabled', 'disabled');
+                // $('#btn-regist').removeAttr('disabled');
             },
             //ajax通信が失敗した場合
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -85,6 +93,6 @@ $(function() {
         });
         //サブミット後ページをリロードしない
         return false;
-    });
+    });*/
 
 });

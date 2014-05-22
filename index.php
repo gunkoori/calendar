@@ -11,16 +11,22 @@ $make_calendar = makeCalendar($display_count, $prev_month, $year_of_ym);
 
 //祝日
 $holiday = getHoliday($last_month, $next_month);
+if ($holiday === false) {
+    echo h('祝日取得失敗失敗しています');
+}
 
 //オークショントピック
 $auc_topi = aucTopi();
+if ($auc_topi === false) {
+    echo h('オクトピの取得に失敗しています');
+}
 
 //DB接続
 $connect_db = connectDB();
 if ($connect_db['return'] == false) {//接続状況の確認
-    echo 'DB接続失敗';
+    echo h('DB接続失敗しています');
 }
-
+// $get_token = getToken($str);
 //フォームのデータ整形
 $form_data = formData($make_calendar);
 
@@ -45,7 +51,9 @@ $unset_session = unsetSession();
 <title></title>
 <link href="calendar.css" rel="stylesheet">
 <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="js/register.js"></script>
+<!-- <script type="text/javascript" src="js/register.js"></script> -->
+<script type="text/javascript" src="js/form.js"></script>
+
 </head>
 <body>
 <div id="shadow"></div><!-- shadow -->
@@ -56,7 +64,7 @@ $unset_session = unsetSession();
 <div id="next"><a href="?ym=<?php echo h($next_month['year'].'-'.$next_month['month']);?>">次月</a></div>
 <form method="get" action="<?php $_SERVER['PHP_SELF'];?>">
     <select id="select_year_month" class="btn_medium" name="ym">
-    <option>選択してください</option>
+    <option value="./">選択してください</option>
     <?php for ($i=0; $i<=24; $i++):?>
     <option value="<?php echo h($get_ymdh['ymi'][$i]);?>"><?php echo h($get_ymdh['ym'][$i]);?></option>
     <?php endfor; ?>
@@ -134,10 +142,9 @@ $unset_session = unsetSession();
                     <?php $holiday_name = $holiday[$value.'-'.$days]; ?>
                 <?php endif;?>
 
-                <?php $auc_topi_feed = '';?><!-- オークショントピック -->
-                <?php if (isset($auc_topi['title'][$value.'-'.$days])):?>
+                <?php $auc_topi_feed = array();?><!-- オークショントピック -->
+                <?php if (isset($auc_topi[$value.'-'.$days]['title'][0])):?>
                     <?php $class = 'auc_topi';?>
-                    <?php $auc_topi_feed = $auc_topi['title'][$value.'-'.$days];?>
                 <?php endif;?>
 
                     <td class="day_td <?php echo h($class); ?>">
@@ -150,19 +157,21 @@ $unset_session = unsetSession();
                             <?php echo h($holiday_name);?>
                         </spans>
                         <!-- オクトピ出力 -->
-                        <?php if(isset($auc_topi['link'][$value.'-'.$days])):?>
-                        <span >
-                            <br /><a class="auc_topi" href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="<?php echo h($auc_topi_feed);?>" target="_blank">
-                            <?php echo h(shortStr($auc_topi_feed).'…');?>
+                        <?php for ($i=0; $i<=10; $i++) :?>
+                        <?php if(isset($auc_topi[$value.'-'.$days]['title'][$i])):?>
+                        <span>
+                            <br /><a class="auc_topi" href="<?php echo h($auc_topi['link'][$value.'-'.$days]);?>" title="" target="_blank">
+                            <?php if (isset($auc_topi[$value.'-'.$days]['title'][$i])) { echo h(shortStr($auc_topi[$value.'-'.$days]['title'][$i].'…')); }?>
                             </a>
                         </span><br />
                         <?php endif;?>
+                        <?php endfor;?>
                         <!-- DBに登録されている予定出力 -->
                             <br />
                             <?php if (isset($schedules_months[$cal_year][$cal_month][$day])):?>
                                 <?php foreach ($schedules_months[$cal_year][$cal_month][$day] as $schedule_id => $schedule):?>
                                     <a class="schedule" href="/schedule?year=<?php echo h($cal_year);?>&month=<?php echo h($cal_month);?>&day=<?php echo h($day.'&id='.$schedule_id);?>" title="<?php echo h($schedule['detail']);?>">
-                                    <?php echo h($schedule['title']);?><br />
+                                    <?php echo h(shortStr($schedule['title']).'…');?><br />
                                 <?php endforeach;?>
                             <?php endif;?>
                             </a>
@@ -180,7 +189,6 @@ $unset_session = unsetSession();
     </tbody>
 
 </table>
-
 <?php endforeach ;?>
 </div><!--calendar-->
 </body>

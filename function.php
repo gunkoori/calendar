@@ -105,14 +105,19 @@ function getHoliday($last_month, $next_month) {
             "$max_date" ,  // 取得終了日
             50             // 最大取得数
             );
-    if ($results = file_get_contents($holidays_url)) {
+    $context = stream_context_create(array(
+      'http' => array('ignore_errors' => true)
+    ));
+    if ($results = file_get_contents($holidays_url, false, $context)) {
             $results = json_decode($results, true);
 
             $holidays = array();
-            foreach ($results['feed']['entry'] as $key =>$val ) {
-                    $date  = $val['gd$when'][0]['startTime'];
-                    $title = $val['title']['$t'];
-                    $holidays[$date] = $title;// [2007-01-01] => 元日 / Ganjitsu / New Year's Day
+            if (is_array($results)) {
+                foreach ($results['feed']['entry'] as $key =>$val ) {
+                        $date  = $val['gd$when'][0]['startTime'];
+                        $title = $val['title']['$t'];
+                        $holidays[$date] = $title;// [2007-01-01] => 元日 / Ganjitsu / New Year's Day
+                }
             }
             ksort($holidays);
     }
@@ -127,6 +132,10 @@ function getHoliday($last_month, $next_month) {
             $holiday_list[$date] = $value[0];//[2007-01-01] => 元日
         }
     }
+    //祝日の取得に失敗した場合
+    if (is_array($results) === false)  {
+        $holiday_list = false;
+    }
     return $holiday_list;
 }
 
@@ -138,22 +147,38 @@ function getHoliday($last_month, $next_month) {
 * @return array $auc_topi['link']['Y-m-d']:string
 */
 function aucTopi() {
-    $rss = simplexml_load_file('http://aucfan.com/article/feed/');
-    $data = get_object_vars($rss);
+    $rss = @simplexml_load_file('http://aucfan.com/article/feed/');
+    $data = @get_object_vars($rss);
     if (empty($rss)) {
-        return;
+        $auc_topi = false;
     }
-
-    $title = array();
-    $date = array();
+// var_dump($rss->channel);
+    $titles = array();
+    $dates = array();
     $link = array();
-    $auc_topi_title = array();
-    foreach ($rss->channel->item as $key => $value) {
-        $title = (string)$value->title;
-        $date = date('Y-m-d', strtotime((string)$value->pubDate));
-        $link = (string)$value->link;
-        $auc_topi['title'][$date] = $title;
-        $auc_topi['link'][$date] = $link;
+    $item = array();
+    $auc_topi = array();
+    // var_dump($rss->channel);
+    if (isset($rss)) {
+        foreach ($rss->channel->item as $value) {
+            // var_dump($value);
+            $titles[] = (string)$value->title;
+            $dates[] = date('Y-m-d', strtotime((string)$value->pubDate));
+
+            // var_dump($dates);
+            $links[] = (string)$value->link;
+
+            foreach ($dates as $key => $date) {
+                $auc_topi[$date]['title'][$key] = $titles[$key];
+                $auc_topi[$key][$date]['link'] = $links[$key];
+
+            }
+
+           // $item = array(
+           //      $titles
+           //  );
+        }
+
     }
     return $auc_topi;
 }
@@ -178,6 +203,14 @@ function shortStr ($str, $length = 13) {
 */
 function h($str) {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+}
+
+/*
+* ランダムな文字列の生成 36文字まで生成可能
+* @return
+*/
+function randomStr($length) {
+    return substr(str_shuffle('1234567890abcdefghijklmnopqrstuvwxyz'), 0, $length);
 }
 
 

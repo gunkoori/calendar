@@ -1,12 +1,16 @@
 * {
     color: #5a5a5a;
-    font-family: 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', メイリオ, Meiryo, 'ＭＳ Ｐゴシック', 'Open Sans', sans-serif;
+    font-family: 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', メイリオ, Meiryo, 'ＭＳＰゴシック', 'Open Sans', sans-serif;
+    margin: 0px;
+    padding: 0px;
 }
 
 
-body {
+html body {
     text-align: center;
     margin: 0 auto;
+    width: 100%;
+    height: 100%;
 }
 
 
@@ -62,6 +66,7 @@ td {
     opacity: 0.5;
     display: none;
     z-index: 3;
+    top: 0%;
 }
 
 /**********header***********/

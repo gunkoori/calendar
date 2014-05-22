@@ -262,6 +262,7 @@ END;
 
 }
 
+//以下２つはトークンのチェックなし
 //予定を3ヶ月分取得
 $schedule_months=<<<END
     SELECT
