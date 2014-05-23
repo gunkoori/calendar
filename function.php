@@ -152,33 +152,22 @@ function aucTopi() {
     if (empty($rss)) {
         $auc_topi = false;
     }
-// var_dump($rss->channel);
     $titles = array();
     $dates = array();
     $link = array();
     $item = array();
     $auc_topi = array();
-    // var_dump($rss->channel);
     if (isset($rss)) {
         foreach ($rss->channel->item as $value) {
-            // var_dump($value);
             $titles[] = (string)$value->title;
             $dates[] = date('Y-m-d', strtotime((string)$value->pubDate));
-
-            // var_dump($dates);
             $links[] = (string)$value->link;
 
             foreach ($dates as $key => $date) {
                 $auc_topi[$date]['title'][$key] = $titles[$key];
                 $auc_topi[$key][$date]['link'] = $links[$key];
-
             }
-
-           // $item = array(
-           //      $titles
-           //  );
         }
-
     }
     return $auc_topi;
 }
